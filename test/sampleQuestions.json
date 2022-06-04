@@ -1,8 +1,0 @@
-[
-    { "id": 1, "type": "single", "question": "Esta es mi pregunta 1", "options": ["Primera", "Segunda", "Tercera", "Cuarta"], "solution": [2], "difficulty": 0.5 },
-    { "id": 2, "type": "single", "question": "Esta es mi pregunta 2", "options": ["Primera", "Segunda", "Tercera", "Cuarta"], "solution": [3], "difficulty": 0.25 },
-    { "id": 3, "type": "single", "question": "Esta es mi pregunta 3", "options": ["Primera", "Segunda", "Tercera", "Cuarta"], "solution": [1], "difficulty": 0.7 },
-    { "id": 4, "type": "single", "question": "Esta es mi pregunta 4", "options": ["Primera", "Segunda", "Tercera", "Cuarta"], "solution": [0], "difficulty": 0.8 },
-    { "id": 5, "type": "single", "question": "Esta es mi pregunta 5", "options": ["Primera", "Segunda", "Tercera", "Cuarta"], "solution": [1], "difficulty": 0.7 },
-    { "id": 6, "type": "single", "question": "Esta es mi pregunta 6", "options": ["Primera", "Segunda", "Tercera", "Cuarta"], "solution": [3], "difficulty": 0.1 }
-]

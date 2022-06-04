@@ -1,0 +1,340 @@
+[
+  {
+    "id": 1,
+    "type": "single",
+    "question": "¿Qué es seguridad?",
+    "options": [
+      "Relativo a confianza",
+      "Lo contrario de inseguridad",
+      "Necesidad del ser humano",
+      "Todas las anteriores"
+    ],
+    "solution": [
+      3
+    ],
+    "difficulty": 0.5
+  },
+  {
+    "id": 2,
+    "type": "single",
+    "question": "¿Qué es seguridad de información?",
+    "options": [
+      "Asegurar sólo los equipos informáticos",
+      "Asegurar sólo los documentos de la empresa",
+      "Asegurar todos los activos de información",
+      "Asegurar sólo la información digital"
+    ],
+    "solution": [
+      2
+    ],
+    "difficulty": 0.5
+  },
+  {
+    "id": 3,
+    "type": "single",
+    "question": "La ciberseguridad protege información en:",
+    "options": [
+      "Formato digital y sistemas interconectados",
+      "Formatos interconectados y sistemas digitales",
+      "Ciberespacio",
+      "Espacio Cibernético"
+    ],
+    "solution": [
+      0
+    ],
+    "difficulty": 0.5
+  },
+  {
+    "id": 4,
+    "type": "single",
+    "question": "¿Cuál de estos NO es un activo de información?",
+    "options": [
+      "Pagina web",
+      "Correos electrónicos de clientes",
+      "Cafetera",
+      "Documentación escrita"
+    ],
+    "solution": [
+      2
+    ],
+    "difficulty": 0.5
+  },
+  {
+    "id": 5,
+    "type": "multiple",
+    "question": "Las dimensiones de la seguridad de información son:",
+    "options": [
+      "Disponibilidad",
+      "Ubicuidad",
+      "Integridad",
+      "Confidencialidad"
+    ],
+    "solution": [
+      0,
+      2,
+      3
+    ],
+    "difficulty": 0.5
+  },
+  {
+    "id": 6,
+    "type": "single",
+    "question": "La fuga de información en una entidad sería un aspecto a cubrir por:",
+    "options": [
+      "Integridad",
+      "Confidencialidad",
+      "Disponibilidad",
+      "Calidad"
+    ],
+    "solution": [
+      1
+    ],
+    "difficulty": 0.6
+  },
+  {
+    "id": 7,
+    "type": "single",
+    "question": "Cuál de estos pilares, NO es de seguridad de información:",
+    "options": [
+      "Disponibilidad",
+      "Unidad",
+      "Integridad",
+      "Confidencialidad"
+    ],
+    "solution": [
+      1
+    ],
+    "difficulty": 0.5
+  },
+  {
+    "id": 8,
+    "type": "single",
+    "question": "Un empleado descontento constituye para la organización",
+    "options": [
+      "Un riesgo",
+      "Una vulnerabilidad",
+      "Una amenaza",
+      "Un control"
+    ],
+    "solution": [
+      2
+    ],
+    "difficulty": 0.6
+  },
+  {
+    "id": 9,
+    "type": "single",
+    "question": "Seguridad de la información abarca",
+    "options": [
+      "Seguridad Informática",
+      "Seguridad Informática y Ciberseguridad",
+      "Ciberseguridad",
+      "Seguridad Cibernética"
+    ],
+    "solution": [
+      2
+    ],
+    "difficulty": 0.7
+  },
+  {
+    "id": 10,
+    "type": "single",
+    "question": "Ataque informático especifícamente dirigido a líderes o altos directivos",
+    "options": [
+      "Whaling",
+      "Vishing",
+      "Phishing",
+      "Pharming"
+    ],
+    "solution": [
+      0
+    ],
+    "difficulty": 0.8
+  },
+  {
+    "id": 11,
+    "type": "multiple",
+    "question": "Impactos que puede causar un ataque informático",
+    "options": [
+      "Financiero",
+      "Reputacional",
+      "Legal",
+      "Ninguna de las anteriores"
+    ],
+    "solution": [
+      0,
+      1,
+      2
+    ],
+    "difficulty": 0.6
+  },
+  {
+    "id": 12,
+    "type": "single",
+    "question": "¿Cuáles son las técnicas de influencia y manipulación utilizadas por los adversarios?",
+    "options": [
+      "Autoridad, Empatía",
+      "Concesión, Urgencia ",
+      "Reciprocidad, Lenguaje no verbal",
+      "Todas las anteriores"
+    ],
+    "solution": [
+      3
+    ],
+    "difficulty": 0.9
+  },
+  {
+    "id": 13,
+    "type": "single",
+    "question": "¿Cuál NO es una forma de protección?",
+    "options": [
+      "Entrada a links sospechosos",
+      "Copias de Seguridad",
+      "Contraseñas seguras",
+      "Doble factor de autenticación"
+    ],
+    "solution": [
+      0
+    ],
+    "difficulty": 0.7
+  },
+  {
+    "id": 14,
+    "type": "single",
+    "question": "Una mala práctica al hacer la copias de seguridad de su información es:",
+    "options": [
+      "Hacer copias incrementales de manera periódica",
+      "Guardarlas en dos lugares diferentes dentro del mismo edificio",
+      "Seleccionar solo la información relevante a copiar",
+      "Guardar la copia en una sede alterna"
+    ],
+    "solution": [
+      1
+    ],
+    "difficulty": 0.7
+  },
+  {
+    "id": 15,
+    "type": "single",
+    "question": "Las políticas de seguridad de información son:",
+    "options": [
+      "Directrices para proteger la información",
+      "El catálogo de activos de información",
+      "La lista de los riesgos de la entidad",
+      "Los documentos que nadie conoce"
+    ],
+    "solution": [
+      0
+    ],
+    "difficulty": 0.6
+  },
+  {
+    "id": 16,
+    "type": "single",
+    "question": "Un error en una contraseña segura es:",
+    "options": [
+      "Una combinación de letras, números y caracteres",
+      "Usar una frase de película o poema preferido",
+      "Tener información personal de fácil recordación",
+      "Tener una longitud de 12 caracteres"
+    ],
+    "solution": [
+      2
+    ],
+    "difficulty": 0.7
+  },
+  {
+    "id": 17,
+    "type": "single",
+    "question": "Los riesgos pueden dividirse en dos grandes categorías:",
+    "options": [
+      "Ambientales y humanos",
+      "Virus y phishing",
+      "Pérdida de información y suplantación de identidad",
+      "Entrada y salida de equipos"
+    ],
+    "solution": [
+      0
+    ],
+    "difficulty": 0.8
+  },
+  {
+    "id": 18,
+    "type": "single",
+    "question": "Un dato personal público es aquel que:",
+    "options": [
+      "Es de naturaleza íntima, solo le interesa al titular",
+      "Es de interés para el titular y para un sector específico",
+      "Con su uso indebido se puede generar discriminación",
+      "Puede ser consultado por cualquiera sin el consentimiento del titular"
+    ],
+    "solution": [
+      3
+    ],
+    "difficulty": 0.7
+  },
+  {
+    "id": 19,
+    "type": "single",
+    "question": "Es un ejemplo de dato sensible:",
+    "options": [
+      "El nombre",
+      "Información de salud",
+      "El número telefónico",
+      "Fecha y lugar de nacimiento"
+    ],
+    "solution": [
+      1
+    ],
+    "difficulty": 0.6
+  },
+  {
+    "id": 20,
+    "type": "single",
+    "question": "Una amenaza física de factor humano:",
+    "options": [
+      "Robo de información",
+      "Daño de equipo por cambio de voltaje",
+      "Inundación de centro de datos",
+      "Terremoto"
+    ],
+    "solution": [
+      0
+    ],
+    "difficulty": 0.7
+  },
+  {
+    "id": 21,
+    "type": "multiple",
+    "question": "Son clases de amenazas:",
+    "options": [
+      "Deliberada, Accidental",
+      "Imaginarias, reales",
+      "Internas, Externas",
+      "Ambientales"
+    ],
+    "solution": [
+      0,
+      1,
+      3
+    ],
+    "difficulty": 0.9
+  },
+  {
+    "id": 22,
+    "type": "multiple",
+    "question": "Son clases de vulnerabilidades:",
+    "options": [
+      "Deliberada, Accidental ",
+      "Red, Lugar",
+      "Hardware, Software",
+      "Personal, Organización"
+    ],
+    "solution": [
+      1,
+      2,
+      3
+    ],
+    "difficulty": 0.9
+  }
+]

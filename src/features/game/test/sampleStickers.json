@@ -1,0 +1,13 @@
+[
+   { "id": 1, "spot": "01A", "weight": 16, "image": "images/joke01A.jpg" },
+   { "id": 2, "spot": "01B", "weight": 4, "image": "images/joke01B.jpg" },
+   { "id": 3, "spot": "01C", "weight": 1, "image": "images/joke01C.jpg" },
+
+   { "id": 4, "spot": "02A", "weight": 16, "image": "images/joke02A.jpg" },
+   { "id": 5, "spot": "02B", "weight": 4, "image": "images/joke02B.jpg" },
+   { "id": 6, "spot": "02C", "weight": 1, "image": "images/joke02C.jpg" },
+
+   { "id": 7, "spot": "03A", "weight": 16, "image": "images/joke03A.jpg" },
+   { "id": 8, "spot": "03B", "weight": 4, "image": "images/joke03B.jpg" },
+   { "id": 9, "spot": "03C", "weight": 1, "image": "images/joke03C.jpg" }
+]
