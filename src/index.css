@@ -31,7 +31,7 @@ code {
   background-color: white;
   position: fixed;
   bottom: 0;
-  padding: 15px;
+  padding: 5px;
   background: linear-gradient(to bottom,  #41e0d0, #05a9a7);
 }
 
@@ -56,10 +56,13 @@ code {
   width: 100%;
   background-color: #3b779e;
   border: 1px solid bisque;
+  background-image: url("../public/questionMark.png");
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .successIco {
-    height: 90px;
+    height: 66px;
 }
 
 .sticker {
