@@ -21,13 +21,13 @@ const AlbumView = () => {
     }
 
     function getStickerView(spot: string) {
-        let sticker = stickers.filter(s=>s.spot==spot)
+        let sticker = stickers.filter(s => s.spot == spot)
         if (sticker.length) {
-            return (<StickerView sticker={sticker[0]} />)
+            return (<StickerView key={spot} sticker={sticker[0]} />)
         }
         else {
             return (<div className="emptySpot" key={spot}>
-                <img key={spot+"_img"} src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" className="sticker" alt={spot} />
+                <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" className="sticker" alt={spot} />
             </div>)
         }
     }
@@ -37,9 +37,9 @@ const AlbumView = () => {
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>
-             <div className='buttonContainer' key='buttonBar0'>
-                {isFull &&<input type="button" className="navBtn" value="Más Láminas" key='button0' onClick={handleMoreStickers}></input>}
-                {!isFull &&<img className="successIco" src="success.png"/>}
+            <div className='buttonContainer' key='buttonBar0'>
+                {!isFull && <input type="button" className="navBtn" value="Más Láminas" key='button0' onClick={handleMoreStickers}></input>}
+                {isFull && <img className="successIco" src="success.png" />}
             </div>
         </section>
 

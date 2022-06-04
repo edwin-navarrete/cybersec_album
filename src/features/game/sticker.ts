@@ -134,7 +134,7 @@ export module Sticker {
 
         async glueSticker(albumStiker: AlbumStiker): Promise<UserSticker> {
             if (!albumStiker.inAlbum) {
-                albumStiker = {...albumStiker, inAlbum: true};
+                albumStiker = { ...albumStiker, inAlbum: true };
                 return this.userStickerDAO.upsert(albumStiker as UserSticker);
             }
             return new Promise((resolve) => resolve(albumStiker))

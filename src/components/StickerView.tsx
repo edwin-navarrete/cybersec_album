@@ -15,15 +15,15 @@ const StickerView = (props: StickerProps) => {
     const dispatch = useDispatch() as AppDispatch;
     const { spot, image, inAlbum } = props.sticker;
 
-    const handleGlue = () =>{
+    const handleGlue = () => {
         // let spot = event.currentTarget.attributes.getNamedItem("alt")
         // console.log(spot)
         dispatch(glueSticker(props.sticker))
     }
 
     return (
-        <div className="stickerFrame" key={spot}>
-            <img src={image} key={spot+"_img"} className={inAlbum ? 'sticker' : 'stickerHint'} onClick={handleGlue} alt={spot} />
+        <div className="stickerFrame" >
+            <img src={image} className={inAlbum ? 'sticker' : 'stickerHint'} onClick={handleGlue} alt={spot} />
         </div>
     );
 };

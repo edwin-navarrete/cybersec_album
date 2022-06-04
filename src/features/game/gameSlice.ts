@@ -30,7 +30,7 @@ export interface AlbumState {
 
 const initialState: AlbumState = {
     stickerCount: stickersDB.length,
-    stickers:[{ "userId": "ME", "inAlbum": true, "stickerId": 1, "id": 1, "spot": "1A", "weight": 16, "image": "sticker/3ad5b52db38cea1ea24eefa8f9dba6ceX.gif" }]
+    stickers: [{ "userId": "ME", "inAlbum": true, "stickerId": 1, "id": 1, "spot": "1A", "weight": 16, "image": "sticker/3ad5b52db38cea1ea24eefa8f9dba6ceX.gif" }]
 };
 
 // Selector for the question
@@ -47,7 +47,7 @@ export const selectStickerSpots = createSelector((state: RootState) => state.gam
 
 // Selector returns true when album is full
 export const selectAchievement = (state: RootState) => {
-    let claimed = state.game.stickers.filter(s=>s.inAlbum)
+    let claimed = state.game.stickers.filter(s => s.inAlbum)
     return claimed.length == state.game.stickerCount
 };
 

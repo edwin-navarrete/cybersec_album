@@ -41,8 +41,8 @@ describe('gameMiddleware', () => {
         let originalSize = feedback.stickers.length;
         let sticker = feedback.stickers.values().next().value
         let stickerAction = await glueSticker(sticker)(dispatch, state, {})
-        let album = stickerAction.payload as Map<string, Sticker.AlbumStiker>;
-        expect(album.size).toEqual(originalSize);
+        let album = stickerAction.payload as Sticker.AlbumStiker[];
+        expect(album.length).toEqual(originalSize);
         expect(Array.from(album.values()).some((s: Sticker.UserSticker) => s.inAlbum)).toBeTruthy()
     });
 })
