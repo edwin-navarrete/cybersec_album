@@ -21,7 +21,7 @@ const AlbumView = () => {
     }
 
     function getStickerView(spot: string) {
-        let sticker = stickers.filter(s => s.spot == spot)
+        let sticker = stickers.filter(s => s.spot === spot)
         if (sticker.length) {
             return (<StickerView key={spot} sticker={sticker[0]} />)
         }
@@ -39,7 +39,7 @@ const AlbumView = () => {
             </section>
             <div className='buttonContainer' key='buttonBar0'>
                 {!isFull && <input type="button" className="navBtn" value="Más Láminas" key='button0' onClick={handleMoreStickers}></input>}
-                {isFull && <img className="successIco" src="success.png" />}
+                {isFull && <img className="successIco" src="success.png" alt="lo lograste!" />}
             </div>
         </section>
 
