@@ -4,9 +4,14 @@ import './App.css';
 
 import AlbumView from './components/AlbumView';
 import QuestionView from './components/QuestionView';
-
-
+import { AppDispatch } from './app/store'
+import { fetchAlbum } from './features/game/gameMiddleware';
+import {  useDispatch } from 'react-redux';
 function App() {
+    // Load initial state
+    const dispatch = useDispatch() as AppDispatch;
+    dispatch(fetchAlbum());
+    
     // <Route path="/preguntas" element={<Preguntas />} />
     return (
         <BrowserRouter>
