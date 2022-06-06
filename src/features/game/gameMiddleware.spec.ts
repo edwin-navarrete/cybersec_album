@@ -1,13 +1,14 @@
 // import { AnyAction } from 'redux'
 // import { PayloadAction } from '@reduxjs/toolkit'
-import { nextQuestion, putAnswer, glueSticker } from './gameMiddleware'
+import { userStickerDAO, nextQuestion, putAnswer, glueSticker } from './gameMiddleware'
 import { QuestionState, FeedbackAndStickers } from './gameSlice'
 import { Sticker } from "./sticker";
 
 describe('gameMiddleware', () => {
 
     beforeEach(() => {
-        // Clear userStickerDAO and
+        // Clear userStickerDAO
+        userStickerDAO.db.length = 0
     })
 
     it('should do a full cycle', async () => {
@@ -35,7 +36,8 @@ describe('gameMiddleware', () => {
         expect(feedback.stickers.length).toBeGreaterThan(0)
         expect(feedback.success).toBeTruthy()
         expect(feedback.wrong && feedback.wrong.length).toEqual(0)
-        expect(Array.from(feedback.stickers.values()).some((s: Sticker.UserSticker) => s.inAlbum)).toBeFalsy()
+        let curStickers = Array.from(feedback.stickers.values())
+        expect(curStickers.some((s: Sticker.UserSticker) => s.inAlbum)).toBeFalsy()
 
         // any sticker can be glued
         let originalSize = feedback.stickers.length;

@@ -10,14 +10,14 @@ import { QuestionState, Attempt, FeedbackAndStickers } from './gameSlice'
 
 const USER_ID = "yo"
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
-const userStickerDAO = new Sticker.UserStickerDAO([])
+export const userStickerDAO = new Sticker.UserStickerDAO([])
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, USER_ID)
 
 // give the first sticker as a sample
-stickerDAO.findAll({include:[1]}).then(async stickerSample=>{
+stickerDAO.findAll({ include: [1] }).then(async stickerSample => {
     let firstSticker = stickerSample[0]
     let userSticker = await theAlbum.ownStickers(stickerSample);
-    theAlbum.glueSticker({...firstSticker, ...userSticker[0]})
+    theAlbum.glueSticker({ ...firstSticker, ...userSticker[0] })
 })
 
 

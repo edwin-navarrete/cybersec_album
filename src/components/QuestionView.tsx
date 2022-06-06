@@ -42,10 +42,10 @@ const QuestionView = () => {
             return (<label className="feedbackMsg">FELICITACIONES! Reclama cada lámina con un click y sigue jugando!</label>)
         }
         if (success === false) {
-                return (<div>
-                        {questionState?.feedback && <p className="feedbackMsg">{questionState.feedback}</p>}
-                        <p className="feedbackMsg">Lo lamento, pero sigue intentándolo!</p>
-                    </div>)
+            return (<div>
+                {questionState?.feedback && <p className="feedbackMsg">{questionState.feedback}</p>}
+                <p className="feedbackMsg">Lo lamento, pero sigue intentándolo!</p>
+            </div>)
         }
         return null
     }
