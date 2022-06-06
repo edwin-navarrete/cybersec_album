@@ -13,9 +13,24 @@ const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 const userStickerDAO = new Sticker.UserStickerDAO([])
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, USER_ID)
 
+// give the first sticker as a sample
+stickerDAO.findAll({include:[1]}).then(async stickerSample=>{
+    let firstSticker = stickerSample[0]
+    let userSticker = await theAlbum.ownStickers(stickerSample);
+    theAlbum.glueSticker({...firstSticker, ...userSticker[0]})
+})
+
+
 const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 const userAnswerDAO = new Question.UserAnswerDAO()
 const theQuiz = new Question.Quiz(userAnswerDAO, questionDefDAO, USER_ID)
+
+export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
+    ('album/fetch', async () => {
+        let stickers = await theAlbum.getStickers()
+        return Array.from(stickers.values())
+    })
+
 
 export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state: RootState }>
     ('question/putAnswer', async (attempt, thunkApi) => {

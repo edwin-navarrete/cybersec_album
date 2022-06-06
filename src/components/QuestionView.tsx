@@ -13,36 +13,33 @@ const QuestionView = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     let optCount = questionState?.options.length || 4
-    const [checkedState, setCheckedState] = useState(
+    const [optState, setOptState] = useState(
         new Array(optCount).fill(false)
     );
 
     const sendAttempt: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-        // debugger
         let position = +event.currentTarget.value;
-        const newOptState = checkedState.map((item, index) =>
-          index === position ? !item : item
-        );
-        setCheckedState(newOptState);
-        let attempts = newOptState.reduce((cnt,chk)=> chk? cnt + 1: cnt, 0)
+        const newOptState = optState.map((b, i) => i === position ? !b : b);
+        setOptState(newOptState);
+        let attempts = newOptState.reduce((cnt, chk) => chk ? cnt + 1 : cnt, 0)
         if (questionState && attempts >= questionState.solution.length) {
-            let response = newOptState.map((b, i) =>  b? i :null ).filter(i=>i!==null) as number[];
+            let response = newOptState.map((b, i) => b ? i : null).filter(i => i !== null) as number[];
             dispatch(putAnswer({
                 response: response,
                 latency: 3_000
             }))
-            setCheckedState(new Array(optCount).fill(false))
+            setOptState(new Array(optCount).fill(false))
         }
     }
 
     function handleNewQuestion() {
-        console.log("handleNewQuestion",optCount, checkedState)
+        console.log("handleNewQuestion", optCount, optState)
         dispatch(nextQuestion())
     }
 
     function renderFeedback(success?: boolean) {
         if (success === true) {
-            return (<label className="feedbackMsg">Felicitaciones! Reclama cada láminas con un click y sigue jugando!</label>)
+            return (<label className="feedbackMsg">FELICITACIONES! Reclama cada lámina con un click y sigue jugando!</label>)
         }
         if (success === false) {
             return (<label className="feedbackMsg">Lo lamento, pero sigue intentándolo!</label>)
@@ -67,7 +64,7 @@ const QuestionView = () => {
                     <input type="checkbox"
                         disabled={success !== undefined}
                         value={i}
-                        checked={checkedState[i]}
+                        checked={optState[i]}
                         onChange={sendAttempt} />
                     {option}
                 </label>)}
