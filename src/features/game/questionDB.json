@@ -19,15 +19,15 @@
     "type": "single",
     "question": "¿Qué es seguridad de información?",
     "options": [
-      "Asegurar sólo los equipos informáticos",
-      "Asegurar sólo los documentos de la empresa",
-      "Asegurar todos los activos de información",
-      "Asegurar sólo la información digital"
+      "Asegurar los equipos informáticos",
+      "Asegurar los documentos de la empresa",
+      "Asegurar los activos de información",
+      "Asegurar la información digital"
     ],
     "solution": [
       2
     ],
-    "difficulty": 0.5
+    "difficulty": 0.6
   },
   {
     "id": 3,
@@ -42,20 +42,22 @@
     "solution": [
       0
     ],
-    "difficulty": 0.5
+    "difficulty": 0.6
   },
   {
     "id": 4,
     "type": "single",
-    "question": "¿Cuál de estos NO es un activo de información?",
+    "question": "¿Cuál de estos es un activo de información?",
     "options": [
       "Pagina web",
       "Correos electrónicos de clientes",
-      "Puerta CC",
+      "Puerta del Centro de Cómputo",
       "Documentación escrita"
     ],
     "solution": [
-      2
+      0,
+      1,
+      3
     ],
     "difficulty": 0.5
   },
@@ -119,7 +121,7 @@
     "solution": [
       2
     ],
-    "difficulty": 0.6
+    "difficulty": 0.7
   },
   {
     "id": 9,
@@ -154,12 +156,12 @@
   {
     "id": 11,
     "type": "multiple",
-    "question": "Impactos que puede causar un ataque informático",
+    "question": "Impactos que puede causar un ataque informático en una entidad",
     "options": [
       "Financiero",
       "Reputacional",
       "Legal",
-      "Ninguna de las anteriores"
+      "Salud"
     ],
     "solution": [
       0,
@@ -188,7 +190,7 @@
     "type": "single",
     "question": "¿Cuál NO es una forma de protección?",
     "options": [
-      "Entrada a links sospechosos",
+      "Entrada a enlaces sospechosos",
       "Copias de Seguridad",
       "Contraseñas seguras",
       "Doble factor de autenticación"
