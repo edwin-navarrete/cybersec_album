@@ -14,7 +14,8 @@ export module Question {
         question: string
         options: string[]
         solution: number[]
-        difficulty: number
+        difficulty: number,
+        feedback?: string
     }
 
     export interface Answer extends Identifiable {
