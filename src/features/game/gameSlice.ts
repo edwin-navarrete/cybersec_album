@@ -2,7 +2,7 @@ import { createSlice, createSelector } from '@reduxjs/toolkit';
 import { Sticker } from "./sticker";
 import { Question } from "./question";
 import { RootState } from '../../app/store';
-import { putAnswer, glueSticker, nextQuestion } from "./gameMiddleware";
+import { putAnswer, glueSticker, nextQuestion, fetchAlbum } from "./gameMiddleware";
 
 import stickersDB from './stickerDB.json';
 
@@ -28,9 +28,10 @@ export interface AlbumState {
     question?: QuestionState
 }
 
+// { "userId": "ME", "inAlbum": true, "stickerId": 1, "id": 1, "spot": "1A", "weight": 16, "image": "sticker/3ad5b52db38cea1ea24eefa8f9dba6ceX.gif" }
 const initialState: AlbumState = {
     stickerCount: stickersDB.length,
-    stickers: [{ "userId": "ME", "inAlbum": true, "stickerId": 1, "id": 1, "spot": "1A", "weight": 16, "image": "sticker/3ad5b52db38cea1ea24eefa8f9dba6ceX.gif" }]
+    stickers: []
 };
 
 // Selector for the question
@@ -48,7 +49,7 @@ export const selectStickerSpots = createSelector((state: RootState) => state.gam
 // Selector returns true when album is full
 export const selectAchievement = (state: RootState) => {
     let claimed = state.game.stickers.filter(s => s.inAlbum)
-    return claimed.length == state.game.stickerCount
+    return claimed.length === state.game.stickerCount
 };
 
 
@@ -64,6 +65,9 @@ export const abumSlice = createSlice({
                 state.question.success = action.payload.success;
                 state.question.wrong = action.payload.wrong;
             }
+        });
+        builder.addCase(fetchAlbum.fulfilled, (state, action) => {
+            state.stickers = action.payload
         });
         builder.addCase(glueSticker.fulfilled, (state, action) => {
             state.stickers = action.payload

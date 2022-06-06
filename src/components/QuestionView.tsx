@@ -1,33 +1,51 @@
 // import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+
 import '../index.css';
 import { selectQuestion, QuestionState } from '../features/game/gameSlice';
-import { putAnswer } from '../features/game/gameMiddleware';
+import { putAnswer, nextQuestion } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
 
 const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
-    const attempts: number[] = []
+    let optCount = questionState?.options.length || 4
+    const [optState, setOptState] = useState(
+        new Array(optCount).fill(false)
+    );
 
-    const sendAttempt: React.MouseEventHandler<HTMLInputElement> = (event) => {
-        attempts.push(+event.currentTarget.value)
-        if (questionState && attempts.length >= questionState.solution.length) {
+    const sendAttempt: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+        let position = +event.currentTarget.value;
+        const newOptState = optState.map((b, i) => i === position ? !b : b);
+        setOptState(newOptState);
+        let attempts = newOptState.reduce((cnt, chk) => chk ? cnt + 1 : cnt, 0)
+        if (questionState && attempts >= questionState.solution.length) {
+            let response = newOptState.map((b, i) => b ? i : null).filter(i => i !== null) as number[];
             dispatch(putAnswer({
-                response: attempts,
+                response: response,
                 latency: 3_000
             }))
+            setOptState(new Array(optCount).fill(false))
         }
+    }
+
+    function handleNewQuestion() {
+        console.log("handleNewQuestion", optCount, optState)
+        dispatch(nextQuestion())
     }
 
     function renderFeedback(success?: boolean) {
         if (success === true) {
-            return (<label className="feedbackMsg">Felicitaciones! Reclama cada láminas con un click y sigue jugando!</label>)
+            return (<label className="feedbackMsg">FELICITACIONES! Reclama cada lámina con un click y sigue jugando!</label>)
         }
         if (success === false) {
-            return (<label className="feedbackMsg">Te equivocaste pero sigue intentándolo!</label>)
+                return (<div>
+                        {questionState?.feedback && <p className="feedbackMsg">{questionState.feedback}</p>}
+                        <p className="feedbackMsg">Lo lamento, pero sigue intentándolo!</p>
+                    </div>)
         }
         return null
     }
@@ -49,7 +67,8 @@ const QuestionView = () => {
                     <input type="checkbox"
                         disabled={success !== undefined}
                         value={i}
-                        onClick={sendAttempt} />
+                        checked={optState[i]}
+                        onChange={sendAttempt} />
                     {option}
                 </label>)}
             {renderFeedback(success)}
@@ -63,6 +82,7 @@ const QuestionView = () => {
             </section>
             <div className='buttonContainer'>
                 <input type="button" className="navBtn" value="Volver" onClick={() => navigate("/")}></input>
+                {questionState?.success !== undefined && <input type="button" className="navBtn" value="Más láminas" onClick={handleNewQuestion}></input>}
             </div>
         </section>
     );
