@@ -1,6 +1,7 @@
 
 import { Question } from "./question";
 import questionDB from './test/sampleQuestions.json';
+import config from './gameConfig.json';
 
 describe('QuestionDefDAO', () => {
 
@@ -193,11 +194,12 @@ describe('Quiz', () => {
         quiz.generate(3)
             .then((questions) => {
                 expect(questions.length).toEqual(3)
-                // "Expecting easier first"
-                expect(questions[0].difficulty).toEqual(0.1)
-                // "Expecting difficulty order"
-                expect(questions[1].difficulty).toEqual(0.25)
-                expect(questions[2].difficulty).toEqual(0.5)
+                if (config.quizStrategy == "easiestUnseen") {
+                    // "Expecting easier first"
+                    expect(questions[0].difficulty).toEqual(0.1)
+                    expect(questions[1].difficulty).toEqual(0.25)
+                    expect(questions[2].difficulty).toEqual(0.5)
+                }
             })
             .then(done)
             .catch(done)
@@ -224,8 +226,10 @@ describe('Quiz', () => {
         expect(firstQuiz.some(q => secondQuiz.includes(q))).toBeFalsy()
         //  `Didn't gave full quiz ${questions.map(q => q.id)}`
         expect(questions.length).toEqual(questionCount)
-        // "Expecting easier unseen first"
-        expect(questions[0].difficulty).toEqual(0.7)
+        if (config.quizStrategy == "easiestUnseen") {
+            // "Expecting easier unseen first"
+            expect(questions[0].difficulty).toEqual(0.7)
+        }
     });
 
 

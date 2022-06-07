@@ -1,3 +1,5 @@
+import config from './gameConfig.json';
+
 export module Question {
 
     enum QuestionType {
@@ -58,7 +60,7 @@ export module Question {
                 .then(seen =>
                     self.questionDefDAO.findAll({
                         exclude: seen,
-                        order: "+difficulty",
+                        order: (config.quizStrategy == "randomUnseen" ? "__random" : "+difficulty"),
                         limit: count
                     }).then(unseen => {
                         let missingCnt = count - unseen.length
@@ -97,6 +99,7 @@ export module Question {
     }
 
     function compare(x: any, y: any, field: string, desc: boolean) {
+        if (field == "_random") return Math.floor(Math.random() * 3) - 1
         let a = x[field], b = y[field]
         if (a > b) return desc ? -1 : 1
         if (a < b) return desc ? 1 : -1

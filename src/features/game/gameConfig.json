@@ -1,3 +1,4 @@
 {
-    "rewardStrategy" : "sequencial"
+    "rewardStrategy" : "sequential",
+    "quizStrategy": "randomUnseen"
 }

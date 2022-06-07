@@ -175,14 +175,21 @@ describe('Reward', () => {
     it('reward by difficulty', async () => {
         quiz = new Question.Quiz(userAnswerDAO, questionDefDAO, "juan")
         let questions = await quiz.generate(6);
-        // 0.5, 1], [0.7, 2], [0.8, 3], [0.9, 5
+        let expected = []
         for (const q of questions) {
             await quiz.putAnswer(q, q.solution)
+            switch (q.difficulty) {
+                case 0.1: expected.push(1); break;
+                case 0.25: expected.push(1); break;
+                case 0.5: expected.push(2); break;
+                case 0.7: expected.push(3); break;
+                case 0.8: expected.push(3); break;
+            }
         }
-        let expectedRewards = [1, 1, 2, 3, 3, 3].values()
+        let expectedRewards = expected.values()
         for (const a of quiz.getAnswers()) {
             let count = reward.stickerCountFor(a)
-            // `Unexpected rewards for ${a.difficulty}`
+            //`Unexpected rewards for ${a.difficulty}`
             expect(count).toEqual(expectedRewards.next().value)
         }
     });
