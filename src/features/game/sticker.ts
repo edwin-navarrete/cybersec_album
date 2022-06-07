@@ -1,4 +1,5 @@
 import { Question } from "./question";
+import config from './gameConfig.json';
 
 export module Sticker {
 
@@ -45,19 +46,28 @@ export module Sticker {
                     // unless the album is full
                     let owned = Array.from((await self.album.getStickers()).keys());
                     stickers = stickers.filter(s => !owned.includes(s.spot)) || stickers;
-
-                    // select random count of stickers based on weight
-                    stickers.sort((a, b) => b.weight - a.weight);
                     let result: StickerDef[] = [];
-                    let top = stickers.reduce((sum, s) => sum + s.weight, 0);
 
-                    while (count--) {
-                        let accum = 0
-                        let rand = top * Math.random();
-                        let f = stickers.find(s => {
-                            return (accum += s.weight) > rand;
-                        })
-                        f && result.push(f)
+                    if (config.rewardStrategy == "randomWeigthed") {
+                        // select random count of stickers based on weight
+                        stickers.sort((a, b) => b.weight - a.weight);
+                        let top = stickers.reduce((sum, s) => sum + s.weight, 0);
+
+                        while (count--) {
+                            let accum = 0
+                            let rand = top * Math.random();
+                            let f = stickers.find(s => {
+                                return (accum += s.weight) > rand;
+                            })
+                            f && result.push(f)
+                        }
+                    }
+                    else { // sequential
+                        // select sequentially the stickers based on spot
+                        stickers.sort((a, b) => a.spot.localeCompare(b.spot));
+                        for (let i = 0; count-- > 0; i++) {
+                            result.push(stickers[i % stickers.length]);
+                        }
                     }
                     return result;
                 })
