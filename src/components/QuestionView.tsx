@@ -82,7 +82,7 @@ const QuestionView = () => {
             </section>
             <div className='buttonContainer'>
                 <input type="button" className="navBtn" value="Volver" onClick={() => navigate("/")}></input>
-                {questionState?.success !== undefined && <input type="button" className="navBtn" value="Más láminas" onClick={handleNewQuestion}></input>}
+                {questionState?.success !== undefined && <input type="button" className="navBtn" value="Ganar láminas" onClick={handleNewQuestion}></input>}
             </div>
         </section>
     );

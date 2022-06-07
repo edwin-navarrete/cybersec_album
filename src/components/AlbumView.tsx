@@ -38,7 +38,7 @@ const AlbumView = () => {
                 {spots.map((spot) => getStickerView(spot))}
             </section>
             <div className='buttonContainer' key='buttonBar0'>
-                {!isFull && <input type="button" className="navBtn" value="Más Láminas" key='button0' onClick={handleMoreStickers}></input>}
+                {!isFull && <input type="button" className="navBtn" value="Ganar Láminas" key='button0' onClick={handleMoreStickers}></input>}
                 {isFull && <img className="successIco" src="success.png" alt="lo lograste!" />}
             </div>
         </section>
