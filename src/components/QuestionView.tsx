@@ -51,9 +51,10 @@ const QuestionView = () => {
     }
 
     function getFeedbackClass(index: number, solution: number[], wrong?: number[], success?: boolean) {
-        if (success === undefined) return "";
-        if (solution.includes(index)) return "correct";
-        if (wrong && wrong.includes(index)) return "wrong";
+        if (success === undefined) return "questionOption";
+        if (solution.includes(index)) return "questionOption correct";
+        if (wrong && wrong.includes(index)) return "questionOption wrong";
+        return "questionOption";
     }
 
     function renderQuestion(questionState?: QuestionState) {

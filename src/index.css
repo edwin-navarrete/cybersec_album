@@ -31,6 +31,7 @@ TURQOISE
     --navbar-txt: azure;
 }
 body {
+  overflow-x: hidden;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -47,7 +48,6 @@ code {
 .navTitle {
   margin: auto;
   padding: 15px;
-  width: 100%;
   text-align: center;
   color: var(--navbar-txt);
   background: linear-gradient(to bottom, var(--navbar-0),  var(--navbar-1));
@@ -73,6 +73,24 @@ code {
   grid-auto-flow: row;
   grid-template-columns: repeat(3, 1fr);
   margin-bottom: 75px;
+}
+
+.questionOption {
+    margin: 10px;
+    padding: 15px 25px;
+    background-color: darkcyan;
+    border-radius: 25px;
+    color: white;
+}
+
+.correct {
+  color: green;
+  font-weight: bold;
+  background-color: yellowgreen;
+}
+
+.wrong {
+  text-decoration: line-through;
 }
 
 .stickerSpot {
@@ -115,13 +133,4 @@ code {
 
 .feedbackMsg {
     margin-top: 20px
-}
-
-.correct {
-  color: green;
-  font-weight: bold;
-}
-
-.wrong {
-  color: red;
 }
