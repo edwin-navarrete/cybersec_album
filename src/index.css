@@ -25,10 +25,10 @@ TURQOISE
 
 */
 * {
-    --empty-spot: #fe9f71;
-    --navbar-0: #c2cf89;
-    --navbar-1: #4f8d88;
-    --navbar-txt: lightcyan;
+    --empty-spot: #d3c199;
+    --navbar-0: #64a2ad;
+    --navbar-1: #41e0d0;
+    --navbar-txt: azure;
 }
 body {
   margin: 0;
