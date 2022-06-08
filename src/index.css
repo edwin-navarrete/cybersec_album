@@ -66,10 +66,6 @@ code {
   background: linear-gradient(to bottom,  var(--navbar-1), var(--navbar-0), var(--navbar-0));
 }
 
-.navBtn {
-    height: 40px
-}
-
 .albumContainer {
   display: grid;
   grid-auto-flow: row;
