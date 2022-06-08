@@ -12,9 +12,10 @@ const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
-    let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 2.5 + 10)
 
-    const [timer, setTimer] = useState(timeLimit)
+    let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6)
+
+    const [timer, setTimer] = useState(-1)
     let interval: NodeJS.Timer;
     useEffect(() => {
         if (questionState?.success === undefined) {
@@ -28,7 +29,11 @@ const QuestionView = () => {
             }
             else if (timer > 0) {
                 interval = setInterval(() => setTimer(timer - 1), 1000);
-            };
+            }
+            else if (timer === -1) {
+                console.log("reset timer", questionState?.difficulty, timeLimit)
+                setTimer(timeLimit)
+            }
         }
         return () => interval && clearInterval(interval);
     });
@@ -56,7 +61,7 @@ const QuestionView = () => {
 
     function handleNewQuestion() {
         console.log("handleNewQuestion", optCount, optState)
-        setTimer(timeLimit)
+        setTimer(-1)
         dispatch(nextQuestion())
     }
 
@@ -83,9 +88,9 @@ const QuestionView = () => {
     function renderQuestion(questionState?: QuestionState) {
         if (!questionState) return (<div className='questionFrame' />);
 
-        const { question, options, success, solution, wrong } = questionState
+        const { id, question, options, success, solution, wrong } = questionState
         return (<div className='questionFrame' >
-            <h3>{question}</h3>
+            <h3>{id}:{question}</h3>
             {options.map((option, i) =>
                 <label key={i} className={getFeedbackClass(i, solution, wrong, success)}>
                     <input type="checkbox"
