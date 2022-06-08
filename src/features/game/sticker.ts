@@ -79,7 +79,7 @@ export module Sticker {
             if (!answer.success) return 0
             let schema = this.difficultySchema
             let marker = answer.difficulty || 0.5
-            if (answer.latency) {
+            if (answer.latency && this.config.rewardSchema == Question.RewardSchema.latency) {
                 schema = this.latencySchema
                 marker = answer.latency
             }

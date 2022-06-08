@@ -124,6 +124,7 @@ describe('Reward', () => {
 
     let config: Question.GameConfig = {
         quizStrategy: Question.QuizStrategy.randomUnseen,
+        rewardSchema: Question.RewardSchema.latency,
         rewardStrategy: Question.RewardStrategy.sequential
     }
 
