@@ -6,6 +6,11 @@ export module Question {
         randomWeigthed = "randomWeigthed"
     }
 
+    export enum RewardSchema {
+        latency = "latency",
+        difficulty = "difficulty"
+    }
+
     export enum QuizStrategy {
         randomUnseen = "randomUnseen",
         easiestUnseen = "easiestUnseen"
@@ -13,6 +18,7 @@ export module Question {
 
     export interface GameConfig {
         rewardStrategy: RewardStrategy,
+        rewardSchema: RewardSchema,
         quizStrategy: QuizStrategy
     }
 

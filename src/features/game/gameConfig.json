@@ -1,4 +1,5 @@
 {
     "rewardStrategy" : "sequential",
+    "rewardSchema": "difficulty",
     "quizStrategy": "randomUnseen"
 }
