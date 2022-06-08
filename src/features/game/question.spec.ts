@@ -1,7 +1,6 @@
 
 import { Question } from "./question";
 import questionDB from './test/sampleQuestions.json';
-import config from './gameConfig.json';
 
 describe('QuestionDefDAO', () => {
 
@@ -186,7 +185,11 @@ describe('Quiz', () => {
     beforeEach(() => {
         questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
         userAnswerDAO = new Question.UserAnswerDAO()
-        quiz = new Question.Quiz(userAnswerDAO, questionDefDAO, "juan")
+        let config: Question.GameConfig = {
+            quizStrategy: Question.QuizStrategy.easiestUnseen,
+            rewardStrategy: Question.RewardStrategy.sequential
+        }
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
     })
 
 
@@ -194,12 +197,10 @@ describe('Quiz', () => {
         quiz.generate(3)
             .then((questions) => {
                 expect(questions.length).toEqual(3)
-                if (config.quizStrategy == "easiestUnseen") {
-                    // "Expecting easier first"
-                    expect(questions[0].difficulty).toEqual(0.1)
-                    expect(questions[1].difficulty).toEqual(0.25)
-                    expect(questions[2].difficulty).toEqual(0.5)
-                }
+                // "Expecting easier first"
+                expect(questions[0].difficulty).toEqual(0.1)
+                expect(questions[1].difficulty).toEqual(0.25)
+                expect(questions[2].difficulty).toEqual(0.5)
             })
             .then(done)
             .catch(done)
@@ -226,10 +227,8 @@ describe('Quiz', () => {
         expect(firstQuiz.some(q => secondQuiz.includes(q))).toBeFalsy()
         //  `Didn't gave full quiz ${questions.map(q => q.id)}`
         expect(questions.length).toEqual(questionCount)
-        if (config.quizStrategy == "easiestUnseen") {
-            // "Expecting easier unseen first"
-            expect(questions[0].difficulty).toEqual(0.7)
-        }
+        // "Expecting easier unseen first"
+        expect(questions[0].difficulty).toEqual(0.7)
     });
 
 

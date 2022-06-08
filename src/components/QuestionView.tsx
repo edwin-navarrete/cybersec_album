@@ -27,13 +27,8 @@ const QuestionView = () => {
                 setOptState(new Array(optCount).fill(false))
                 setTimer(timeLimit)
             }
-            else if (timer > 0) {
-                interval = setInterval(() => setTimer(timer - 1), 1000);
-            }
-            else if (timer === -1) {
-                console.log("reset timer", questionState?.difficulty, timeLimit)
-                setTimer(timeLimit)
-            }
+            else if (timer > 0) interval = setInterval(() => setTimer(timer - 1), 1000);
+            else if (timer === -1) setTimer(timeLimit);
         }
         return () => interval && clearInterval(interval);
     });

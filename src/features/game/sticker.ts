@@ -1,5 +1,4 @@
 import { Question } from "./question";
-import config from './gameConfig.json';
 
 export module Sticker {
 
@@ -24,13 +23,15 @@ export module Sticker {
         stickerDAO: StickerDAO
         latencySchema: Map<number, number> // maxLatency-> stickerCount
         difficultySchema: Map<number, number> // maxDifficulty-> stickerCount
+        config: Question.GameConfig
 
-        constructor(album: Album, stickerDAO: StickerDAO) {
+        constructor(config: Question.GameConfig, album: Album, stickerDAO: StickerDAO) {
             this.album = album
             this.stickerDAO = stickerDAO
             // fibbonaccy reward
             this.latencySchema = new Map<number, number>([[2_000, 5], [5_000, 3], [7_000, 2], [Number.MAX_SAFE_INTEGER, 1]])
-            this.difficultySchema = new Map<number, number>([[0.5, 1], [0.7, 2], [0.9, 3], [1, 5]])
+            this.difficultySchema = new Map<number, number>([[0.5, 1], [0.7, 2], [0.9, 3], [1, 5]]);
+            this.config = config;
         }
 
         async produceStickers(answers: Question.Answer[]): Promise<StickerDef[]> {
@@ -48,7 +49,7 @@ export module Sticker {
                     stickers = stickers.filter(s => !owned.includes(s.spot)) || stickers;
                     let result: StickerDef[] = [];
 
-                    if (config.rewardStrategy == "randomWeigthed") {
+                    if (self.config.rewardStrategy == Question.RewardStrategy.randomWeigthed) {
                         // select random count of stickers based on weight
                         stickers.sort((a, b) => b.weight - a.weight);
                         let top = stickers.reduce((sum, s) => sum + s.weight, 0);

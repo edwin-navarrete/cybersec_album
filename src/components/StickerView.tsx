@@ -16,8 +16,6 @@ const StickerView = (props: StickerProps) => {
     const { spot, image, inAlbum } = props.sticker;
 
     const handleGlue = () => {
-        // let spot = event.currentTarget.attributes.getNamedItem("alt")
-        // console.log(spot)
         dispatch(glueSticker(props.sticker))
     }
 

@@ -8,7 +8,6 @@ describe('UserStickerDAO', () => {
 
     var userStickerDAO: Sticker.UserStickerDAO
 
-
     beforeEach(() => {
         userStickerDAO = new Sticker.UserStickerDAO([])
     })
@@ -36,7 +35,6 @@ describe('Album', () => {
 
     var userStickerDAO: Sticker.UserStickerDAO
     var album: Sticker.Album
-
 
     beforeEach(() => {
         let stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
@@ -124,25 +122,29 @@ describe('Reward', () => {
     let quiz: Question.Quiz
     let userAnswerDAO: Question.UserAnswerDAO
 
+    let config: Question.GameConfig = {
+        quizStrategy: Question.QuizStrategy.randomUnseen,
+        rewardStrategy: Question.RewardStrategy.sequential
+    }
 
     beforeEach(() => {
         questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
         stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
         userStickerDAO = new Sticker.UserStickerDAO([])
         album = new Sticker.Album(stickerDAO, userStickerDAO, "juan")
-        reward = new Sticker.Reward(album, stickerDAO)
+        reward = new Sticker.Reward(config, album, stickerDAO)
         userAnswerDAO = new Question.UserAnswerDAO()
     })
 
     it('no rewards when no answers', async () => {
-        quiz = new Question.Quiz(userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
         let rewards = await reward.produceStickers([])
         // "Waiting no rewards"
         expect(rewards.length).toEqual(0)
     });
 
     it('no rewards when all is wrong', async () => {
-        quiz = new Question.Quiz(userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
         let questions = await quiz.generate(3);
         for (const q of questions) {
             let wrong = q.options
@@ -157,7 +159,7 @@ describe('Reward', () => {
 
 
     it('reward by latency', async () => {
-        quiz = new Question.Quiz(userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
         let questions = await quiz.generate(3);
         let latencies = [1_000, 4_500, 5_500, 10_000].values()
         for (const q of questions) {
@@ -173,7 +175,7 @@ describe('Reward', () => {
 
 
     it('reward by difficulty', async () => {
-        quiz = new Question.Quiz(userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
         let questions = await quiz.generate(6);
         let expected = []
         for (const q of questions) {
@@ -196,7 +198,7 @@ describe('Reward', () => {
 
 
     it('max rewards on perfect quiz', async () => {
-        quiz = new Question.Quiz(userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
         let questions = await quiz.generate(3);
         for (const q of questions) {
             await quiz.putAnswer(q, q.solution, 1_000)
@@ -216,7 +218,7 @@ describe('Reward', () => {
         let maxIter = 100
         let filledPerc = 0
         while (filledPerc < 1 && maxIter--) {
-            quiz = new Question.Quiz(userAnswerDAO, questionDefDAO, "juan")
+            quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
             let questions = await quiz.generate(3);
             for (const q of questions) {
                 const rndInt = Math.floor(Math.random() * q.options.length)

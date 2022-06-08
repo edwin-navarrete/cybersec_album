@@ -4,6 +4,7 @@ import { Question } from "./question";
 import { Sticker } from "./sticker";
 import stickersDB from './stickerDB.json';
 import questionDB from './questionDB.json';
+import config from './gameConfig.json';
 
 import { RootState } from '../../app/store';
 import { QuestionState, Attempt, FeedbackAndStickers } from './gameSlice'
@@ -12,6 +13,7 @@ const USER_ID = "yo"
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 export const userStickerDAO = new Sticker.UserStickerDAO([])
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, USER_ID)
+const gameConfig = config as Question.GameConfig
 
 // give the first sticker as a sample
 stickerDAO.findAll({ include: [1] }).then(async stickerSample => {
@@ -23,7 +25,7 @@ stickerDAO.findAll({ include: [1] }).then(async stickerSample => {
 
 const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 const userAnswerDAO = new Question.UserAnswerDAO()
-const theQuiz = new Question.Quiz(userAnswerDAO, questionDefDAO, USER_ID)
+const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, USER_ID)
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {
@@ -37,7 +39,7 @@ export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state:
         const question = thunkApi.getState().game.question
         if (!question) throw new Error("Illegal answer without question")
         let answer = await theQuiz.putAnswer(question, attempt.response, attempt.latency)
-        let reward = new Sticker.Reward(theAlbum, stickerDAO);
+        let reward = new Sticker.Reward(gameConfig, theAlbum, stickerDAO);
         let stickerDefs = await reward.produceStickers([answer])
         theAlbum.ownStickers(stickerDefs)
         let wrong = attempt.response.filter(r => !question.solution.includes(r))

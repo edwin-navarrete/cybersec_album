@@ -1,6 +1,20 @@
-import config from './gameConfig.json';
 
 export module Question {
+
+    export enum RewardStrategy {
+        sequential = "sequential",
+        randomWeigthed = "randomWeigthed"
+    }
+
+    export enum QuizStrategy {
+        randomUnseen = "randomUnseen",
+        easiestUnseen = "easiestUnseen"
+    }
+
+    export interface GameConfig {
+        rewardStrategy: RewardStrategy,
+        quizStrategy: QuizStrategy
+    }
 
     enum QuestionType {
         single = "single",
@@ -42,12 +56,14 @@ export module Question {
         userAnswerDAO: UserAnswerDAO
         questionDefDAO: QuestionDefDAO
         answers: Answer[]
+        config: GameConfig
 
-        constructor(userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, userId: string) {
+        constructor(config: GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, userId: string) {
             this.userId = userId
             this.userAnswerDAO = userAnswerDAO
             this.questionDefDAO = questionDefDAO
             this.answers = []
+            this.config = config
         }
 
         async generate(count: number): Promise<QuestionDef[]> {
@@ -60,7 +76,7 @@ export module Question {
                 .then(seen =>
                     self.questionDefDAO.findAll({
                         exclude: seen,
-                        order: (config.quizStrategy == "randomUnseen" ? "__random" : "+difficulty"),
+                        order: (this.config.quizStrategy == "randomUnseen" ? "__random" : "+difficulty"),
                         limit: count
                     }).then(unseen => {
                         let missingCnt = count - unseen.length
