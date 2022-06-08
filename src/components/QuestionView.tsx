@@ -1,7 +1,7 @@
 // import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import '../index.css';
 import { selectQuestion, QuestionState } from '../features/game/gameSlice';
@@ -12,6 +12,28 @@ const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
+    let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 2.5 + 10)
+
+    const [timer, setTimer] = useState(timeLimit)
+    let interval: NodeJS.Timer;
+    useEffect(() => {
+        if (questionState?.success === undefined) {
+            if (timer === 0) {
+                dispatch(putAnswer({
+                    response: [],
+                    latency: timeLimit - timer
+                }))
+                setOptState(new Array(optCount).fill(false))
+                setTimer(timeLimit)
+            }
+            else if (timer > 0) {
+                interval = setInterval(() => setTimer(timer - 1), 1000);
+            };
+        }
+        return () => interval && clearInterval(interval);
+    });
+
+
     let optCount = questionState?.options.length || 4
     const [optState, setOptState] = useState(
         new Array(optCount).fill(false)
@@ -26,7 +48,7 @@ const QuestionView = () => {
             let response = newOptState.map((b, i) => b ? i : null).filter(i => i !== null) as number[];
             dispatch(putAnswer({
                 response: response,
-                latency: 3_000
+                latency: timeLimit - timer
             }))
             setOptState(new Array(optCount).fill(false))
         }
@@ -34,6 +56,7 @@ const QuestionView = () => {
 
     function handleNewQuestion() {
         console.log("handleNewQuestion", optCount, optState)
+        setTimer(timeLimit)
         dispatch(nextQuestion())
     }
 
@@ -72,6 +95,9 @@ const QuestionView = () => {
                         onChange={sendAttempt} />
                     {option}
                 </label>)}
+            {questionState?.success === undefined && <div id="timer">
+                <div id="seconds">{timer}<span>Segundos</span></div>
+            </div>}
             {renderFeedback(success)}
         </div>);
     }

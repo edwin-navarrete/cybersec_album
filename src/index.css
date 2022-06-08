@@ -1,3 +1,5 @@
+@import url(https://fonts.googleapis.com/css?family=Covered+By+Your+Grace);
+
 /*
 BEACH THEME
 * {
@@ -27,7 +29,7 @@ TURQOISE
 * {
     --empty-spot: #d3c199;
     --navbar-0: #64a2ad;
-    --navbar-1: #41e0d0;
+    --navbar-1: rgb(65, 224, 208, 0.6);
     --navbar-txt: azure;
 }
 body {
@@ -50,7 +52,7 @@ code {
   padding: 15px;
   text-align: center;
   color: var(--navbar-txt);
-  background: linear-gradient(to bottom, var(--navbar-0),  var(--navbar-1));
+  background: linear-gradient(to bottom, var(--navbar-0), var(--navbar-0), var(--navbar-1));
 }
 
 .buttonContainer {
@@ -61,7 +63,7 @@ code {
   position: fixed;
   bottom: 0;
   padding: 5px;
-  background: linear-gradient(to bottom,  var(--navbar-1), var(--navbar-0));
+  background: linear-gradient(to bottom,  var(--navbar-1), var(--navbar-0), var(--navbar-0));
 }
 
 .navBtn {
@@ -133,4 +135,23 @@ code {
 
 .feedbackMsg {
     margin-top: 20px
+}
+
+#timer {
+  font-family: 'Covered By Your Grace', cursive;
+  display: inline-block;
+  line-height: 1;
+  padding: 20px;
+  font-size: 40px;
+}
+
+#timer span {
+  display: block;
+  font-size: 20px;
+  color: black;
+}
+
+#seconds {
+  font-size: 50px;
+  color: darkcyan;
 }
