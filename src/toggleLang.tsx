@@ -1,22 +1,30 @@
-import * as React from 'react';
+import {useState} from 'react';
+import { AppDispatch } from './app/store'
+import { useDispatch } from 'react-redux';
+
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import i18n from "i18next"
+import { changeLanguage } from './features/game/gameMiddleware';
 
 export default function ToggleLang() {
-  const [alignment, setAlignment] = React.useState<string | null>('left');
+  const [language, setLanguage] = useState('es');
+  const dispatch = useDispatch() as AppDispatch;
 
-  const handleAlignment = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null,
+  const handleLanguage = (
+    _event: React.MouseEvent<HTMLElement>,
+    newLanguage: string,
   ) => {
-    setAlignment(newAlignment);
+    setLanguage(newLanguage);
+    dispatch(changeLanguage(newLanguage))
+    i18n.changeLanguage(newLanguage);
   };
 
   return (
     <ToggleButtonGroup
-      value={alignment}
+      value={language}
       exclusive
-      onChange={handleAlignment}
+      onChange={handleLanguage}
       aria-label="language"
       size="small"
     >

@@ -129,7 +129,7 @@ export module Question {
     }
 
     export class DAO<Type extends Identifiable>{
-        readonly db: Type[]
+        db: Type[]
 
         constructor(initialDB: Type[]) {
             this.db = initialDB

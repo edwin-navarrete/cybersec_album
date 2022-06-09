@@ -2,8 +2,8 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { Question } from "./question";
 import { Sticker } from "./sticker";
-import stickersDB from './stickerDB.json';
-import questionDB from './questionDB.json';
+import stickersDB from './data/es/stickerDB.json';
+import questionDB from './data/es/questionDB.json';
 import config from './gameConfig.json';
 
 import { RootState } from '../../app/store';
@@ -33,6 +33,12 @@ export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
         return Array.from(stickers.values())
     })
 
+export const changeLanguage = createAsyncThunk<QuestionState[], string>
+    ('album/lang', async (newLanguage) => {
+        let newQuestions = await import(`./data/${newLanguage}/questionDB.json`);
+        questionDefDAO.db = Array.from(newQuestions as Question.QuestionDef[]);
+        return questionDefDAO.db
+    })
 
 export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state: RootState }>
     ('question/putAnswer', async (attempt, thunkApi) => {
