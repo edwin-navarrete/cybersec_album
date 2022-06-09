@@ -2,22 +2,26 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import '../index.css';
 import { selectQuestion, QuestionState } from '../features/game/gameSlice';
 import { putAnswer, nextQuestion } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
+import Button from '@mui/material/Button';
 
 const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
+    const { t } = useTranslation(); // i18n
 
     let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6)
+    let optCount = questionState?.options.length || 4;
 
     const [timer, setTimer] = useState(-1)
-    let interval: NodeJS.Timer;
     useEffect(() => {
+        let interval: NodeJS.Timer;
         if (questionState?.success === undefined) {
             if (timer === 0) {
                 dispatch(putAnswer({
@@ -31,10 +35,9 @@ const QuestionView = () => {
             else if (timer === -1) setTimer(timeLimit);
         }
         return () => interval && clearInterval(interval);
-    });
+    }, [questionState?.success, timer, timeLimit, dispatch, optCount]);
 
 
-    let optCount = questionState?.options.length || 4
     const [optState, setOptState] = useState(
         new Array(optCount).fill(false)
     );
@@ -62,12 +65,12 @@ const QuestionView = () => {
 
     function renderFeedback(success?: boolean) {
         if (success === true) {
-            return (<label className="feedbackMsg">FELICITACIONES! Reclama cada lámina con un click y sigue jugando!</label>)
+            return (<label className="feedbackMsg">{t("quiz.success")}</label>)
         }
         if (success === false) {
             return (<div>
                 {questionState?.feedback && <p className="feedbackMsg">{questionState.feedback}</p>}
-                <p className="feedbackMsg">Lo lamento, pero sigue intentándolo!</p>
+                <p className="feedbackMsg">{t("quiz.fail")}</p>
             </div>)
         }
         return null
@@ -96,7 +99,7 @@ const QuestionView = () => {
                     {option}
                 </label>)}
             {questionState?.success === undefined && <div id="timer">
-                <div id="seconds">{timer}<span>Segundos</span></div>
+                <div id="seconds">{timer}<span>{t("timer.secs")}</span></div>
             </div>}
             {renderFeedback(success)}
         </div>);
@@ -104,12 +107,12 @@ const QuestionView = () => {
 
     return (
         <section className="pageContainer">
-            <section className="preguntasContainer" data-testid="container-a">
+            <section className="questionContainer" data-testid="container-a">
                 {renderQuestion(questionState)}
             </section>
             <div className='buttonContainer'>
-                <input type="button" className="navBtn" value="Volver" onClick={() => navigate("/")}></input>
-                {questionState?.success !== undefined && <input type="button" className="navBtn" value="Ganar láminas" onClick={handleNewQuestion}></input>}
+                <Button variant="contained" onClick={() => navigate("/")}>{t("button.back")}</Button>
+                {questionState?.success !== undefined && <Button variant="contained" onClick={handleNewQuestion}>{t("button.earn")}</Button>}
             </div>
         </section>
     );

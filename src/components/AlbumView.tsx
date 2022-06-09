@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectStickers, selectStickerSpots, selectAchievement } from '../features/game/gameSlice';
 import { nextQuestion } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
+import { useTranslation } from 'react-i18next';
+import Button from '@mui/material/Button';
 
 // import '../index.css';
 import StickerView from './StickerView';
@@ -14,6 +16,7 @@ const AlbumView = () => {
     const stickers = useSelector(selectStickers);
     const isFull = useSelector(selectAchievement);
     const navigate = useNavigate();
+    const { t } = useTranslation(); // i18n
 
     function handleMoreStickers() {
         dispatch(nextQuestion())
@@ -38,7 +41,7 @@ const AlbumView = () => {
                 {spots.map((spot) => getStickerView(spot))}
             </section>
             <div className='buttonContainer' key='buttonBar0'>
-                {!isFull && <input type="button" className="navBtn" value="Ganar Láminas" key='button0' onClick={handleMoreStickers}></input>}
+                {!isFull && <Button key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
                 {isFull && <img className="successIco" src="success.png" alt="lo lograste!" />}
             </div>
         </section>

@@ -2,9 +2,9 @@ import { createSlice, createSelector } from '@reduxjs/toolkit';
 import { Sticker } from "./sticker";
 import { Question } from "./question";
 import { RootState } from '../../app/store';
-import { putAnswer, glueSticker, nextQuestion, fetchAlbum } from "./gameMiddleware";
+import { changeLanguage, putAnswer, glueSticker, nextQuestion, fetchAlbum } from "./gameMiddleware";
 
-import stickersDB from './stickerDB.json';
+import stickersDB from './data/es/stickerDB.json';
 
 export type QuestionState = Question.QuestionDef & Feedback
 
@@ -19,6 +19,11 @@ export interface Feedback {
 }
 
 export type FeedbackAndStickers = Feedback & {
+    stickers: Sticker.AlbumStiker[]
+}
+
+export type QuestionsAndStickers = {
+    questions: Question.QuestionDef[]
     stickers: Sticker.AlbumStiker[]
 }
 
@@ -71,6 +76,13 @@ export const abumSlice = createSlice({
         });
         builder.addCase(glueSticker.fulfilled, (state, action) => {
             state.stickers = action.payload
+        });
+        builder.addCase(changeLanguage.fulfilled, (state, action) => {
+            if (state.question) {
+                let found = action.payload.questions.find(q => q.id === state.question?.id);
+                found && (state.question = { ...state.question, ...found });
+            }
+            state.stickers = action.payload.stickers;
         });
         builder.addCase(nextQuestion.fulfilled, (state, action) => {
             state.question = action.payload

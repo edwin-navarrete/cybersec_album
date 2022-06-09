@@ -82,7 +82,7 @@ export module Question {
                 .then(seen =>
                     self.questionDefDAO.findAll({
                         exclude: seen,
-                        order: (this.config.quizStrategy == "randomUnseen" ? "__random" : "+difficulty"),
+                        order: (this.config.quizStrategy === "randomUnseen" ? "__random" : "+difficulty"),
                         limit: count
                     }).then(unseen => {
                         let missingCnt = count - unseen.length
@@ -121,7 +121,7 @@ export module Question {
     }
 
     function compare(x: any, y: any, field: string, desc: boolean) {
-        if (field == "_random") return Math.floor(Math.random() * 3) - 1
+        if (field === "_random") return Math.floor(Math.random() * 3) - 1
         let a = x[field], b = y[field]
         if (a > b) return desc ? -1 : 1
         if (a < b) return desc ? 1 : -1
@@ -129,7 +129,7 @@ export module Question {
     }
 
     export class DAO<Type extends Identifiable>{
-        readonly db: Type[]
+        db: Type[]
 
         constructor(initialDB: Type[]) {
             this.db = initialDB

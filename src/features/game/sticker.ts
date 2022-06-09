@@ -49,7 +49,7 @@ export module Sticker {
                     stickers = stickers.filter(s => !owned.includes(s.spot)) || stickers;
                     let result: StickerDef[] = [];
 
-                    if (self.config.rewardStrategy == Question.RewardStrategy.randomWeigthed) {
+                    if (self.config.rewardStrategy === Question.RewardStrategy.randomWeigthed) {
                         // select random count of stickers based on weight
                         stickers.sort((a, b) => b.weight - a.weight);
                         let top = stickers.reduce((sum, s) => sum + s.weight, 0);
@@ -79,7 +79,7 @@ export module Sticker {
             if (!answer.success) return 0
             let schema = this.difficultySchema
             let marker = answer.difficulty || 0.5
-            if (answer.latency && this.config.rewardSchema == Question.RewardSchema.latency) {
+            if (answer.latency && this.config.rewardSchema === Question.RewardSchema.latency) {
                 schema = this.latencySchema
                 marker = answer.latency
             }

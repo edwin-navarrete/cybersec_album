@@ -2,12 +2,12 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { Question } from "./question";
 import { Sticker } from "./sticker";
-import stickersDB from './stickerDB.json';
-import questionDB from './questionDB.json';
+import stickersDB from './data/es/stickerDB.json';
+import questionDB from './data/es/questionDB.json';
 import config from './gameConfig.json';
 
 import { RootState } from '../../app/store';
-import { QuestionState, Attempt, FeedbackAndStickers } from './gameSlice'
+import { QuestionState, Attempt, QuestionsAndStickers, FeedbackAndStickers } from './gameSlice'
 
 const USER_ID = "yo"
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
@@ -33,6 +33,15 @@ export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
         return Array.from(stickers.values())
     })
 
+export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>
+    ('album/lang', async (newLanguage) => {
+        let newQuestions = await import(`./data/${newLanguage}/questionDB.json`);
+        questionDefDAO.db = Array.from(newQuestions as Question.QuestionDef[]);
+        let newStickers = await import(`./data/${newLanguage}/stickerDB.json`);
+        stickerDAO.db = Array.from(newStickers as Sticker.StickerDef[]);
+        let stickers = await theAlbum.getStickers()
+        return { questions: questionDefDAO.db, stickers: Array.from(stickers.values()) }
+    })
 
 export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state: RootState }>
     ('question/putAnswer', async (attempt, thunkApi) => {
