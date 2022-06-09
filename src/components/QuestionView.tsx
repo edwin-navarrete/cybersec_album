@@ -35,7 +35,7 @@ const QuestionView = () => {
             else if (timer === -1) setTimer(timeLimit);
         }
         return () => interval && clearInterval(interval);
-    },[questionState?.success, timer, timeLimit, dispatch, optCount]);
+    }, [questionState?.success, timer, timeLimit, dispatch, optCount]);
 
 
     const [optState, setOptState] = useState(

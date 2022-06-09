@@ -22,6 +22,11 @@ export type FeedbackAndStickers = Feedback & {
     stickers: Sticker.AlbumStiker[]
 }
 
+export type QuestionsAndStickers = {
+    questions: Question.QuestionDef[]
+    stickers: Sticker.AlbumStiker[]
+}
+
 export interface AlbumState {
     stickerCount: number,
     stickers: Sticker.AlbumStiker[],
@@ -73,11 +78,11 @@ export const abumSlice = createSlice({
             state.stickers = action.payload
         });
         builder.addCase(changeLanguage.fulfilled, (state, action) => {
-            if(state.question){
-                let found = action.payload.find(q=>q.id === state.question?.id);
-                found && (state.question = {...state.question,...found});
+            if (state.question) {
+                let found = action.payload.questions.find(q => q.id === state.question?.id);
+                found && (state.question = { ...state.question, ...found });
             }
-
+            state.stickers = action.payload.stickers;
         });
         builder.addCase(nextQuestion.fulfilled, (state, action) => {
             state.question = action.payload
