@@ -53,19 +53,19 @@ export const selectStickerSpots = createSelector((state: RootState) => state.gam
 
 // Selector returns true when album is full
 export const selectAchievement = (state: RootState) => {
-    let claimed =  state.game.stickers.reduce((cnt, s) => s.inAlbum ? cnt + 1: cnt, 0);
+    let claimed = state.game.stickers.reduce((cnt, s) => s.inAlbum ? cnt + 1 : cnt, 0);
     return claimed === state.game.stickerCount
 };
 
 // Selector returns percentage of completeness
 export const selectGauge = (state: RootState) => {
-    let claimed = state.game.stickers.reduce((cnt, s) => s.inAlbum ? cnt + 1: cnt, 0);
+    let claimed = state.game.stickers.reduce((cnt, s) => s.inAlbum ? cnt + 1 : cnt, 0);
     return claimed / state.game.stickerCount;
 };
 
 // Selector returns number of unclaimed stickers
 export const selectUnclaimed = (state: RootState) => {
-    return  state.game.stickers.reduce((cnt, s) => !s.inAlbum ? cnt + 1: cnt, 0);
+    return state.game.stickers.reduce((cnt, s) => !s.inAlbum ? cnt + 1 : cnt, 0);
 };
 
 export const abumSlice = createSlice({

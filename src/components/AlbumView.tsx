@@ -1,14 +1,14 @@
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
 
 import { selectStickers, selectStickerSpots, selectAchievement } from '../features/game/gameSlice';
 import { nextQuestion } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
-import { useTranslation } from 'react-i18next';
-import Button from '@mui/material/Button';
 import Gauge from './Gauge';
-
 import StickerView from './StickerView';
-import { useNavigate } from 'react-router-dom';
 
 const AlbumView = () => {
     const dispatch = useDispatch() as AppDispatch;
@@ -17,6 +17,17 @@ const AlbumView = () => {
     const isFull = useSelector(selectAchievement);
     const navigate = useNavigate();
     const { t } = useTranslation();
+
+    const [splash, setSplash] = useState(true);
+
+    useEffect(() => {
+        if (isFull) {
+            console.log("setTimeout");
+            setTimeout(() => {
+                setSplash(false);
+            }, 3500);
+        }
+    });
 
     function handleMoreStickers() {
         dispatch(nextQuestion())
@@ -35,16 +46,21 @@ const AlbumView = () => {
         }
     }
 
+    function success() {
+        return splash && (<div className='successSplash'></div>);
+    }
+
     return (
         <section className="pageContainer">
-            {Gauge()}
+
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>
-            <div className='buttonContainer' key='buttonBar0'>
-                {!isFull && <Button key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
-                {isFull && <img className="successIco" src="success.png" alt="lo lograste!" />}
-            </div>
+            {isFull && success()}
+                <div className='buttonContainer' key='buttonBar0'>
+                    {Gauge()}
+                    {!isFull &&<Button key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+                </div>
         </section>
 
     );
