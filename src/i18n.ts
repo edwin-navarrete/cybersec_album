@@ -12,7 +12,10 @@ const resources = {
             "button.back": "Go back",
             "timer.secs": "Seconds",
             "quiz.fail": "I'm sorry, but keep trying!",
-            "quiz.success": "CONGRATULATIONS! Claim each sheet with a click and continue playing!"
+            "quiz.success": "CONGRATULATIONS! Claim each sticker with a click and continue playing!",
+            "quiz.reward": "Now you have $t(stickers, {\"count\": {{number}} }) to claim.",
+            "stickers_one": "{{count}} lámina",
+            "stickers_other": "{{count}} láminas"
         }
     },
     es: {
@@ -22,7 +25,10 @@ const resources = {
             "button.back": "Volver",
             "timer.secs": "Segundos",
             "quiz.fail": "Lo lamento, pero sigue intentándolo!",
-            "quiz.success": "FELICITACIONES! Reclama cada lámina con un click y sigue jugando!"
+            "quiz.success": "FELICITACIONES! Reclama cada lámina con un click y sigue jugando!",
+            "quiz.reward": "Ahora tienes $t(stickers, {\"count\": {{number}} }) por reclamar.",
+            "stickers_one": "{{count}} lámina",
+            "stickers_other": "{{count}} láminas"
         }
     }
 };

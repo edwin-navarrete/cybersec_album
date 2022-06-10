@@ -1,5 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Covered+By+Your+Grace);
-
+@import url(https://fonts.googleapis.com/css2?family=Itim&display=swap);
 /*
 BEACH THEME
 * {
@@ -129,8 +129,19 @@ code {
     padding-left: 20px;
 }
 
+.feedbackFrame {
+    margin: 20px;
+}
+
 .feedbackMsg {
-    margin-top: 20px
+    font-family: 'Itim', cursive;
+    font-size: 20px;
+}
+
+.rewardMsg {
+    font-family: 'Itim', cursive;
+    font-size: 20px;
+    color: orangered;
 }
 
 #timer {

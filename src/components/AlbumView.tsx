@@ -1,12 +1,12 @@
 import { useSelector, useDispatch } from 'react-redux';
-// import React, { useState } from 'react';
+
 import { selectStickers, selectStickerSpots, selectAchievement } from '../features/game/gameSlice';
 import { nextQuestion } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
 import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
+import Gauge from './Gauge';
 
-// import '../index.css';
 import StickerView from './StickerView';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,7 +16,7 @@ const AlbumView = () => {
     const stickers = useSelector(selectStickers);
     const isFull = useSelector(selectAchievement);
     const navigate = useNavigate();
-    const { t } = useTranslation(); // i18n
+    const { t } = useTranslation();
 
     function handleMoreStickers() {
         dispatch(nextQuestion())
@@ -37,6 +37,7 @@ const AlbumView = () => {
 
     return (
         <section className="pageContainer">
+            {Gauge()}
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>
