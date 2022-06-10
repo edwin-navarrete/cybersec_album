@@ -1,0 +1,33 @@
+{
+  "name": "cybersec_album",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app",
+    "server": "nodemon",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm run build --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/edwin-navarrete/cybersec_album.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/edwin-navarrete/cybersec_album/issues"
+  },
+  "homepage": "https://github.com/edwin-navarrete/cybersec_album#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "express-validator": "^6.14.1"
+  },
+  "devDependencies": {
+    "concurrently": "^7.2.1"
+  }
+}
