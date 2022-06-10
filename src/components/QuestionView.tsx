@@ -5,13 +5,15 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import '../index.css';
-import { selectQuestion, QuestionState } from '../features/game/gameSlice';
+import { selectQuestion, selectUnclaimed, QuestionState } from '../features/game/gameSlice';
 import { putAnswer, nextQuestion } from '../features/game/gameMiddleware';
+
 import { AppDispatch } from '../app/store'
 import Button from '@mui/material/Button';
 
 const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
+    const unclaimed = useSelector(selectUnclaimed);
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     const { t } = useTranslation(); // i18n
@@ -58,19 +60,23 @@ const QuestionView = () => {
     }
 
     function handleNewQuestion() {
-        console.log("handleNewQuestion", optCount, optState)
         setTimer(-1)
         dispatch(nextQuestion())
     }
 
     function renderFeedback(success?: boolean) {
         if (success === true) {
-            return (<label className="feedbackMsg">{t("quiz.success")}</label>)
+            return (<div className="feedbackFrame">
+                <label className="feedbackMsg">{t("quiz.success")}</label>
+                <p className="rewardMsg">{t("quiz.reward", { number: unclaimed })}</p>
+            </div>)
         }
         if (success === false) {
             return (<div>
                 {questionState?.feedback && <p className="feedbackMsg">{questionState.feedback}</p>}
                 <p className="feedbackMsg">{t("quiz.fail")}</p>
+
+
             </div>)
         }
         return null

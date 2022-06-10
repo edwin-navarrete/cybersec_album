@@ -1,11 +1,11 @@
+import i18n from "i18next"
 import { useState } from 'react';
-import { AppDispatch } from './app/store'
+import { AppDispatch } from '../app/store'
 import { useDispatch } from 'react-redux';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import i18n from "i18next"
-import { changeLanguage } from './features/game/gameMiddleware';
+import { changeLanguage } from '../features/game/gameMiddleware';
 
 export default function ToggleLang() {
     const [language, setLanguage] = useState('es');
