@@ -7,7 +7,7 @@ import { initReactI18next } from "react-i18next";
 const resources = {
     en: {
         translation: {
-            "album.title": "4S Didactic Security",
+            "album.title": "4S CyberAlbum",
             "button.earn": "Earn Stickers",
             "button.back": "Go back",
             "timer.secs": "Seconds",
@@ -20,7 +20,7 @@ const resources = {
     },
     es: {
         translation: {
-            "album.title": "4S Seguridad Didáctica",
+            "album.title": "CiberAlbum 4S",
             "button.earn": "Ganar Láminas",
             "button.back": "Volver",
             "timer.secs": "Segundos",
