@@ -12,7 +12,7 @@ class Server {
 
     this.middlewares();
     this.app.use(express.static(path.join(__dirname,"../client/build")));
-    this.app.use('/cybersec_album4s', express.static(path.join(__dirname,"../client/build")));    
+    this.app.use('/cybersec_album', express.static(path.join(__dirname,"../client/build")));    
     this.routes();
   }
 
