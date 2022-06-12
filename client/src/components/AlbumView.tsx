@@ -57,10 +57,10 @@ const AlbumView = () => {
                 {spots.map((spot) => getStickerView(spot))}
             </section>
             {isFull && success()}
-                <div className='buttonContainer' key='buttonBar0'>
-                    {Gauge()}
-                    {!isFull &&<Button key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
-                </div>
+            <div className='buttonContainer' key='buttonBar0'>
+                {Gauge()}
+                {!isFull && <Button key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+            </div>
         </section>
 
     );

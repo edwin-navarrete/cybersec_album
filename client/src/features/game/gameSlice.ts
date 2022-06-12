@@ -51,10 +51,10 @@ export const selectStickerSpots = createSelector((state: RootState) => state.gam
     return [...Array(stickerCount).keys()].map(i => `${Math.floor(i / 3) + 1}${letters[i % 3]}`)
 });
 
-// Selector returns true when album is full
-export const selectAchievement = (state: RootState) => {
-    let claimed = state.game.stickers.reduce((cnt, s) => s.inAlbum ? cnt + 1 : cnt, 0);
-    return claimed === state.game.stickerCount
+// Selector returns true when album is full, has the argument withUnclaimed to determine if full including unclaimed
+export const selectAchievement = (state: RootState, withUnclaimed?: boolean) => {
+    let total = withUnclaimed ? state.game.stickers.length : state.game.stickers.reduce((cnt, s) => s.inAlbum ? cnt + 1 : cnt, 0);
+    return total === state.game.stickerCount
 };
 
 // Selector returns percentage of completeness

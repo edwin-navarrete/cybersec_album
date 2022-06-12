@@ -5,15 +5,16 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import '../index.css';
-import { selectQuestion, selectUnclaimed, QuestionState } from '../features/game/gameSlice';
+import { selectQuestion, selectUnclaimed, selectAchievement, QuestionState } from '../features/game/gameSlice';
 import { putAnswer, nextQuestion } from '../features/game/gameMiddleware';
 
-import { AppDispatch } from '../app/store'
+import { AppDispatch, RootState } from '../app/store'
 import Button from '@mui/material/Button';
 
 const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
     const unclaimed = useSelector(selectUnclaimed);
+    const achievement = useSelector((state: RootState) => selectAchievement(state, true));
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     const { t } = useTranslation(); // i18n
@@ -22,6 +23,9 @@ const QuestionView = () => {
     let optCount = questionState?.options.length || 4;
 
     const [timer, setTimer] = useState(-1)
+
+    // go to album if answered enough to fill the album
+    useEffect(() => { achievement && navigate("/") })
     useEffect(() => {
         let interval: NodeJS.Timer;
         if (questionState?.success === undefined) {
