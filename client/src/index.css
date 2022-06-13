@@ -176,3 +176,13 @@ code {
   font-size: 50px;
   color: darkcyan;
 }
+
+.completed {
+    text-align: center;
+    width: 100%;
+    bottom: 50px;
+    position: absolute;
+    font-family: 'Covered By Your Grace', cursive;
+    font-size: xx-large;
+    color: darkorchid;
+}

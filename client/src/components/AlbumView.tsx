@@ -25,7 +25,7 @@ const AlbumView = () => {
             console.log("setTimeout");
             setTimeout(() => {
                 setSplash(false);
-            }, 3500);
+            }, 4500);
         }
     });
 
@@ -47,7 +47,7 @@ const AlbumView = () => {
     }
 
     function success() {
-        return splash && (<div className='successSplash'></div>);
+        return splash && (<div className='successSplash'><span className="completed">{t("quiz.completed")}</span></div>);
     }
 
     return (
