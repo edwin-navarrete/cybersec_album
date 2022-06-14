@@ -15,7 +15,7 @@ describe('UserStickerDAO', () => {
 
     it('should upsert', async () => {
         let sticker = await userStickerDAO.upsert({
-            userId: "juan",
+            albumId: "juan",
             stickerId: 1,
         })
         expect(sticker.id).toBeDefined()
@@ -44,9 +44,9 @@ describe('Album', () => {
 
 
     it('get all available spots', async () => {
-        userStickerDAO.upsert({ userId: "juan", stickerId: 1 })
-        userStickerDAO.upsert({ userId: "juan", stickerId: 2 })
-        userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
+        userStickerDAO.upsert({ albumId: "juan", stickerId: 1 })
+        userStickerDAO.upsert({ albumId: "juan", stickerId: 2 })
+        userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
         let found = await album.getStickers()
         expect(found.size).toEqual(3)
         expect(await album.getAchievement()).toEqual(0)
@@ -55,11 +55,11 @@ describe('Album', () => {
 
 
     it('get all available spots even with repeated stickers', async () => {
-        userStickerDAO.upsert({ userId: "juan", stickerId: 1 })
-        userStickerDAO.upsert({ userId: "juan", stickerId: 2 })
-        userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
-        userStickerDAO.upsert({ userId: "juan", stickerId: 2 })
-        userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
+        userStickerDAO.upsert({ albumId: "juan", stickerId: 1 })
+        userStickerDAO.upsert({ albumId: "juan", stickerId: 2 })
+        userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
+        userStickerDAO.upsert({ albumId: "juan", stickerId: 2 })
+        userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
         let found = await album.getStickers()
         expect(found.size).toEqual(3)
         expect(await album.getAchievement()).toEqual(0)
@@ -68,11 +68,11 @@ describe('Album', () => {
 
 
     it('allow to add stickers', async () => {
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 1 })
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 2 })
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 2 })
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 1 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 2 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 2 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
 
         let found = await album.getStickers()
         expect(found.size).toEqual(3)
@@ -90,11 +90,11 @@ describe('Album', () => {
 
 
     it('do not glue repeatedly a spot', async () => {
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
-        await userStickerDAO.upsert({ userId: "juan", stickerId: 3 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
+        await userStickerDAO.upsert({ albumId: "juan", stickerId: 3 })
 
         let found = await album.getStickers()
         expect(found.size).toEqual(1)
@@ -229,7 +229,7 @@ describe('Reward', () => {
             // add the stickers to the user collection
             for (const r of rewards) {
                 expect(r.id).toBeDefined()
-                userStickerDAO.upsert({ userId: "juan", stickerId: r.id || 0 })
+                userStickerDAO.upsert({ albumId: "juan", stickerId: r.id || 0 })
             }
             // add the stickers to the album
             let newStickers = await album.getStickers()

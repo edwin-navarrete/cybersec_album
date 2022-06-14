@@ -41,7 +41,7 @@ export module Question {
     }
 
     export interface Answer extends Identifiable {
-        userId: string
+        albumId: string
         questionId: number
         success?: boolean
         latency?: number
@@ -58,14 +58,14 @@ export module Question {
     }
 
     export class Quiz {
-        userId: string
+        albumId: string
         userAnswerDAO: UserAnswerDAO
         questionDefDAO: QuestionDefDAO
         answers: Answer[]
         config: GameConfig
 
-        constructor(config: GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, userId: string) {
-            this.userId = userId
+        constructor(config: GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: string) {
+            this.albumId = albumId
             this.userAnswerDAO = userAnswerDAO
             this.questionDefDAO = questionDefDAO
             this.answers = []
@@ -102,7 +102,7 @@ export module Question {
         async putAnswer(question: QuestionDef, response: number[], latency?: number): Promise<Answer> {
             if (!question.id) throw new Error("question id is required")
             let answer: Answer = {
-                userId: this.userId,
+                albumId: this.albumId,
                 questionId: question.id,
                 success: response.length === question.solution.length
                     && response.reduce((a, b) => a && question.solution.includes(b), true),
@@ -177,7 +177,7 @@ export module Question {
             return new Promise((resolve) => {
                 answer.id = db.length + 1
                 let found = db.find(a =>
-                    a.questionId === answer.questionId && a.userId === answer.userId)
+                    a.questionId === answer.questionId && a.albumId === answer.albumId)
                 if (!found) {
                     answer.attempts = 1
                     answer.answeredOn = Date.now()

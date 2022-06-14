@@ -33,7 +33,6 @@ export interface AlbumState {
     question?: QuestionState
 }
 
-// { "userId": "ME", "inAlbum": true, "stickerId": 1, "id": 1, "spot": "1A", "weight": 16, "image": "sticker/3ad5b52db38cea1ea24eefa8f9dba6ceX.gif" }
 const initialState: AlbumState = {
     stickerCount: stickersDB.length,
     stickers: []

@@ -75,11 +75,11 @@ describe('UserAnswerDAO', () => {
 
     beforeEach(function() {
         userAnswerDAO = new Question.UserAnswerDAO()
-        userAnswerDAO.put({ userId: "juan", questionId: 1, success: true })
-        userAnswerDAO.put({ userId: "juan", questionId: 2, success: false })
-        userAnswerDAO.put({ userId: "juan", questionId: 5, success: true })
-        userAnswerDAO.put({ userId: "juan", questionId: 3, success: false })
-        userAnswerDAO.put({ userId: "juan", questionId: 4, success: true })
+        userAnswerDAO.put({ albumId: "juan", questionId: 1, success: true })
+        userAnswerDAO.put({ albumId: "juan", questionId: 2, success: false })
+        userAnswerDAO.put({ albumId: "juan", questionId: 5, success: true })
+        userAnswerDAO.put({ albumId: "juan", questionId: 3, success: false })
+        userAnswerDAO.put({ albumId: "juan", questionId: 4, success: true })
     });
 
 
@@ -94,7 +94,7 @@ describe('UserAnswerDAO', () => {
 
 
     it('should return put', (done) => {
-        userAnswerDAO.put({ userId: "juan", questionId: 9, success: true })
+        userAnswerDAO.put({ albumId: "juan", questionId: 9, success: true })
             .then((result) => {
                 expect(result.questionId).toEqual(9)
                 expect(result.id).toEqual(6)
@@ -105,14 +105,14 @@ describe('UserAnswerDAO', () => {
 
 
     it('should update on put', async () => {
-        let added = await userAnswerDAO.put({ userId: "juan", questionId: 3, success: false, latency: 12_000 })
+        let added = await userAnswerDAO.put({ albumId: "juan", questionId: 3, success: false, latency: 12_000 })
         expect(added.id).toEqual(4)
         // "Unexpected attempts"
         expect(added.attempts).toEqual(2)
         // "Unexpected latency"
         expect(added.latency).toEqual(12_000)
         expect(added.success).toBeFalsy()
-        added = await userAnswerDAO.put({ userId: "juan", questionId: 3, success: true, latency: 22_000 })
+        added = await userAnswerDAO.put({ albumId: "juan", questionId: 3, success: true, latency: 22_000 })
         expect(added.id).toEqual(4)
         // "Expecting attempts"
         expect(added.attempts).toEqual(3)

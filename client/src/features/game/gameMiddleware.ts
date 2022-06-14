@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import {v4 as uuidv4 } from "uuid"
 
 import { Question } from "./question";
 import { Sticker } from "./sticker";
@@ -9,10 +10,15 @@ import config from './gameConfig.json';
 import { RootState } from '../../app/store';
 import { QuestionState, Attempt, QuestionsAndStickers, FeedbackAndStickers } from './gameSlice'
 
-const USER_ID = "yo"
+var ALBUM_ID = localStorage.getItem("albumId");
+if(!ALBUM_ID){
+    ALBUM_ID = uuidv4();
+    localStorage.setItem("albumId", ALBUM_ID)
+}
+
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 export const userStickerDAO = new Sticker.UserStickerDAO([])
-const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, USER_ID)
+const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, ALBUM_ID)
 const gameConfig = config as Question.GameConfig
 
 // give the first sticker as a sample
@@ -25,7 +31,7 @@ stickerDAO.findAll({ include: [1] }).then(async stickerSample => {
 
 const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 const userAnswerDAO = new Question.UserAnswerDAO()
-const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, USER_ID)
+const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, ALBUM_ID)
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {

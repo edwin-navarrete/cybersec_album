@@ -10,7 +10,7 @@ export module Sticker {
 
 
     export interface UserSticker extends Question.Identifiable {
-        userId: string
+        albumId: string
         stickerId: number
         inAlbum?: boolean
         addedOn?: number
@@ -96,18 +96,18 @@ export module Sticker {
     export class Album {
         stickerDAO: StickerDAO
         userStickerDAO: UserStickerDAO
-        userId: string
+        albumId: string
 
-        constructor(stickerDAO: StickerDAO, userStickerDAO: UserStickerDAO, userId: string) {
+        constructor(stickerDAO: StickerDAO, userStickerDAO: UserStickerDAO, albumId: string) {
             this.stickerDAO = stickerDAO
             this.userStickerDAO = userStickerDAO
-            this.userId = userId
+            this.albumId = albumId
         }
 
         // FIXME The sticker details mapped by spot is not serializable! simplify to plain array
         async getStickers(): Promise<Map<string, AlbumStiker>> {
             let self = this
-            // TODO: Should filter by userId in the future
+            // TODO: Should filter by albumId in the future
             return this.userStickerDAO.findAll({ order: "+inAlbum" })
                 .then(userStickers =>
                     self.stickerDAO.findAll({
@@ -120,7 +120,7 @@ export module Sticker {
                                 ...s,
                                 id: us.id,
                                 inAlbum: us.inAlbum,
-                                userId: us.userId,
+                                albumId: us.albumId,
                                 addedOn: us.addedOn,
                                 stickerId: us.stickerId
                             } as AlbumStiker
@@ -136,7 +136,7 @@ export module Sticker {
             let upserts = stickers.map(stickerDef => {
                 if (!stickerDef.id) throw new Error("Invalid sticker in userSticker")
                 return this.userStickerDAO.upsert({
-                    userId: this.userId,
+                    albumId: this.albumId,
                     stickerId: stickerDef.id
                 })
             })
