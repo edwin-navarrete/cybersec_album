@@ -10,62 +10,44 @@ describe('QuestionDefDAO', () => {
         questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
     })
 
-    it('should return all', (done) => {
-        questionDefDAO.findAll()
-            .then((results) => expect(results.length).toEqual(6))
-            .then(done)
-            .catch(done)
+    it('should return all',  async () => {
+        const results = await questionDefDAO.findAll();
+        expect(results.length).toEqual(6);
     });
 
 
-    it('should return excluding', (done) => {
-        questionDefDAO.findAll({
+    it('should return excluding',  async () => {
+        const results = await questionDefDAO.findAll({
             exclude: [1, 5]
-        })
-            .then((results) => {
-                expect(results.length).toEqual(4)
-                expect(results.some(q => q.id && [1, 5].includes(q.id))).toBeFalsy()
-            })
-            .then(done)
-            .catch(done)
+        });
+        expect(results.length).toEqual(4)
+        expect(results.some(q => q.id && [1, 5].includes(q.id))).toBeFalsy()
     });
 
 
-    it('should return including', (done) => {
-        questionDefDAO.findAll({
+    it('should return including',  async () => {
+        const results = await questionDefDAO.findAll({
             include: [1, 5]
-        })
-            .then((results) => {
-                expect(results.length).toEqual(2)
-                expect(results.every(q => q.id && [1, 5].includes(q.id))).toBeTruthy()
-            })
-            .then(done)
-            .catch(done)
+        });
+        expect(results.length).toEqual(2);
+        expect(results.every(q => q.id && [1, 5].includes(q.id))).toBeTruthy();
     });
 
 
-    it('should return sorted', (done) => {
-        questionDefDAO.findAll({
+    it('should return sorted',  async () => {
+        const results = await questionDefDAO.findAll({
             order: "-difficulty"
-        })
-            .then((results) => {
-                expect(results.length).toEqual(6)
-                expect(results[0].difficulty).toEqual(0.8)
-            })
-            .then(done)
-            .catch(done)
+        });
+        expect(results.length).toEqual(6);
+        expect(results[0].difficulty).toEqual(0.8);
     });
 
 
-    it('should return limited', (done) => {
-        questionDefDAO.findAll({
+    it('should return limited',  async () => {
+        const results = await questionDefDAO.findAll({
             limit: 3
-        })
-            .then((results) => {
-                expect(results.length).toEqual(3)
-            })
-            .then(done)
-            .catch(done)
+        });
+        expect(results.length).toEqual(3)
     });
 });
 
@@ -83,24 +65,16 @@ describe('UserAnswerDAO', () => {
     });
 
 
-    it('should return all', (done) => {
-        userAnswerDAO.findAll()
-            .then((results) => {
-                expect(results.length).toEqual(5);
-            })
-            .then(done)
-            .catch(done)
+    it('should return all', async () => {
+        const results = await userAnswerDAO.findAll();
+        expect(results.length).toEqual(5);
     });
 
 
-    it('should return put', (done) => {
-        userAnswerDAO.put({ albumId: "juan", questionId: 9, success: true })
-            .then((result) => {
-                expect(result.questionId).toEqual(9)
-                expect(result.id).toEqual(6)
-            })
-            .then(done)
-            .catch(done)
+    it('should return put', async () => {
+        const result = await userAnswerDAO.put({ albumId: "juan", questionId: 9, success: true })
+        expect(result.questionId).toEqual(9);
+        expect(result.id).toEqual(6);
     });
 
 
@@ -122,56 +96,40 @@ describe('UserAnswerDAO', () => {
     });
 
 
-    it('should return excluding', (done) => {
-        userAnswerDAO.findAll({
+    it('should return excluding', async () => {
+        const results = await userAnswerDAO.findAll({
             exclude: [1, 5]
-        })
-            .then((results) => {
-                expect(results.length).toEqual(3)
-                expect(results.some(q => q.id && [1, 5].includes(q.id))).toBeFalsy()
-            })
-            .then(done)
-            .catch(done)
+        });
+        expect(results.length).toEqual(3)
+        expect(results.some(q => q.id && [1, 5].includes(q.id))).toBeFalsy()
     });
 
 
-    it('should return including', (done) => {
-        userAnswerDAO.findAll({
+    it('should return including', async () => {
+        const results = await userAnswerDAO.findAll({
             include: [1, 5]
-        })
-            .then((results) => {
-                expect(results.length).toEqual(2)
-                expect(results.every(q => q.id && [1, 5].includes(q.id))).toBeTruthy()
-            })
-            .then(done)
-            .catch(done)
+        });
+        expect(results.length).toEqual(2);
+        expect(results.every(q => q.id && [1, 5].includes(q.id))).toBeTruthy();
     });
 
 
-    it('should return sorted', (done) => {
-        userAnswerDAO.findAll({
+    it('should return sorted', async () => {
+        const results = await userAnswerDAO.findAll({
             order: "-questionId"
         })
-            .then((results) => {
-                expect(results.length).toEqual(5)
-                expect(results[0].questionId).toEqual(5)
-            })
-            .then(done)
-            .catch(done)
+        expect(results.length).toEqual(5)
+        expect(results[0].questionId).toEqual(5)
     });
 
 
-    it('should return sorted by 2', (done) => {
-        userAnswerDAO.findAll({
+    it('should return sorted by 2', async () => {
+        const results = await userAnswerDAO.findAll({
             order: ["+success", "-questionId"]
-        })
-            .then((results) => {
-                expect(results.length).toEqual(5)
-                expect(results[0].success).toEqual(false)
-                expect(results[0].questionId).toEqual(3)
-            })
-            .then(done)
-            .catch(done)
+        });
+        expect(results.length).toEqual(5)
+        expect(results[0].success).toEqual(false)
+        expect(results[0].questionId).toEqual(3)
     });
 });
 
@@ -194,17 +152,13 @@ describe('Quiz', () => {
     })
 
 
-    it('should return even without answers', (done) => {
-        quiz.generate(3)
-            .then((questions) => {
-                expect(questions.length).toEqual(3)
-                // "Expecting easier first"
-                expect(questions[0].difficulty).toEqual(0.1)
-                expect(questions[1].difficulty).toEqual(0.25)
-                expect(questions[2].difficulty).toEqual(0.5)
-            })
-            .then(done)
-            .catch(done)
+    it('should return even without answers', async () => {
+        const questions = await quiz.generate(3);
+        expect(questions.length).toEqual(3)
+        // "Expecting easier first"
+        expect(questions[0].difficulty).toEqual(0.1)
+        expect(questions[1].difficulty).toEqual(0.25)
+        expect(questions[2].difficulty).toEqual(0.5)
     });
 
 
