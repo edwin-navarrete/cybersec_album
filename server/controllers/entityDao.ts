@@ -1,11 +1,12 @@
-interface GetOptions {
-    limit: number
-    sort: string
-    include: Array<number>
-    exclude: Array<number>
+export interface GetOptions {
+    limit?: number
+    sort?: string
+    order?: string
+    include?: Array<number>
+    exclude?: Array<number>
 }
 
-export class EntityDAO<T> {
+export default class EntityDAO<T> {
   entityName: string
 
   constructor (entityName: string) {
