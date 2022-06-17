@@ -56,6 +56,10 @@ code {
   background: linear-gradient(to bottom, var(--navbar-0), var(--navbar-0), var(--navbar-1));
 }
 
+.grecaptcha-badge {
+    top:0px !important;
+}
+
 .buttonContainer {
   margin-top: 30px;
   text-align: center;
