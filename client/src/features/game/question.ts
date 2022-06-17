@@ -1,3 +1,4 @@
+import axios from "axios"
 
 export module Question {
 
@@ -130,6 +131,7 @@ export module Question {
 
     export class DAO<Type extends Identifiable>{
         db: Type[]
+        static token: string = ""
 
         constructor(initialDB: Type[]) {
             this.db = initialDB
@@ -165,6 +167,22 @@ export module Question {
                 resolve(results.map(o => { return { ...o } }))
             });
         }
+
+        async push(record: Type){
+            this.db.push(record);
+            if(DAO.token){
+                console.log("push wth ", process.env.REACT_APP_API, DAO.token.slice(-5), record);
+                try {
+                    let uri = process.env.REACT_APP_API+"/auth/login";
+                    const { data, status } = await axios.post(uri,
+                    {"email":"edwin@gmail.com","password":"1234"},
+                    {headers:{"g-recaptcha-response":DAO.token}});
+                    console.log("replied",status, data);
+                } catch (error){
+                    console.log("failed", error);
+                }
+            }
+        }
     }
 
     export class UserAnswerDAO extends DAO<Answer> {
@@ -181,7 +199,7 @@ export module Question {
                 if (!found) {
                     answer.attempts = 1
                     answer.answeredOn = Date.now()
-                    db.push(answer)
+                    super.push(answer)
                     resolve(answer)
                 }
                 else {

@@ -1,4 +1,4 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import { Sticker } from "./sticker";
 import { Question } from "./question";
 import { RootState } from '../../app/store';
@@ -28,12 +28,14 @@ export type QuestionsAndStickers = {
 }
 
 export interface AlbumState {
-    stickerCount: number,
-    stickers: Sticker.AlbumStiker[],
+    token: string
+    stickerCount: number
+    stickers: Sticker.AlbumStiker[]
     question?: QuestionState
 }
 
 const initialState: AlbumState = {
+    token: "",
     stickerCount: stickersDB.length,
     stickers: []
 };
@@ -71,6 +73,9 @@ export const abumSlice = createSlice({
     name: 'game',
     initialState,
     reducers: {
+        updateToken: (state, action: PayloadAction<string>) => {
+          state.token = action.payload || "";
+        }
     },
     extraReducers: builder => {
         builder.addCase(putAnswer.fulfilled, (state, action) => {
@@ -99,4 +104,5 @@ export const abumSlice = createSlice({
     }
 })
 
+export const { updateToken } = abumSlice.actions
 export default abumSlice.reducer;

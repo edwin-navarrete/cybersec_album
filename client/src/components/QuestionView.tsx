@@ -1,11 +1,12 @@
 // import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import '../index.css';
-import { selectQuestion, selectUnclaimed, selectAchievement, QuestionState } from '../features/game/gameSlice';
+import { selectQuestion, selectUnclaimed, selectAchievement, updateToken, QuestionState } from '../features/game/gameSlice';
 import { putAnswer, nextQuestion } from '../features/game/gameMiddleware';
 
 import { AppDispatch, RootState } from '../app/store'
@@ -18,6 +19,12 @@ const QuestionView = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     const { t } = useTranslation(); // i18n
+
+    const handleCaptcha = useCallback((token : string) => {
+        console.log(token.slice(-5));
+        dispatch(updateToken(token));
+        // eslint-disable-next-line
+    }, [dispatch, questionState]);
 
     let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6)
     let optCount = questionState?.options.length || 4;
@@ -79,8 +86,6 @@ const QuestionView = () => {
             return (<div>
                 {questionState?.feedback && <p className="feedbackMsg">{questionState.feedback}</p>}
                 <p className="feedbackMsg">{t("quiz.fail")}</p>
-
-
             </div>)
         }
         return null
@@ -98,6 +103,7 @@ const QuestionView = () => {
 
         const { id, question, options, success, solution, wrong } = questionState
         return (<div className='questionFrame' >
+            <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/>
             <h3>{id}:{question}</h3>
             {options.map((option, i) =>
                 <label key={i} className={getFeedbackClass(i, solution, wrong, success)}>

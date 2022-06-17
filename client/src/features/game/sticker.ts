@@ -169,9 +169,9 @@ export module Sticker {
             return new Promise(resolve => {
                 if (!sticker.id) {
                     sticker.id = this.db.length + 1
-                    sticker.addedOn = Date.now()
-                    sticker.inAlbum = sticker.inAlbum || false
-                    this.db.push(sticker)
+                    sticker.addedOn = Date.now();
+                    sticker.inAlbum = sticker.inAlbum || false;
+                    super.push(sticker)
                 }
                 else {
                     // just update some fields

@@ -53,6 +53,7 @@ export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state:
     ('question/putAnswer', async (attempt, thunkApi) => {
         const question = thunkApi.getState().game.question
         if (!question) throw new Error("Illegal answer without question")
+        Question.DAO.token = thunkApi.getState().game.token;
         let answer = await theQuiz.putAnswer(question, attempt.response, attempt.latency)
         let reward = new Sticker.Reward(gameConfig, theAlbum, stickerDAO);
         let stickerDefs = await reward.produceStickers([answer])

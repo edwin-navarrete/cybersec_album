@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { selectStickers, selectStickerSpots, selectAchievement } from '../features/game/gameSlice';
 import { nextQuestion } from '../features/game/gameMiddleware';
@@ -16,6 +15,7 @@ const AlbumView = () => {
     const spots = useSelector(selectStickerSpots);
     const stickers = useSelector(selectStickers);
     const isFull = useSelector(selectAchievement);
+
     const navigate = useNavigate();
     const { t } = useTranslation();
 
@@ -51,13 +51,8 @@ const AlbumView = () => {
         return splash && (<div className='successSplash'><span className="completed">{t("quiz.completed")}</span></div>);
     }
 
-    function handleCaptcha(token : string){
-        // FIXME send token to backend for verification
-    }
-
     return (
         <section className="pageContainer">
-            <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>

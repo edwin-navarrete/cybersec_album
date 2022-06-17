@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
-import path from 'path'
+import recaptcha from './recaptcha'
+// import path from 'path'
 
 export class Server {
   port: string | undefined
@@ -9,14 +10,16 @@ export class Server {
   constructor () {
     this.port = process.env.PORT // Loaded from .env file
     this.middlewares()
-    this.app.use(express.static(path.join(__dirname, '../client/build')))
-    this.app.use('/cybersec_album', express.static(path.join(__dirname, '../client/build')))
+    // this.app.use(express.static(path.join(__dirname, '../client/build')))
+    // this.app.use('/cybersec_album', express.static(path.join(__dirname, '../client/build')))
     this.routes()
   }
 
   middlewares () {
     this.app.use(cors()) // Enable CORS
+    // this.app.options('*', cors());
     this.app.use(express.json())
+    this.app.use(recaptcha)
   }
 
   // Bind controllers to routes
