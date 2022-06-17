@@ -32,6 +32,7 @@
     "express-validator": "^6.14.1",
     "jest": "^28.1.1",
     "memoizee": "^0.4.15",
+    "mysql": "^2.18.1",
     "react-scripts": "^5.0.1",
     "save-dev": "^0.0.1-security",
     "source-map-loader": "^4.0.0",
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.12",
     "@types/memoizee": "^0.4.8",
+    "@types/mysql": "^2.15.21",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "concurrently": "^7.2.1",

@@ -1,24 +1,46 @@
+export type Fetch = (query : string) => Promise<any[]>;
+
+export type Insert = (stm : string, values: any[]) => Promise<any>;
+
 export interface GetOptions {
     limit?: number
     sort?: string
-    order?: string
+    order?: string | string[] // "[-|+]field"
     include?: Array<number>
     exclude?: Array<number>
 }
 
-export default class EntityDAO<T> {
+export default class EntityDAO<T extends Object> {
   entityName: string
+  fetch: Fetch
+  insert: Insert
 
-  constructor (entityName: string) {
+  constructor (fetch: Fetch, insert: Insert, entityName: string) {
     this.entityName = entityName
-    // FIXME do mysql connection here
+    this.fetch = fetch
+    this.insert = insert
   }
 
-  public get (_options: GetOptions): Array<T> {
-    return []
+  public async get (albumId:number, options: GetOptions): Promise<T[]> {
+    let qry = `select * from ${this.entityName} where album_id=${albumId}`
+    options.include && (qry += ` and ${this.entityName}_id in (${options.include})`)
+    options.exclude && (qry += ` and ${this.entityName}_id not in (${options.exclude})`)
+    if (options.order) {
+      (typeof options.order === 'string') && (options.order = [options.order])
+      const order = []
+      for (const o of options.order) {
+        const fld = o.substring(1)
+        order.push(`${fld === '_random' ? 'RAND()' : fld} ${o.startsWith('-') ? 'desc' : 'asc'}`)
+      }
+      order && (qry += ` order by ${order}`)
+    }
+    options.limit && (qry += ` limit ${options.limit}`)
+    return this.fetch(qry)
   }
 
-  public post (_record: T): void {
-
+  public async post (row: T): Promise<void> {
+      let fields = Object.keys(row);
+     let stm = `insert into ${this.entityName}(${fields}) values (${fields.map(_f=>'?')})`;
+    return this.insert(stm,  Object.values(row));
   }
 }
