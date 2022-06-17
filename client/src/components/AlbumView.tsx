@@ -20,6 +20,13 @@ const AlbumView = () => {
     const { t } = useTranslation();
 
     const [splash, setSplash] = useState(true);
+    const [intro, setIntro] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setIntro(false);
+        }, 5500);
+    });
 
     useEffect(() => {
         if (isFull) {
@@ -47,6 +54,10 @@ const AlbumView = () => {
         }
     }
 
+    function showIntro() {
+        return intro && (<div className='introSplash'><span className="introMsg bubble-bottom-left">{t("introMsg")}</span></div>);
+    }
+
     function success() {
         return splash && (<div className='successSplash'><span className="completed">{t("quiz.completed")}</span></div>);
     }
@@ -56,6 +67,7 @@ const AlbumView = () => {
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>
+            {stickers.length === 1 && showIntro()}
             {isFull && success()}
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}

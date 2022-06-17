@@ -15,8 +15,9 @@ const resources = {
             "quiz.success": "CONGRATULATIONS! Claim each sticker with a click and continue playing!",
             "quiz.completed": "YOU DID IT! Now enjoy your full album",
             "quiz.reward": "Now you have $t(stickers, {\"count\": {{number}} }) to claim.",
-            "stickers_one": "{{count}} lámina",
-            "stickers_other": "{{count}} láminas"
+            "stickers_one": "{{count}} sticker",
+            "stickers_other": "{{count}} stickers",
+            "introMsg": "Hi! would you help me to fill the album? start down here!"
         }
     },
     es: {
@@ -30,7 +31,8 @@ const resources = {
             "quiz.completed": "LO LOGRASTE! Ahora disfruta tu álbum lleno.",
             "quiz.reward": "Ahora tienes $t(stickers, {\"count\": {{number}} }) por reclamar.",
             "stickers_one": "{{count}} lámina",
-            "stickers_other": "{{count}} láminas"
+            "stickers_other": "{{count}} láminas",
+            "introMsg": "Hola! me ayudarías a llenar el album? empieza aquí abajo!"
         }
     }
 };
