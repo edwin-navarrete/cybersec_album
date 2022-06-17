@@ -139,6 +139,68 @@ code {
     font-size: 20px;
 }
 
+@keyframes entrance {
+  from { left: -200px;}
+  to { left: 0;}
+}
+
+@keyframes appear {
+  from { opacity: 0;}
+  to {opacity: 1;}
+}
+
+.introSplash {
+    position: fixed;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    width: 200px;
+    height: 196px;
+    background-repeat:   no-repeat;
+    background-position: center center;
+    background-image: url("../public/intro.png");
+    animation-name: entrance ;
+    animation-timing-function: ease;
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+    animation-direction: alternate;
+}
+
+.introMsg {
+    position: fixed;
+    left: 98px;
+    width: 240px;
+    bottom: 228px;
+    font-family: 'Itim', cursive;
+    font-size: 20px;
+    opacity: 0;
+    animation-name: appear;
+    animation-delay: 1s;
+    animation-duration: 2s;
+    animation-iteration-count: 1;
+    animation-direction: alternate;
+    animation-fill-mode: forwards;
+    line-height: 24px;
+    background: #fff;
+    border-radius: 40px;
+    padding: 24px;
+    text-align: center;
+    color: #000;
+}
+
+.bubble-bottom-left:before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  border-left: 24px solid #fff;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #fff;
+  border-bottom: 20px solid transparent;
+  left: 32px;
+  bottom: -24px;
+}
+
 .successSplash {
     position: fixed;
     z-index: 1;
