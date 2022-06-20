@@ -2,7 +2,7 @@ import EntityDAO from './entityDAO'
 
 interface Row extends Object {
     user_id: string
-    created: Date
+    created: number
 }
 
 describe('EntityDAO', () => {
@@ -61,10 +61,10 @@ describe('EntityDAO', () => {
   test('post works with a simple object', async () => {
       dao.post( {
         user_id: "7fa3",
-        created: new Date()
+        created: Date.parse('04 Dec 1995 00:12:00 GMT')
       })
       expect(dummy).toHaveBeenCalled()
       expect(dummy).toHaveBeenCalledTimes(1)
-      expect(dummy).toHaveBeenCalledWith('insert')
+      expect(dummy).toHaveBeenCalledWith("insert into foo(user_id,created) values (?,?)", ["7fa3",818035920000])
     })
 })
