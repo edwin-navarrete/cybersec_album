@@ -26,6 +26,7 @@ export class Server {
   routes () {
     this.app.use('/api/auth', require('../routes/auth'))
     this.app.use('/api', require('../routes/userSticker'))
+    this.app.use('/api', require('../routes/userAnswer'))
   }
 
   listen () {

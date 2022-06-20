@@ -42,7 +42,7 @@ const testTokenMem = memoize(testToken, { maxAge: 1200, promise: true })
 
 // Validate the header g-recaptcha-response for POST enrypoints
 export default async function recaptcha (req: Request, resp: Response, next: NextFunction) {
-  if (req.method === 'POST') {
+  if (process.env.CAPTCHA_SECRET && req.method === 'POST') {
     const token = req.header('g-recaptcha-response')
     const valid = await testTokenMem(token, req.ip)
     if (!valid) {

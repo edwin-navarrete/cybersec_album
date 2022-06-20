@@ -1,6 +1,4 @@
-export type Fetch = (query : string) => Promise<any[]>;
-
-export type Insert = (stm : string, values: any[]) => Promise<any>;
+import {Fetch, Insert} from './DBDriver';
 
 export interface GetOptions {
     limit?: number
