@@ -1,39 +1,38 @@
 // get the client
-import mysql from 'mysql2/promise';
-import {Fetch, Insert} from './DBDriver';
-
+import mysql from 'mysql2/promise'
+import { Fetch, Insert } from './DBDriver'
 
 class MySQLDriver {
-    // create the connection to database
-    connection: mysql.Connection;
-    config : mysql.ConnectionOptions
-    constructor(config : mysql.ConnectionOptions) {
-        this.config = config;
-        this.connection = null;
-    }
+  // create the connection to database
+  connection: mysql.Connection
+  config: mysql.ConnectionOptions
+  constructor (config: mysql.ConnectionOptions) {
+    this.config = config
+    this.connection = null
+  }
 
-    async connect( ) {
-        if(this.connection === null){
-            this.connection = await mysql.createConnection(this.config);
-        }
+  async connect () {
+    if (this.connection === null) {
+      this.connection = await mysql.createConnection(this.config)
     }
+  }
 
-    fetch :  Fetch = async (query:string)=>{
-        await this.connect();
-        const [rows, _fields] = await this.connection.execute(query);
-        return rows as any[]
-    }
+  fetch: Fetch = async (query: string) => {
+    await this.connect()
+    const [rows] = await this.connection.execute(query)
+    return rows as any[]
+  }
 
-    insert :Insert = async (stm:string, values:any[]) : Promise<any> => {
-        await this.connect();
-        const [result, _fields] = await this.connection.execute(stm, values);
-        return result;
-    }
+  insert: Insert = async (stm: string, values: any[]): Promise<any> => {
+    await this.connect()
+    const [result] = await this.connection.execute(stm, values)
+    return result
+  }
 }
 
 export default new MySQLDriver({
-    user: "ssolucio_cyberalbum",
-    password:"cYb3#r41boom",
-    database: "ssolucio_cyberalbum",
-    host:"localhost"
+  user: 'ssolucio_cyberalbum',
+  password: 'cYb3#r41boom',
+  database: 'ssolucio_cyberalbum',
+  host: 'localhost'
 })

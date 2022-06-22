@@ -48,9 +48,8 @@ export default async function recaptcha (req: Request, resp: Response, next: Nex
     if (!valid) {
       console.log('rejected ', token.slice(-5))
       return resp.sendStatus(403)
-    } else {
-      console.log('Accepted ', token.slice(-5))
     }
+    console.log('Accepted ', token.slice(-5))
   }
   next()
 }

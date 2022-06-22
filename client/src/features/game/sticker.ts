@@ -164,7 +164,9 @@ export module Sticker {
 
 
     export class UserStickerDAO extends Question.DAO<UserSticker> {
-
+        constructor(initialDB:UserSticker[]) {
+            super("userSticker",initialDB)
+        }
         async upsert(sticker: UserSticker): Promise<UserSticker> {
             return new Promise(resolve => {
                 if (!sticker.id) {
@@ -186,5 +188,9 @@ export module Sticker {
         }
     }
 
-    export class StickerDAO extends Question.DAO<StickerDef> { }
+    export class StickerDAO extends Question.DAO<StickerDef> {
+        constructor(initialDB:StickerDef[]) {
+            super("",initialDB)
+        }
+    }
 }

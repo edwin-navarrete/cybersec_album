@@ -1,4 +1,4 @@
-import {Fetch, Insert} from './DBDriver';
+import { Fetch, Insert } from './DBDriver'
 
 export interface GetOptions {
     limit?: number
@@ -19,7 +19,7 @@ export default class EntityDAO<T extends Object> {
     this.insert = insert
   }
 
-  public async get (albumId:number, options: GetOptions): Promise<T[]> {
+  public async get (albumId: number, options: GetOptions): Promise<T[]> {
     let qry = `select * from ${this.entityName} where album_id=${albumId}`
     options.include && (qry += ` and ${this.entityName}_id in (${options.include})`)
     options.exclude && (qry += ` and ${this.entityName}_id not in (${options.exclude})`)
@@ -37,8 +37,8 @@ export default class EntityDAO<T extends Object> {
   }
 
   public async post (row: T): Promise<void> {
-      let fields = Object.keys(row);
-     let stm = `insert into ${this.entityName}(${fields}) values (${fields.map(_f=>'?')})`;
-    return this.insert(stm,  Object.values(row));
+    const fields = Object.keys(row)
+    const stm = `insert into ${this.entityName}(${fields}) values (${fields.map(_f => '?')})`
+    return this.insert(stm, Object.values(row))
   }
 }

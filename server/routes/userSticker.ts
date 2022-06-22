@@ -36,19 +36,19 @@ const validateInput = (req: Request, res: Response, next: NextFunction) => {
 }
 
 router.post('/userSticker', [
-  check('album_id', 'album_id is required').isUUID(4),
-  check('sticker_id', 'sticker_id is required').isNumeric(),
-  check('in_album', 'in_album is required').isBoolean(),
-  check('added_on', 'added_on is required').isNumeric(),
+  check('albumId', 'albumId is required').isUUID(4),
+  check('stickerId', 'stickerId is required').isNumeric(),
+  check('inAlbum', 'inAlbum is required').isBoolean(),
+  check('addedOn', 'addedOn is required').isNumeric(),
   validateInput
 ],  async (req: Request, res: Response) => {
     let dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, "user_sticker");
     let value: UserStickerRow = req.body as UserStickerRow;
     value = {
-        album_id: req.body.album_id,
-        sticker_id: req.body.sticker_id,
-        in_album: req.body.in_album,
-        added_on: req.body.added_on
+        album_id: req.body.albumId,
+        sticker_id: req.body.stickerId,
+        in_album: req.body.inAlbum !== undefined? req.body.inAlbum : null,
+        added_on: req.body.addedOn
     }
     dao.post(value);
     res.status(200).json(value);
