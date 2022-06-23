@@ -41,4 +41,11 @@ export default class EntityDAO<T extends Object> {
     const stm = `insert into ${this.entityName}(${fields}) values (${fields.map(_f => '?')})`
     return this.insert(stm, Object.values(row))
   }
+
+
+    public async upsert (row: T): Promise<void> {
+      const fields = Object.keys(row)
+      const stm = `replace into ${this.entityName}(${fields}) values (${fields.map(_f => '?')})`
+      return this.insert(stm, Object.values(row))
+    }
 }

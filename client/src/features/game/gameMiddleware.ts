@@ -14,6 +14,7 @@ var ALBUM_ID = localStorage.getItem("albumId");
 if(!ALBUM_ID){
     ALBUM_ID = uuidv4();
     localStorage.setItem("albumId", ALBUM_ID)
+    localStorage.setItem("startedOn", Date.now().toString())
 }
 
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
