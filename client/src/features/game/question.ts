@@ -44,7 +44,7 @@ export module Question {
     export interface Answer extends Identifiable {
         albumId: string
         questionId: number
-        success?: boolean
+        success?: boolean | null
         latency?: number
         attempts?: number
         answeredOn?: number
@@ -110,10 +110,11 @@ export module Question {
                 latency: latency,
                 difficulty: question.difficulty
             }
+            let store = {...answer};
             if(response.length === 0){
-                answer.success = undefined;
+                store.success = null;
             }
-            answer = await this.userAnswerDAO.put(answer)
+            answer = await this.userAnswerDAO.put(store)
             this.answers.push(answer)
             return answer
         }

@@ -75,14 +75,14 @@ const QuestionView = () => {
         dispatch(nextQuestion())
     }
 
-    function renderFeedback(success?: boolean) {
+    function renderFeedback(success?: boolean | null) {
         if (success === true) {
             return (<div className="feedbackFrame">
                 <label className="feedbackMsg">{t("quiz.success")}</label>
                 <p className="rewardMsg">{t("quiz.reward", { number: unclaimed })}</p>
             </div>)
         }
-        if (success === false) {
+        if (success === false || success === null) {
             return (<div>
                 {questionState?.feedback && <p className="feedbackMsg">{questionState.feedback}</p>}
                 <p className="feedbackMsg">{t("quiz.fail")}</p>
@@ -91,7 +91,7 @@ const QuestionView = () => {
         return null
     }
 
-    function getFeedbackClass(index: number, solution: number[], wrong?: number[], success?: boolean) {
+    function getFeedbackClass(index: number, solution: number[], wrong?: number[], success?: boolean | null) {
         if (success === undefined) return "questionOption";
         if (solution.includes(index)) return "questionOption correct";
         if (wrong && wrong.includes(index)) return "questionOption wrong";

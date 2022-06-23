@@ -15,7 +15,7 @@ export interface Attempt {
 
 export interface Feedback {
     wrong?: number[]
-    success?: boolean
+    success?: boolean | null
 }
 
 export type FeedbackAndStickers = Feedback & {

@@ -42,7 +42,7 @@ router.post('/userAnswer', [
   check('albumId', 'album_id is required').isUUID(4),
   check('questionId', 'question_id is required').isNumeric(),
   check('attempts', 'attempts is required').optional().isNumeric(),
-  check('success', 'success is required').optional().isBoolean(),
+  check('success', 'success is required').optional({ nullable: true }).isBoolean(),
   check('latency', 'latency is required').optional().isNumeric(),
   check('answeredOn', 'answered_on is required').isNumeric(),
   validateInput
