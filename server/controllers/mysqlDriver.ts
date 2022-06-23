@@ -32,7 +32,7 @@ class MySQLDriver {
 
 export default new MySQLDriver({
   user: 'ssolucio_cyberalbum',
-  password: 'cYb3#r41boom',
+  password: process.env.DB_PWD,
   database: 'ssolucio_cyberalbum',
   host: 'localhost'
 })
