@@ -176,15 +176,13 @@ export module Question {
         async push(record: Type){
             this.db.push(record);
             if(DAO.token && this.entrypoint){
-                console.log("push wth ", process.env.REACT_APP_API, DAO.token.slice(-5), record);
                 try {
                     let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
-                    const { data, status } = await axios.post(uri,record,{
+                    await axios.post(uri,record,{
                         headers:{"g-recaptcha-response":DAO.token
                     }});
-                    console.log("replied",status, data);
                 } catch (error){
-                    console.log("failed", error);
+                    console.error("API error", error);
                 }
             }
         }

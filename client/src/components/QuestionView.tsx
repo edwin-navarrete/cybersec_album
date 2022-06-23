@@ -21,7 +21,7 @@ const QuestionView = () => {
     const { t } = useTranslation(); // i18n
 
     const handleCaptcha = useCallback((token : string) => {
-        console.log(token.slice(-5));
+        // console.log(token.slice(-5));
         dispatch(updateToken(token));
         // eslint-disable-next-line
     }, [dispatch, questionState]);

@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
+import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
-import { selectStickers, selectStickerSpots, selectAchievement } from '../features/game/gameSlice';
-import { nextQuestion } from '../features/game/gameMiddleware';
+import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
+import { nextQuestion, stickerSample, glueSticker } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
@@ -36,6 +37,13 @@ const AlbumView = () => {
         }
     });
 
+    const handleCaptcha = useCallback(async (token : string) => {
+        // console.log(token.slice(-5));
+        dispatch(updateToken(token));
+        if(stickers.length === 1 && !stickers[0].inAlbum) dispatch(glueSticker(await stickerSample))
+        // eslint-disable-next-line
+    }, [dispatch, stickers]);
+
     function handleMoreStickers() {
         dispatch(nextQuestion())
         navigate("/reto/")
@@ -63,6 +71,7 @@ const AlbumView = () => {
 
     return (
         <section className="pageContainer">
+            <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>

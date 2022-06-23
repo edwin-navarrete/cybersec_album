@@ -74,7 +74,8 @@ export const abumSlice = createSlice({
     initialState,
     reducers: {
         updateToken: (state, action: PayloadAction<string>) => {
-          state.token = action.payload || "";
+          Question.DAO.token = action.payload || "";
+          state.token = Question.DAO.token;
         }
     },
     extraReducers: builder => {
