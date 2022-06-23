@@ -165,12 +165,11 @@ export module Sticker {
                 ? albumSpots.size
                 : Array.from(albumSpots.values())
                     .reduce((cnt, s) => s.inAlbum ? cnt + 1 : cnt, 0)
-            console.log("filled withUnclaimed", filled, withUnclaimed)
             if(filled === 1 || filled >= allSpots){
                 // Album started or finished
                 try {
                     let uri = process.env.REACT_APP_API+`/album`;
-                    const { data, status } = await axios.post(uri,{
+                    await axios.post(uri,{
                         albumId: localStorage.getItem("albumId"),
                         startedOn: localStorage.getItem("startedOn"),
                         endedOn: filled >= allSpots? Date.now() : null,
@@ -178,9 +177,8 @@ export module Sticker {
                     },{
                         headers:{"g-recaptcha-response": Question.DAO.token
                     }});
-                    console.log("replied",status, data);
                 } catch (error){
-                    console.log("failed", error);
+                    console.error("API error", error);
                 }
             }
             return (filled / allSpots)

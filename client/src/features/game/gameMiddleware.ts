@@ -17,6 +17,11 @@ if(!ALBUM_ID){
     localStorage.setItem("startedOn", Date.now().toString())
 }
 
+// backward compatibility
+if(!localStorage.getItem("startedOn")){
+    localStorage.setItem("startedOn", Date.now().toString())
+}
+
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 export const userStickerDAO = new Sticker.UserStickerDAO([])
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, ALBUM_ID)
