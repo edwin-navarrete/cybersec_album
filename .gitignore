@@ -30,3 +30,4 @@ client/build/.htaccess
 stderr.log
 tmp/
 .env.production
+client/.env.production
