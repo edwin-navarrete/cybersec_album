@@ -1,3 +1,4 @@
+import axios from "axios"
 import { Question } from "./question";
 
 export module Sticker {
@@ -144,11 +145,17 @@ export module Sticker {
         }
 
         async glueSticker(albumStiker: AlbumStiker): Promise<UserSticker> {
-            if (!albumStiker.inAlbum) {
-                albumStiker = { ...albumStiker, inAlbum: true };
-                return this.userStickerDAO.upsert(albumStiker as UserSticker);
+            try{
+                if (!albumStiker.inAlbum) {
+                    albumStiker = { ...albumStiker, inAlbum: true };
+                    // to trigger the start of the album
+                    return this.userStickerDAO.upsert(albumStiker as UserSticker);
+                }
+                return new Promise((resolve) => resolve(albumStiker))
             }
-            return new Promise((resolve) => resolve(albumStiker))
+            finally {
+                await this.getAchievement();
+            }
         }
 
         async getAchievement(withUnclaimed?: boolean): Promise<number> {
@@ -158,13 +165,33 @@ export module Sticker {
                 ? albumSpots.size
                 : Array.from(albumSpots.values())
                     .reduce((cnt, s) => s.inAlbum ? cnt + 1 : cnt, 0)
+            console.log("filled withUnclaimed", filled, withUnclaimed)
+            if(filled === 1 || filled >= allSpots){
+                // Album started or finished
+                try {
+                    let uri = process.env.REACT_APP_API+`/album`;
+                    const { data, status } = await axios.post(uri,{
+                        albumId: localStorage.getItem("albumId"),
+                        startedOn: localStorage.getItem("startedOn"),
+                        endedOn: filled >= allSpots? Date.now() : null,
+                        language: navigator.language
+                    },{
+                        headers:{"g-recaptcha-response": Question.DAO.token
+                    }});
+                    console.log("replied",status, data);
+                } catch (error){
+                    console.log("failed", error);
+                }
+            }
             return (filled / allSpots)
         }
     }
 
 
     export class UserStickerDAO extends Question.DAO<UserSticker> {
-
+        constructor(initialDB:UserSticker[]) {
+            super("userSticker",initialDB)
+        }
         async upsert(sticker: UserSticker): Promise<UserSticker> {
             return new Promise(resolve => {
                 if (!sticker.id) {
@@ -186,5 +213,9 @@ export module Sticker {
         }
     }
 
-    export class StickerDAO extends Question.DAO<StickerDef> { }
+    export class StickerDAO extends Question.DAO<StickerDef> {
+        constructor(initialDB:StickerDef[]) {
+            super("",initialDB)
+        }
+    }
 }

@@ -30,7 +30,6 @@ const AlbumView = () => {
 
     useEffect(() => {
         if (isFull) {
-            console.log("setTimeout");
             setTimeout(() => {
                 setSplash(false);
             }, 4500);

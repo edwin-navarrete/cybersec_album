@@ -44,7 +44,7 @@ export module Question {
     export interface Answer extends Identifiable {
         albumId: string
         questionId: number
-        success?: boolean
+        success?: boolean | null
         latency?: number
         attempts?: number
         answeredOn?: number
@@ -110,8 +110,11 @@ export module Question {
                 latency: latency,
                 difficulty: question.difficulty
             }
-
-            answer = await this.userAnswerDAO.put(answer)
+            let store = {...answer};
+            if(response.length === 0){
+                store.success = null;
+            }
+            answer = await this.userAnswerDAO.put(store)
             this.answers.push(answer)
             return answer
         }
@@ -132,12 +135,14 @@ export module Question {
     export class DAO<Type extends Identifiable>{
         db: Type[]
         static token: string = ""
+        entrypoint: string
 
-        constructor(initialDB: Type[]) {
+        constructor(entrypoint:string, initialDB: Type[]) {
             this.db = initialDB
             // verify no duplicated ids
             if (new Set(this.db.map(i => i.id)).size !== this.db.length)
                 throw (new Error('Duplicated key value'));
+            this.entrypoint = entrypoint
         }
 
         findAll(options?: QueryOptions): Promise<Type[]> {
@@ -170,13 +175,13 @@ export module Question {
 
         async push(record: Type){
             this.db.push(record);
-            if(DAO.token){
+            if(DAO.token && this.entrypoint){
                 console.log("push wth ", process.env.REACT_APP_API, DAO.token.slice(-5), record);
                 try {
-                    let uri = process.env.REACT_APP_API+"/auth/login";
-                    const { data, status } = await axios.post(uri,
-                    {"email":"edwin@gmail.com","password":"1234"},
-                    {headers:{"g-recaptcha-response":DAO.token}});
+                    let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
+                    const { data, status } = await axios.post(uri,record,{
+                        headers:{"g-recaptcha-response":DAO.token
+                    }});
                     console.log("replied",status, data);
                 } catch (error){
                     console.log("failed", error);
@@ -187,7 +192,7 @@ export module Question {
 
     export class UserAnswerDAO extends DAO<Answer> {
         constructor() {
-            super([])
+            super("userAnswer",[])
         }
 
         async put(answer: Answer): Promise<Answer> {
@@ -216,5 +221,9 @@ export module Question {
         }
     }
 
-    export class QuestionDefDAO extends DAO<QuestionDef> { }
+    export class QuestionDefDAO extends DAO<QuestionDef> {
+        constructor(initialDB:QuestionDef[]){
+            super("", initialDB)
+        }
+    }
 }
