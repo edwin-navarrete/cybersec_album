@@ -26,10 +26,9 @@ export class Server {
 
   // Bind controllers to routes
   routes () {
-    this.app.use('/api/auth', require('../routes/auth'))
-    this.app.use('/api', require('../routes/userSticker'))
-    this.app.use('/api', require('../routes/userAnswer'))
-    this.app.use('/api', require('../routes/album'))
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userSticker'))
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userAnswer'))
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/album'))
   }
 
   listen () {
