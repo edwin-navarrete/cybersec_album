@@ -7,6 +7,7 @@ class MySQLDriver {
   connection: mysql.Connection
   config: mysql.ConnectionOptions
   constructor (config: mysql.ConnectionOptions) {
+      console.error("-",process.env.DB_PWD, process.env.NODE_ENV)
     this.config = config
     this.connection = null
   }
