@@ -38,7 +38,7 @@ const AlbumView = () => {
     });
 
     const handleCaptcha = useCallback(async (token : string) => {
-        console.log(token.slice(-5));
+        // console.log(token.slice(-5));
         dispatch(updateToken(token));
         if(stickers.length === 1 && !stickers[0].inAlbum) dispatch(glueSticker(await stickerSample))
         // eslint-disable-next-line
