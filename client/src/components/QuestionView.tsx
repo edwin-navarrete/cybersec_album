@@ -30,6 +30,7 @@ const QuestionView = () => {
     let optCount = questionState?.options.length || 4;
 
     const [timer, setTimer] = useState(-1)
+    const [timestamp, setTimestamp] = useState(-1)
 
     // go to album if answered enough to fill the album
     useEffect(() => { achievement && navigate("/") })
@@ -39,16 +40,19 @@ const QuestionView = () => {
             if (timer === 0) {
                 dispatch(putAnswer({
                     response: [],
-                    latency: timeLimit - timer
+                    latency: Date.now() - timestamp
                 }))
                 setOptState(new Array(optCount).fill(false))
                 setTimer(timeLimit)
             }
             else if (timer > 0) interval = setInterval(() => setTimer(timer - 1), 1000);
-            else if (timer === -1) setTimer(timeLimit);
+            else if (timer === -1){
+                setTimestamp(Date.now())
+                setTimer(timeLimit)
+            };
         }
         return () => interval && clearInterval(interval);
-    }, [questionState?.success, timer, timeLimit, dispatch, optCount]);
+    }, [questionState?.success, timer, timeLimit, dispatch, optCount, timestamp]);
 
 
     const [optState, setOptState] = useState(
@@ -64,7 +68,7 @@ const QuestionView = () => {
             let response = newOptState.map((b, i) => b ? i : null).filter(i => i !== null) as number[];
             dispatch(putAnswer({
                 response: response,
-                latency: timeLimit - timer
+                latency: Date.now() - timestamp
             }))
             setOptState(new Array(optCount).fill(false))
         }
