@@ -23,12 +23,11 @@ const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, ALBUM_ID)
 const gameConfig = config as Question.GameConfig
 
 // give the first sticker as a sample
-stickerDAO.findAll({ include: [1] }).then(async stickerSample => {
+export const stickerSample = stickerDAO.findAll({ include: [1] }).then( async stickerSample => {
     let firstSticker = stickerSample[0]
     let userSticker = await theAlbum.ownStickers(stickerSample);
-    theAlbum.glueSticker({ ...firstSticker, ...userSticker[0] })
-})
-
+    return { ...firstSticker, ...userSticker[0] };
+ });
 
 const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 const userAnswerDAO = new Question.UserAnswerDAO()
