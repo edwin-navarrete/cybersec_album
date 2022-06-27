@@ -12,20 +12,22 @@ class MySQLDriver {
   }
 
   async connect () {
-    if (this.connection === null) {
-      this.connection = await mysql.createConnection(this.config)
-    }
+      // FIXME attempt the connection pool to increase speed
+     this.connection = await mysql.createConnection(this.config)
   }
 
   fetch: Fetch = async (query: string) => {
     await this.connect()
     const [rows] = await this.connection.execute(query)
+    this.connection.end();
     return rows as any[]
   }
 
   insert: Insert = async (stm: string, values: any[]): Promise<any> => {
     await this.connect()
-    const [result] = await this.connection.execute(stm, values)
+    const [result] = await this.connection.execute(stm, values);
+    this.connection.commit();
+    this.connection.end();
     return result
   }
 }
