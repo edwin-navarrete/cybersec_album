@@ -12,7 +12,7 @@
     "solution": [
       3
     ],
-    "difficulty": 0.2,
+    "difficulty": 0.4,
     "feedback": "Recuerda que seguridad en el sentido más amplio incluye la protección de miembros de un grupo contra daños así como la percepción individual del riesgo."
   },
   {
@@ -28,7 +28,7 @@
     "solution": [
       2
     ],
-    "difficulty": 0.4
+    "difficulty": 0.5
   },
   {
     "id": 3,
@@ -43,7 +43,7 @@
     "solution": [
       0
     ],
-    "difficulty": 0.6
+    "difficulty": 0.7
   },
   {
     "id": 4,
@@ -107,7 +107,7 @@
     "solution": [
       1
     ],
-    "difficulty": 0.1
+    "difficulty": 0.4
   },
   {
     "id": 8,
@@ -135,7 +135,7 @@
       "Seguridad Cibernética"
     ],
     "solution": [
-      2
+      1
     ],
     "difficulty": 0.7
   },
@@ -199,7 +199,7 @@
     "solution": [
       0
     ],
-    "difficulty": 0.3
+    "difficulty": 0.4
   },
   {
     "id": 14,

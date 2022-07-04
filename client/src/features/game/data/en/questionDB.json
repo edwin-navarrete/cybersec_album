@@ -4,7 +4,7 @@
     "type": "single",
     "question": "What is security?",
     "options": [
-      "related to trust",
+      "Related to trust",
       "The opposite of insecurity",
       "Necessity of the human being",
       "All of the above"
@@ -12,7 +12,7 @@
     "solution": [
       3
     ],
-    "difficulty": 0.2,
+    "difficulty": 0.4,
     "feedback": "Remember that security in the broadest sense includes the protection of members of a group from harm as well as individual perception of risk."
   },
   {
@@ -21,14 +21,14 @@
     "question": "What is information security?",
     "options": [
       "Securing computer equipment",
-      "Secure company documents",
-      "Securing Information Assets",
-      "Secure digital information"
+      "Securing company documents",
+      "Securing information assets",
+      "Securing digital information"
     ],
     "solution": [
       2
     ],
-    "difficulty": 0.4
+    "difficulty": 0.5
   },
   {
     "id": 3,
@@ -38,12 +38,12 @@
       "Digital format and interconnected systems",
       "Interconnected formats and digital systems",
       "Cyberspace",
-      "Cyber ​​Space"
+      "Physical"
     ],
     "solution": [
       0
     ],
-    "difficulty": 0.6
+    "difficulty": 0.7
   },
   {
     "id": 4,
@@ -107,7 +107,7 @@
     "solution": [
       1
     ],
-    "difficulty": 0.1
+    "difficulty": 0.4
   },
   {
     "id": 8,
@@ -115,7 +115,7 @@
     "question": "A dissatisfied employee constitutes for the organization",
     "options": [
       "A risk",
-      "A Vulnerability",
+      "A vulnerability",
       "A threat",
       "A control"
     ],
@@ -129,10 +129,10 @@
     "type": "single",
     "question": "Information security encompasses",
     "options": [
-      "Informatic security",
+      "Information Security",
       "Information Security and Cybersecurity",
-      "Cyber ​​Security",
-      "Cyber ​​Security"
+      "Cybersecurity",
+      "Security"
     ],
     "solution": [
       2
@@ -144,9 +144,9 @@
     "type": "single",
     "question": "Computer attack specifically targeting leaders or senior managers",
     "options": [
-      "whaling",
+      "Whaling",
       "Vishing",
-      "phishing",
+      "Phishing",
       "Pharming"
     ],
     "solution": [
@@ -199,7 +199,7 @@
     "solution": [
       0
     ],
-    "difficulty": 0.3
+    "difficulty": 0.4
   },
   {
     "id": 14,
@@ -222,9 +222,9 @@
     "question": "Information security policies are:",
     "options": [
       "Guidelines to protect information",
-      "The Catalog of Information Assets",
+      "The catalog of Information Assets",
       "The list of risks of the entity",
-      "The Documents Nobody Knows"
+      "The documents nobody knows"
     ],
     "solution": [
       0
@@ -298,7 +298,7 @@
     "options": [
       "Information theft",
       "Equipment damage due to voltage change",
-      "Data Center Flood",
+      "Data Center flood",
       "Earthquake"
     ],
     "solution": [
@@ -309,12 +309,12 @@
   {
     "id": 21,
     "type": "multiple",
-    "question": "Three classes:",
+    "question": "Threat classes:",
     "options": [
       "Deliberate, Accidental",
       "Imaginary, real",
       "Internal, External",
-      "environmental"
+      "Environmental"
     ],
     "solution": [
       0,
