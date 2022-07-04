@@ -109,6 +109,7 @@ const QuestionView = () => {
         return (<div className='questionFrame' >
             <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/>
             <h3>{id}:{question}</h3>
+            {solution.length > 1 && <h4>{t("quiz.multipleWrn")}</h4>}
             {options.map((option, i) =>
                 <label key={i} className={getFeedbackClass(i, solution, wrong, success)}>
                     <input type="checkbox"

@@ -48,7 +48,7 @@
   {
     "id": 4,
     "type": "single",
-    "question": "¿Cuál de estos es un activo de información?",
+    "question": "¿Cuál de estos son activos de información?",
     "options": [
       "Pagina web",
       "Correos electrónicos de clientes",
@@ -157,7 +157,7 @@
   {
     "id": 11,
     "type": "multiple",
-    "question": "Impactos que puede causar un ataque informático en una entidad",
+    "question": "Cuáles son los impactos que puede causar un ataque informático en una entidad?",
     "options": [
       "Financiero",
       "Reputacional",

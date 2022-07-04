@@ -48,7 +48,7 @@
   {
     "id": 4,
     "type": "single",
-    "question": "Which of these is an information asset?",
+    "question": "Which of these are information assets?",
     "options": [
       "Web page",
       "Customer Emails",
@@ -82,7 +82,7 @@
   {
     "id": 6,
     "type": "single",
-    "question": "The leak of information in an entity would be an aspect to cover by:",
+    "question": "The leak of information in an corporation would be an aspect to cover by:",
     "options": [
       "Integrity",
       "Confidentiality",
@@ -157,7 +157,7 @@
   {
     "id": 11,
     "type": "multiple",
-    "question": "Impacts that a computer attack can cause in an entity",
+    "question": "What are the impacts that a computer attack can cause in a corporation?",
     "options": [
       "Financial",
       "Reputational",
@@ -223,7 +223,7 @@
     "options": [
       "Guidelines to protect information",
       "The catalog of Information Assets",
-      "The list of risks of the entity",
+      "The list of risks of the corporation",
       "The documents nobody knows"
     ],
     "solution": [
