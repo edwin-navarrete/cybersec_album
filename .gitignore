@@ -32,3 +32,4 @@ stderr.log
 tmp/
 .env.production
 client/.env.production
+.idea

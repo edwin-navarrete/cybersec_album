@@ -153,6 +153,21 @@ code {
   to {opacity: 1;}
 }
 
+@keyframes glowing {
+  0% {
+    background-color: #003e7b;
+    box-shadow: 0 0 3px #003e7b;
+  }
+  50% {
+    background-color: #1976d2;
+    box-shadow: 0 0 10px #1976d2;
+  }
+  100% {
+    background-color: #003e7b;
+    box-shadow: 0 0 3px #1976d2;
+  }
+}
+
 .introSplash {
     position: fixed;
     z-index: 1;
@@ -251,4 +266,8 @@ code {
     font-family: 'Covered By Your Grace', cursive;
     font-size: xx-large;
     color: darkorchid;
+}
+
+.glowingBtn {
+    animation: glowing 1300ms infinite;
 }
