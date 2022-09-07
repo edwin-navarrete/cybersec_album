@@ -271,3 +271,7 @@ code {
 .glowingBtn {
     animation: glowing 1300ms infinite;
 }
+
+.albumDigest {
+    font-size: x-large;
+}

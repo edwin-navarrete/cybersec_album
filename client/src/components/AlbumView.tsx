@@ -68,9 +68,11 @@ const AlbumView = () => {
     function success() {
         return splash && (<div className='successSplash'><span className="completed">{t("quiz.completed")}</span></div>);
     }
+    const digest = (localStorage.getItem("albumId") || '').slice(-4);
 
     return (
         <section className="pageContainer">
+
             <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
@@ -80,6 +82,7 @@ const AlbumView = () => {
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
                 {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+                {isFull && <span className="albumDigest">id: {digest}</span>}
             </div>
         </section>
 
