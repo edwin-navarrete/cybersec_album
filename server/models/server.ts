@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import recaptcha from './recaptcha'
-import useragent from 'express-useragent';
+import useragent from 'express-useragent'
 // import path from 'path'
 
 export class Server {
@@ -20,7 +20,7 @@ export class Server {
     this.app.use(cors()) // Enable CORS
     // this.app.options('*', cors());
     this.app.use(express.json())
-    this.app.use(useragent.express());
+    this.app.use(useragent.express())
     this.app.use(recaptcha)
   }
 

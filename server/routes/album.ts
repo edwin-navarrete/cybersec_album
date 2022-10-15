@@ -48,7 +48,7 @@ router.post('/album', [
   check('albumId', 'album_id is required').isUUID(4),
   check('startedOn', 'startedOn is required').isNumeric(),
   check('endedOn', 'endedOn is required').optional({ nullable: true }).isNumeric(),
-  check('language', 'language is required').matches("\\w+(-\\w+)*"),
+  check('language', 'language is required').matches('\\w+(-\\w+)*'),
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
@@ -61,10 +61,10 @@ router.post('/album', [
     platform: req.useragent?.platform,
     browser: req.useragent?.browser,
     version: req.useragent?.version,
-    is_mobile: req.useragent?.isMobile,
-  } as AlbumRow;
-  dao.upsert(value).catch(err=>{
-      console.log("Failed post album:", err)
+    is_mobile: req.useragent?.isMobile
+  } as AlbumRow
+  dao.upsert(value).catch(err => {
+    console.log('Failed post album:', err)
   })
   res.status(200).json(value)
 })

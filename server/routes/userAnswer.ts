@@ -51,13 +51,13 @@ router.post('/userAnswer', [
   const value = {
     album_id: req.body.albumId,
     question_id: req.body.questionId,
-    success: req.body.success !== undefined?  req.body.success : null,
+    success: req.body.success !== undefined ? req.body.success : null,
     latency: req.body.latency || null,
     attempts: req.body.attempts || null,
     answered_on: req.body.answeredOn
   }
-  dao.post(value).catch((err)=>{
-      console.log("failed post answer:", err);
+  dao.post(value).catch((err) => {
+    console.log('failed post answer:', err)
   })
   res.status(200).json(value)
 })

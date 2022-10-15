@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import { check, validationResult } from 'express-validator'
 
-import  EntityDAO  from '../controllers/entityDao'
-import  mysqlDriver  from '../controllers/mysqlDriver'
+import EntityDAO from '../controllers/entityDao'
+import mysqlDriver from '../controllers/mysqlDriver'
 
 const router = Router()
 
@@ -23,7 +23,7 @@ interface UserStickerRow {
     added_on: number
 }
 
-class UserStickerDAO extends EntityDAO<UserStickerRow>{
+class UserStickerDAO extends EntityDAO<UserStickerRow> {
 }
 
 const validateInput = (req: Request, res: Response, next: NextFunction) => {
@@ -41,17 +41,17 @@ router.post('/userSticker', [
   check('inAlbum', 'inAlbum is required').isBoolean(),
   check('addedOn', 'addedOn is required').isNumeric(),
   validateInput
-],  async (req: Request, res: Response) => {
-    let dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, "user_sticker");
-    let value: UserStickerRow = req.body as UserStickerRow;
-    value = {
-        album_id: req.body.albumId,
-        sticker_id: req.body.stickerId,
-        in_album: req.body.inAlbum !== undefined? req.body.inAlbum : null,
-        added_on: req.body.addedOn
-    }
-    dao.post(value);
-    res.status(200).json(value);
+], async (req: Request, res: Response) => {
+  const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
+  let value: UserStickerRow = req.body as UserStickerRow
+  value = {
+    album_id: req.body.albumId,
+    sticker_id: req.body.stickerId,
+    in_album: req.body.inAlbum !== undefined ? req.body.inAlbum : null,
+    added_on: req.body.addedOn
+  }
+  dao.post(value)
+  res.status(200).json(value)
 })
 
 module.exports = router
