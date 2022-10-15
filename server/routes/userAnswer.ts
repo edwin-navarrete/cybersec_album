@@ -56,7 +56,9 @@ router.post('/userAnswer', [
     attempts: req.body.attempts || null,
     answered_on: req.body.answeredOn
   }
-  dao.post(value)
+  dao.post(value).catch((err)=>{
+      console.log("failed post answer:", err);
+  })
   res.status(200).json(value)
 })
 

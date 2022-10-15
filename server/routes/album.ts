@@ -63,7 +63,9 @@ router.post('/album', [
     version: req.useragent?.version,
     is_mobile: req.useragent?.isMobile,
   } as AlbumRow;
-  dao.upsert(value)
+  dao.upsert(value).catch(err=>{
+      console.log("Failed post album:", err)
+  })
   res.status(200).json(value)
 })
 
