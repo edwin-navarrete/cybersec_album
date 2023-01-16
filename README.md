@@ -56,3 +56,5 @@ React-Redux aplicación cliente
 Recursos estáticos
 
 # Diseño
+
+#CambiosByJuan
