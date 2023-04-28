@@ -1,0 +1,10 @@
+{
+  "data": [
+    { "album_id": "0f308ef7-dc76-404b-97ea-974bb94599d9", "error_number": 2 },
+    { "album_id": "16052aae-2e03-40e4-a4da-c0564d1e7572", "error_number": 1 },
+    { "album_id": "19e9822a-c611-4e3a-b64b-a9d2ddc1c4bf", "error_number": 7 },
+    { "album_id": "9321a580-3fce-402f-9d39-8b88d604d7fb", "error_number": 2 },
+    { "album_id": "c7ae7bfb-7dae-4f70-8cfd-0be105b43743", "error_number": 2 },
+    { "album_id": "10a9c819-46c8-41c3-bb05-5340ebeccc63", "error_number": 0 }
+  ]
+}
