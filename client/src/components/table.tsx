@@ -20,7 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
 const today = dayjs();
-
+//
 
 interface IData {
 
@@ -126,8 +126,8 @@ export default function BasicTable() {
             <TableCell align="right">Número de errores</TableCell>
             <TableCell align="right">Preguntas respondidas</TableCell>
             <TableCell align="right">Album finalizado</TableCell>
-            <TableCell align="right">Tiempo total de respuesta</TableCell>
-            <TableCell align="right">Porcentaje de error</TableCell>
+            <TableCell align="right">Tiempo total de respuesta (s)</TableCell>
+            <TableCell align="right">Porcentaje de error (%)  </TableCell>
             <TableCell align="right">Fecha</TableCell>
           </TableRow>
         </TableHead>
