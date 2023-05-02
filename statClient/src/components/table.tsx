@@ -10,7 +10,6 @@ import Paper from '@mui/material/Paper';
 import Tooltip from '@mui/material/Tooltip';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import useSort from '../hooks/useSort';
 import { Divider } from '@mui/material';
 import dayjs from 'dayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
@@ -20,7 +19,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
 const today = dayjs();
-//
 
 interface IData {
 
@@ -32,7 +30,40 @@ interface IData {
   error_percentage: number;
   total_response_time: number;
   epocas: number;
+  rank:number;
 
+}
+
+function sortArray (dataToSort:any) {
+  if (dataToSort.length > 0) {
+    // setDataSorted(dataToSort);
+   dataToSort.sort(function(a: any,b:any) {
+        //Sort by less time
+        return a.total_response_time - b.total_response_time;
+    })
+   dataToSort.sort(function(a: any,b:any) {
+        //Sort by status of album (enden or not)
+        if (a.ended_album > b.ended_album) {
+            return -1;
+        }
+    
+        if (a.ended_album < b.ended_album) {
+            return 1;
+        }
+        // //Sort by less error number
+        return a.error_number - b.error_number ;
+    })
+  }
+  return addRank(dataToSort)
+}
+function addRank(arrayData:any) {
+  let position = 1
+  for (let index = 0; index < arrayData.length; index++) {
+    const element = arrayData[index];
+    element.rank = position++;
+  }
+  // console.log(arrayData)
+  return arrayData
 }
 
 
@@ -49,31 +80,27 @@ export default function BasicTable() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8001/user")//Url api server
+      .get("http://localhost:3004/user")//Url api server
       .then((res) => {
-        setData(res.data.data);
+        setData(sortArray(res.data.data));
 
       })
       .catch((error) => {
         console.log(error);
       });
-
   }, []);
-
-  //Use of hook useSort to 
-  const dataSorted = useSort(data);
-  // console.log(dataSorted)
 
   // Filter data to show only rows with matching dates
   const filteredData = data.filter(row => {
     const rowDate = dayjs(row.epocas);
-    if (selectedDate == today) {
+    if (selectedDate === today) {
       return rowDate
     }
     else {
 
       return rowDate.isSame(selectedDate, 'day');
     }
+    
   });
   ;
 
@@ -122,13 +149,14 @@ export default function BasicTable() {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Album Id</TableCell>
-            <TableCell align="right">Número de errores</TableCell>
-            <TableCell align="right">Preguntas respondidas</TableCell>
+          <TableCell>Posición</TableCell>
+            <TableCell align="right">Album</TableCell>
+            <TableCell align="right">Fecha y hora de inicio</TableCell>
             <TableCell align="right">Album finalizado</TableCell>
-            <TableCell align="right">Tiempo total de respuesta (s)</TableCell>
+            <TableCell align="right">Preguntas respondidas</TableCell>
+            <TableCell align="right">Número de errores</TableCell>
             <TableCell align="right">Porcentaje de error (%)  </TableCell>
-            <TableCell align="right">Fecha</TableCell>
+            <TableCell align="right">Tiempo total de respuesta (Segundos)</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -138,16 +166,20 @@ export default function BasicTable() {
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell component="th" scope="row">
+                {row.rank}
+              </TableCell>
+              <TableCell align="right" >
                 {row.album_id.slice(-5)}
               </TableCell>
-              <TableCell align="right">{row.error_number}</TableCell>
-              <TableCell align="right">{row.answered_question_number}</TableCell>
-              <TableCell align="right">{row.ended_album}</TableCell>
-              <TableCell align="right">{row.error_percentage}</TableCell>
-              <TableCell align="right">{row.total_response_time}</TableCell>
               <TableCell align="right">{
                 row.epocas ? new Date(row.epocas).toLocaleDateString() : new Date().toLocaleDateString()
               }</TableCell>
+              <TableCell align="right">{row.ended_album}</TableCell>
+              <TableCell align="right">{row.answered_question_number}</TableCell>
+              <TableCell align="right">{row.error_number}</TableCell>
+              <TableCell align="right">{row.error_percentage}%</TableCell>
+              <TableCell align="right">{row.total_response_time}</TableCell>
+              
             </TableRow>
           ))}
         </TableBody>
