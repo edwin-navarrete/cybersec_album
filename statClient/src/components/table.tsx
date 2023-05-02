@@ -56,6 +56,7 @@ function sortArray (dataToSort:any) {
   }
   return addRank(dataToSort)
 }
+//Método que añade posiciones 
 function addRank(arrayData:any) {
   let position = 1
   for (let index = 0; index < arrayData.length; index++) {
@@ -177,7 +178,7 @@ export default function BasicTable() {
               <TableCell align="right">{row.ended_album}</TableCell>
               <TableCell align="right">{row.answered_question_number}</TableCell>
               <TableCell align="right">{row.error_number}</TableCell>
-              <TableCell align="right">{row.error_percentage*100}%</TableCell>
+              <TableCell align="right">{row.error_percentage}%</TableCell>
               <TableCell align="right">{row.total_response_time}</TableCell>
               
             </TableRow>
