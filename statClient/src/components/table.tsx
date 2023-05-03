@@ -23,7 +23,7 @@ const today = dayjs();
 interface IData {
 
   // define la estructura de los datos que esperas recibir de la API
-  album_id: string; // En 
+  album_id: string; // En
   error_number: number;
   answered_question_number: number;
   ended_album: string;
@@ -46,7 +46,7 @@ function sortArray (dataToSort:any) {
         if (a.ended_album > b.ended_album) {
             return -1;
         }
-    
+
         if (a.ended_album < b.ended_album) {
             return 1;
         }
@@ -56,7 +56,7 @@ function sortArray (dataToSort:any) {
   }
   return addRank(dataToSort)
 }
-//Método que añade posiciones 
+//Método que añade posiciones
 function addRank(arrayData:any) {
   let position = 1
   for (let index = 0; index < arrayData.length; index++) {
@@ -76,7 +76,7 @@ export default function BasicTable() {
     setSelectedDate(date);
   };
 
-  // Hooks for query data from server API 
+  // Hooks for query data from server API
   const [data, setData] = useState<IData[]>([]);
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export default function BasicTable() {
 
       return rowDate.isSame(selectedDate, 'day');
     }
-    
+
   });
   ;
 
@@ -173,14 +173,14 @@ export default function BasicTable() {
                 {row.album_id.slice(-5)}
               </TableCell>
               <TableCell align="right">{
-                row.epocas ? new Date(row.epocas).toLocaleDateString() : new Date().toLocaleDateString()
+                new Date(row.epocas).toLocaleString()
               }</TableCell>
-              <TableCell align="right">{row.ended_album}</TableCell>
+              <TableCell align="right">{row.ended_album? "Sí" : "No"}</TableCell>
               <TableCell align="right">{row.answered_question_number}</TableCell>
               <TableCell align="right">{row.error_number}</TableCell>
-              <TableCell align="right">{row.error_percentage}%</TableCell>
+              <TableCell align="right">{row.error_percentage*100}%</TableCell>
               <TableCell align="right">{row.total_response_time}</TableCell>
-              
+
             </TableRow>
           ))}
         </TableBody>
