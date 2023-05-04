@@ -34,40 +34,6 @@ interface IData {
 
 }
 
-function sortArray (dataToSort:any) {
-  if (dataToSort.length > 0) {
-    // setDataSorted(dataToSort);
-   dataToSort.sort(function(a: any,b:any) {
-        //Sort by less time
-        return a.total_response_time - b.total_response_time;
-    })
-   dataToSort.sort(function(a: any,b:any) {
-        //Sort by status of album (enden or not)
-        if (a.ended_album > b.ended_album) {
-            return -1;
-        }
-
-        if (a.ended_album < b.ended_album) {
-            return 1;
-        }
-        // //Sort by less error number
-        return a.error_number - b.error_number ;
-    })
-  }
-  return addRank(dataToSort)
-}
-//Método que añade posiciones
-function addRank(arrayData:any) {
-  let position = 1
-  for (let index = 0; index < arrayData.length; index++) {
-    const element = arrayData[index];
-    element.rank = position++;
-  }
-  // console.log(arrayData)
-  return arrayData
-}
-
-
 export default function BasicTable() {
 
   const [selectedDate, setSelectedDate] = useState(today);
@@ -83,7 +49,7 @@ export default function BasicTable() {
     axios
       .get("http://localhost:3004/user")//Url api server
       .then((res) => {
-        setData(sortArray(res.data.data));
+        setData(res.data.data);
 
       })
       .catch((error) => {
