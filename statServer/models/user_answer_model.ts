@@ -28,7 +28,17 @@ function sortArray(dataToSort: any) {
 			}
 		});
 	}
-	return dataToSort;
+	return addRank(dataToSort);
+}
+//Método que añade posiciones al array organizado
+function addRank(arrayData: any) {
+	let position = 1;
+	for (let index = 0; index < arrayData.length; index++) {
+		const element = arrayData[index];
+		element.rank = position++;
+	}
+	// console.log(arrayData)
+	return arrayData;
 }
 
 export const findAll = (callback: Function) => {
