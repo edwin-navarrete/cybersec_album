@@ -2,45 +2,6 @@ import { UserAnswer } from '../types/user_answer';
 import { db } from '../db';
 import { RowDataPacket } from 'mysql2';
 
-// Método en reemplazo del hook useSort, por medio del cual se ejecutaban un
-// ordenamiento según instrucciones, sobre el erray en bruto extraído
-// de la BD.
-function sortArray(dataToSort: any) {
-	if (dataToSort.length > 0) {
-		// Organización por menor tiempo que se hace primero para hacer el descarte
-		dataToSort.sort(function (a: any, b: any) {
-			return a.total_response_time - b.total_response_time;
-		});
-		//Organización por porcentaje de errores, que son los errores de un usuario
-		//con respecto a las respuestas respondidas
-		dataToSort.sort(function (a: any, b: any) {
-			return a.error_percentage - b.error_percentage;
-		});
-		//Organización por terminación del album (album finalizado o no)
-		dataToSort.sort(function (a: any, b: any) {
-			if (a.ended_album > b.ended_album) {
-				return -1;
-			}
-
-			if (a.ended_album < b.ended_album) {
-				return 1;
-			}
-		});
-	}
-	return addRank(dataToSort);
-	// return dataToSort;
-}
-//Método que añade posiciones
-function addRank(arrayData: any) {
-	let position = 1;
-	for (let index = 0; index < arrayData.length; index++) {
-		const element = arrayData[index];
-		element.rank = position++;
-	}
-	// console.log(arrayData)
-	return arrayData;
-}
-
 export const findAll = (callback: Function) => {
 	const queryString = `
 SELECT
@@ -111,7 +72,6 @@ GROUP BY album_id
 			userAnswers.push(a_id);
 		});
 
-		callback(null, sortArray(userAnswers));
-		console.log(userAnswers);
+		callback(null, userAnswers);
 	});
 };
