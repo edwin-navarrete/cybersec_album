@@ -29,7 +29,7 @@ SELECT
     ABS((ROUND((ABS((SUM(CASE
                         WHEN user_answer.success = 0 THEN 1
                         ELSE 0
-                    END) - COUNT(user_answer.question_id)) / COUNT(user_answer.question_id)) * 100), 0) - 100))/100 AS porcentaje_error,
+                    END) - COUNT(user_answer.question_id)) / COUNT(user_answer.question_id)) * 100), 0) - 100)) AS porcentaje_error,
     SUM(latency) AS tiempo_total_de_respuesta,
     album.started_on as epocas
 FROM

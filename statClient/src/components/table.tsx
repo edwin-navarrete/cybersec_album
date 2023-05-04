@@ -178,7 +178,7 @@ export default function BasicTable() {
               <TableCell align="right">{row.ended_album? "Sí" : "No"}</TableCell>
               <TableCell align="right">{row.answered_question_number}</TableCell>
               <TableCell align="right">{row.error_number}</TableCell>
-              <TableCell align="right">{row.error_percentage*100}%</TableCell>
+              <TableCell align="right">{row.error_percentage}%</TableCell>
               <TableCell align="right">{row.total_response_time}</TableCell>
 
             </TableRow>
