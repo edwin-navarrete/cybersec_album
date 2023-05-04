@@ -39,9 +39,10 @@ function sortArray(dataToSort: any) {
 		dataToSort.sort(function (a: any, b: any) {
 			return a.total_response_time - b.total_response_time;
 		});
-		//Organización por número de errores
+		//Organización por porcentaje de errores, que son los errores de un usuario
+    //con respecto a las respuestas respondidas
 		dataToSort.sort(function (a: any, b: any) {
-			return a.error_number - b.error_number;
+			return a.error_percentage - b.error_percentage;
 		});
 		//Organización por terminación del album (album finalizado o no)
 		dataToSort.sort(function (a: any, b: any) {
@@ -170,7 +171,7 @@ export default function BasicTable() {
 							<TableCell align="right">{row.ended_album ? 'Sí' : 'No'}</TableCell>
 							<TableCell align="right">{row.answered_question_number}</TableCell>
 							<TableCell align="right">{row.error_number}</TableCell>
-							<TableCell align="right">{row.error_percentage * 100}%</TableCell>
+							<TableCell align="right">{row.error_percentage}%</TableCell>
 							<TableCell align="right">{row.total_response_time}</TableCell>
 						</TableRow>
 					))}
