@@ -1,23 +1,48 @@
 import { UserAnswer } from '../types/user_answer';
-import {db} from "../db";
-import { RowDataPacket } from "mysql2";
+import { db } from '../db';
+import { RowDataPacket } from 'mysql2';
 
+// Método en reemplazo del hook useSort, por medio del cual se ejecutaban un
+// ordenamiento según instrucciones, sobre el erray en bruto extraído
+// de la BD.
+function sortArray(dataToSort: any) {
+	if (dataToSort.length > 0) {
+		// Organización por menor tiempo que se hace primero para hacer el descarte
+		dataToSort.sort(function (a: any, b: any) {
+			return a.total_response_time - b.total_response_time;
+		});
+		//Organización por porcentaje de errores, que son los errores de un usuario
+		//con respecto a las respuestas respondidas
+		dataToSort.sort(function (a: any, b: any) {
+			return a.error_percentage - b.error_percentage;
+		});
+		//Organización por terminación del album (album finalizado o no)
+		dataToSort.sort(function (a: any, b: any) {
+			if (a.ended_album > b.ended_album) {
+				return -1;
+			}
 
-/*
-
-    SELECT album_id, COUNT(*) AS errores
-FROM user_answer
-WHERE success is null or success = 0
-GROUP BY album_id
-UNION
-SELECT album_id, 0 AS errores
-FROM user_answer
-WHERE album_id NOT IN (SELECT album_id FROM user_answer WHERE success = 0)
-GROUP BY album_id;
-*/
+			if (a.ended_album < b.ended_album) {
+				return 1;
+			}
+		});
+	}
+	return addRank(dataToSort);
+	// return dataToSort;
+}
+//Método que añade posiciones
+function addRank(arrayData: any) {
+	let position = 1;
+	for (let index = 0; index < arrayData.length; index++) {
+		const element = arrayData[index];
+		element.rank = position++;
+	}
+	// console.log(arrayData)
+	return arrayData;
+}
 
 export const findAll = (callback: Function) => {
-const queryString = `
+	const queryString = `
 SELECT
     user_answer.album_id,
     SUM(CASE
@@ -29,7 +54,7 @@ SELECT
     ABS((ROUND((ABS((SUM(CASE
                         WHEN user_answer.success = 0 THEN 1
                         ELSE 0
-                    END) - COUNT(user_answer.question_id)) / COUNT(user_answer.question_id)) * 100), 0) - 100))/100 AS porcentaje_error,
+                    END) - COUNT(user_answer.question_id)) / COUNT(user_answer.question_id)) * 100), 0) - 100)) AS porcentaje_error,
     SUM(latency) AS tiempo_total_de_respuesta,
     album.started_on as epocas
 FROM
@@ -38,9 +63,9 @@ JOIN
 	album ON user_answer.album_id = album.album_id
 GROUP BY album_id
 
-`
+`;
 
-/*  const queryString = `
+	/*  const queryString = `
   SELECT
     album_id,
     SUM(CASE
@@ -65,25 +90,28 @@ GROUP BY album_id
 
   `
 */
-    db.query(queryString, (err, result) => {
-      if (err) {callback(err)}
+	db.query(queryString, (err, result) => {
+		if (err) {
+			callback(err);
+		}
 
-      const rows = <RowDataPacket[]> result;
-      const userAnswers: UserAnswer[] = [];
+		const rows = <RowDataPacket[]>result;
+		const userAnswers: UserAnswer[] = [];
 
-      rows.forEach(row => {
-        const a_id: UserAnswer = {
-          album_id: row.album_id,
-          error_number: Number(row.numero_de_errores),
-          answered_question_number: Number(row.preguntas_respondidas),
-          ended_album: Boolean(row.finalizacion_album),
-          error_percentage: Number(row.porcentaje_error),
-          total_response_time: Number(row.tiempo_total_de_respuesta),
-          epocas: Number(row.epocas)
+		rows.forEach((row) => {
+			const a_id: UserAnswer = {
+				album_id: row.album_id,
+				error_number: Number(row.numero_de_errores),
+				answered_question_number: Number(row.preguntas_respondidas),
+				ended_album: Boolean(row.finalizacion_album),
+				error_percentage: Number(row.porcentaje_error),
+				total_response_time: Number(row.tiempo_total_de_respuesta),
+				epocas: Number(row.epocas),
+			};
+			userAnswers.push(a_id);
+		});
 
-        }
-          userAnswers.push(a_id);
-      });
-      callback(null, userAnswers);
-    });
-  }
+		callback(null, sortArray(userAnswers));
+		console.log(userAnswers);
+	});
+};
