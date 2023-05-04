@@ -6,7 +6,7 @@ import {UserAnswer} from "../types/user_answer";
 const user_answerRouter = express.Router();
 
 user_answerRouter.get("/", async (req: Request, res: Response) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
   
   user_answer_model.findAll((err: Error, albumIds: UserAnswer[]) => {
     if (err) {
