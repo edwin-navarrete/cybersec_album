@@ -1,5 +1,5 @@
 import React from 'react';
-import EnhancedTable from './components/table'
+import EnhancedTable from './components/table_ranking'
 import Configuracion from './components/configuracion'
 //import PageNotFound from './pages/PageNotFound'
 
