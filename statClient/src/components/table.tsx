@@ -19,7 +19,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 
 const today = dayjs();
-//
 
 interface IData {
 
@@ -32,7 +31,39 @@ interface IData {
   errors: number,
   rank: number,
   album_id: string,
+}
 
+function sortArray (dataToSort:any) {
+  if (dataToSort.length > 0) {
+    // setDataSorted(dataToSort);
+   dataToSort.sort(function(a: any,b:any) {
+        //Sort by less time
+        return a.total_response_time - b.total_response_time;
+    })
+   dataToSort.sort(function(a: any,b:any) {
+        //Sort by status of album (enden or not)
+        if (a.ended_album > b.ended_album) {
+            return -1;
+        }
+
+        if (a.ended_album < b.ended_album) {
+            return 1;
+        }
+        // //Sort by less error number
+        return a.error_number - b.error_number ;
+    })
+  }
+  return addRank(dataToSort)
+}
+//Método que añade posiciones
+function addRank(arrayData:any) {
+  let position = 1
+  for (let index = 0; index < arrayData.length; index++) {
+    const element = arrayData[index];
+    element.rank = position++;
+  }
+  // console.log(arrayData)
+  return arrayData
 }
 
 
@@ -44,22 +75,20 @@ export default function BasicTable() {
     setSelectedDate(date);
   };
 
-  // Hooks for query data from server API 
+  // Hooks for query data from server API
   const [data, setData] = useState<IData[]>([]);
 
   useEffect(() => {
     axios
       .get("http://localhost:8001/ranking")//Url api server
       .then((res) => {
-        setData(res.data.data);
+        setData(sortArray(res.data.data));
 
       })
       .catch((error) => {
         console.log(error);
       });
-
   }, []);
-
 
   // Filter data to show only rows with matching dates
   const filteredData = data.filter(row => {
@@ -71,11 +100,11 @@ export default function BasicTable() {
 
       return rowDate.isSame(selectedDate, 'day');
     }
+
   });
   ;
 
   return (
-    
 
     <TableContainer component={Paper}>
       <Toolbar sx={{
@@ -125,9 +154,10 @@ export default function BasicTable() {
             <TableCell align="right">Número de errores</TableCell>
             <TableCell align="right">Preguntas respondidas</TableCell>
             <TableCell align="right">Album finalizado</TableCell>
-            <TableCell align="right">Tiempo total de respuesta (s)</TableCell>
+            <TableCell align="right">Preguntas respondidas</TableCell>
+            <TableCell align="right">Número de errores</TableCell>
             <TableCell align="right">Porcentaje de error (%)  </TableCell>
-            <TableCell align="right">Fecha</TableCell>
+            <TableCell align="right">Tiempo total de respuesta (Segundos)</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -138,6 +168,9 @@ export default function BasicTable() {
             >
               <TableCell>{row.rank}</TableCell>
               <TableCell component="th" scope="row">
+                {row.rank}
+              </TableCell>
+              <TableCell align="right" >
                 {row.album_id.slice(-5)}
               </TableCell>
               <TableCell align="right">{row.number_errors}</TableCell>
@@ -148,11 +181,16 @@ export default function BasicTable() {
               <TableCell align="right">{
                 row.started_on ? new Date(row.started_on).toLocaleDateString() : new Date().toLocaleDateString()
               }</TableCell>
+              <TableCell align="right">{row.ended_album? "Sí" : "No"}</TableCell>
+              <TableCell align="right">{row.answered_question_number}</TableCell>
+              <TableCell align="right">{row.error_number}</TableCell>
+              <TableCell align="right">{row.error_percentage*100}%</TableCell>
+              <TableCell align="right">{row.total_response_time}</TableCell>
+
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
-    
   );
 }

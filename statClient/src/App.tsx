@@ -1,28 +1,26 @@
 import React from 'react';
-import EnhancedTable from './components/table'
-import Configuracion from './components/configuracion'
-//import PageNotFound from './pages/PageNotFound'
+import logo from './logo.svg';
+import './App.css';
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Header from './components/header';
-
-export default function App() {
+function App() {
   return (
-    <>
-    <Header />
-    <Router>
-      <Routes>
-        <Route path="/" element={<EnhancedTable />} />
-        <Route path="/configuracion" element={<Configuracion />}  />
-        <Route path="*" element={NotFound()}  />
-      </Routes>
-    </Router>
-    </>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.tsx</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Módulo de estadísticas
+        </a>
+      </header>
+    </div>
   );
 }
 
-function NotFound() {
-  return <>Ha llegado a una página que no existe</>;
-}
-
-
+export default App;
