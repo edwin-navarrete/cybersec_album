@@ -9,7 +9,6 @@ SELECT t.*, ROW_NUMBER() OVER () AS ranking
 FROM (
 SELECT a.album_id,
 a.started_on,
-FROM_UNIXTIME(a.started_on / 1000),
 a.ended_on is not null finalizacion_album,
 COUNT(DISTINCT question_id) preguntas_respondidas,
 COUNT(DISTINCT question_id) - SUM(success) numero_de_errores,

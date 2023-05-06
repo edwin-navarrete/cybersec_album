@@ -149,15 +149,14 @@ export default function BasicTable() {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>Posición</TableCell>
+          <TableCell>Posición</TableCell>
             <TableCell>Album Id</TableCell>
             <TableCell align="right">Número de errores</TableCell>
             <TableCell align="right">Preguntas respondidas</TableCell>
             <TableCell align="right">Album finalizado</TableCell>
-            <TableCell align="right">Preguntas respondidas</TableCell>
-            <TableCell align="right">Número de errores</TableCell>
+            <TableCell align="right">Tiempo total de respuesta (s)</TableCell>
             <TableCell align="right">Porcentaje de error (%)  </TableCell>
-            <TableCell align="right">Tiempo total de respuesta (Segundos)</TableCell>
+            <TableCell align="right">Fecha</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -167,9 +166,6 @@ export default function BasicTable() {
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell>{row.rank}</TableCell>
-              <TableCell component="th" scope="row">
-                {row.rank}
-              </TableCell>
               <TableCell align="right" >
                 {row.album_id.slice(-5)}
               </TableCell>
@@ -181,11 +177,7 @@ export default function BasicTable() {
               <TableCell align="right">{
                 row.started_on ? new Date(row.started_on).toLocaleDateString() : new Date().toLocaleDateString()
               }</TableCell>
-              <TableCell align="right">{row.ended_album? "Sí" : "No"}</TableCell>
-              <TableCell align="right">{row.answered_question_number}</TableCell>
-              <TableCell align="right">{row.error_number}</TableCell>
-              <TableCell align="right">{row.error_percentage*100}%</TableCell>
-              <TableCell align="right">{row.total_response_time}</TableCell>
+             
 
             </TableRow>
           ))}
