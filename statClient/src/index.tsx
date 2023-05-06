@@ -14,9 +14,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <Header />
-    <EnhancedTable />
-    
+    <App/>    
   </React.StrictMode>
 );
 
