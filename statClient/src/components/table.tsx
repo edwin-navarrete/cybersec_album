@@ -23,15 +23,14 @@ const today = dayjs();
 interface IData {
 
   // define la estructura de los datos que esperas recibir de la API
-  album_id: string; // En
-  error_number: number;
-  answered_question_number: number;
-  ended_album: string;
-  error_percentage: number;
-  total_response_time: number;
-  epocas: number;
-  rank:number;
-
+  started_on: number,
+  number_errors: number,
+  total_latency: number,
+  finished: boolean,
+  answered: number,
+  errors: number,
+  rank: number,
+  album_id: string,
 }
 
 function sortArray (dataToSort:any) {
@@ -81,7 +80,7 @@ export default function BasicTable() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3004/user")//Url api server
+      .get("http://localhost:8001/ranking")//Url api server
       .then((res) => {
         setData(sortArray(res.data.data));
 
@@ -93,8 +92,8 @@ export default function BasicTable() {
 
   // Filter data to show only rows with matching dates
   const filteredData = data.filter(row => {
-    const rowDate = dayjs(row.epocas);
-    if (selectedDate === today) {
+    const rowDate = dayjs(row.started_on);
+    if (selectedDate == today) {
       return rowDate
     }
     else {
@@ -151,13 +150,13 @@ export default function BasicTable() {
         <TableHead>
           <TableRow>
           <TableCell>Posición</TableCell>
-            <TableCell align="right">Album</TableCell>
-            <TableCell align="right">Fecha y hora de inicio</TableCell>
-            <TableCell align="right">Album finalizado</TableCell>
-            <TableCell align="right">Preguntas respondidas</TableCell>
+            <TableCell>Album Id</TableCell>
             <TableCell align="right">Número de errores</TableCell>
-            <TableCell align="right">Porcentaje de error (%)  </TableCell>
+            <TableCell align="right">Preguntas respondidas</TableCell>
+            <TableCell align="right">Album finalizado</TableCell>
             <TableCell align="right">Tiempo total de respuesta (Segundos)</TableCell>
+            <TableCell align="right">Porcentaje de error (%)  </TableCell>
+            <TableCell align="right">Fecha y Hora de Inicio</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -166,20 +165,17 @@ export default function BasicTable() {
               key={row.album_id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <TableCell component="th" scope="row">
-                {row.rank}
-              </TableCell>
+              <TableCell>{row.rank}</TableCell>
               <TableCell align="right" >
                 {row.album_id.slice(-5)}
               </TableCell>
-              <TableCell align="right">{
-                new Date(row.epocas).toLocaleString()
-              }</TableCell>
-              <TableCell align="right">{row.ended_album? "Sí" : "No"}</TableCell>
-              <TableCell align="right">{row.answered_question_number}</TableCell>
-              <TableCell align="right">{row.error_number}</TableCell>
-              <TableCell align="right">{row.error_percentage*100}%</TableCell>
-              <TableCell align="right">{row.total_response_time}</TableCell>
+              <TableCell align="right">{row.number_errors}</TableCell>
+              <TableCell align="right">{row.answered}</TableCell>
+              <TableCell align="right">{row.finished? "Sí" : "No"}</TableCell>
+              <TableCell align="right">{Math.round(row.total_latency)}</TableCell>
+              <TableCell align="right">{Math.round(row.errors*100)} % </TableCell>
+              <TableCell align="right">{new Date(row.started_on).toLocaleString() }</TableCell>
+             
 
             </TableRow>
           ))}
