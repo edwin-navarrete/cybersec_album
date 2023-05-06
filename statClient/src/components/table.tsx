@@ -135,7 +135,7 @@ export default function BasicTable() {
                 <DatePicker
                   value={selectedDate}
                   onChange={handleDateChange}
-                  format="DD/MM/YYYY/HH:MM"
+                  format="DD/MM/YYYY"
                   views={['year', 'month', 'day']}
                 />
               </DemoItem>
@@ -172,8 +172,8 @@ export default function BasicTable() {
               <TableCell align="right">{row.number_errors}</TableCell>
               <TableCell align="right">{row.answered}</TableCell>
               <TableCell align="right">{row.finished? "Sí" : "No"}</TableCell>
-              <TableCell align="right">{row.total_latency}</TableCell>
-              <TableCell align="right">{row.errors*100}</TableCell>
+              <TableCell align="right">{Math.round(row.total_latency)}</TableCell>
+              <TableCell align="right">{Math.round(row.errors*100)} % </TableCell>
               <TableCell align="right">{new Date(row.started_on).toLocaleString() }</TableCell>
              
 
