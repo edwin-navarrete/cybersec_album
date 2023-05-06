@@ -10,7 +10,6 @@ import Paper from '@mui/material/Paper';
 import Tooltip from '@mui/material/Tooltip';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import useSort from '../hooks/useSort';
 import { Divider } from '@mui/material';
 import dayjs from 'dayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
@@ -25,13 +24,14 @@ const today = dayjs();
 interface IData {
 
   // define la estructura de los datos que esperas recibir de la API
-  album_id: string; // En 
-  error_number: number;
-  answered_question_number: number;
-  ended_album: string;
-  error_percentage: number;
-  total_response_time: number;
-  epocas: number;
+  started_on: number,
+  number_errors: number,
+  total_latency: number,
+  finished: boolean,
+  answered: number,
+  errors: number,
+  rank: number,
+  album_id: string,
 
 }
 
@@ -49,7 +49,7 @@ export default function BasicTable() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8001/user")//Url api server
+      .get("http://localhost:8001/ranking")//Url api server
       .then((res) => {
         setData(res.data.data);
 
@@ -60,13 +60,10 @@ export default function BasicTable() {
 
   }, []);
 
-  //Use of hook useSort to 
-  const dataSorted = useSort(data);
-  // console.log(dataSorted)
 
   // Filter data to show only rows with matching dates
   const filteredData = data.filter(row => {
-    const rowDate = dayjs(row.epocas);
+    const rowDate = dayjs(row.started_on);
     if (selectedDate == today) {
       return rowDate
     }
@@ -123,6 +120,7 @@ export default function BasicTable() {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
+            <TableCell>Posición</TableCell>
             <TableCell>Album Id</TableCell>
             <TableCell align="right">Número de errores</TableCell>
             <TableCell align="right">Preguntas respondidas</TableCell>
@@ -138,16 +136,17 @@ export default function BasicTable() {
               key={row.album_id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
+              <TableCell>{row.rank}</TableCell>
               <TableCell component="th" scope="row">
                 {row.album_id.slice(-5)}
               </TableCell>
-              <TableCell align="right">{row.error_number}</TableCell>
-              <TableCell align="right">{row.answered_question_number}</TableCell>
-              <TableCell align="right">{row.ended_album}</TableCell>
-              <TableCell align="right">{row.error_percentage}</TableCell>
-              <TableCell align="right">{row.total_response_time}</TableCell>
+              <TableCell align="right">{row.number_errors}</TableCell>
+              <TableCell align="right">{row.answered}</TableCell>
+              <TableCell align="right">{row.finished}</TableCell>
+              <TableCell align="right">{row.total_latency}</TableCell>
+              <TableCell align="right">{row.errors}</TableCell>
               <TableCell align="right">{
-                row.epocas ? new Date(row.epocas).toLocaleDateString() : new Date().toLocaleDateString()
+                row.started_on ? new Date(row.started_on).toLocaleDateString() : new Date().toLocaleDateString()
               }</TableCell>
             </TableRow>
           ))}
