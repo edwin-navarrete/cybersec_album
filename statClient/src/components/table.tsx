@@ -135,7 +135,7 @@ export default function BasicTable() {
                 <DatePicker
                   value={selectedDate}
                   onChange={handleDateChange}
-                  format="DD/MM/YYYY"
+                  format="DD/MM/YYYY/HH:MM"
                   views={['year', 'month', 'day']}
                 />
               </DemoItem>
@@ -154,9 +154,9 @@ export default function BasicTable() {
             <TableCell align="right">Número de errores</TableCell>
             <TableCell align="right">Preguntas respondidas</TableCell>
             <TableCell align="right">Album finalizado</TableCell>
-            <TableCell align="right">Tiempo total de respuesta (s)</TableCell>
+            <TableCell align="right">Tiempo total de respuesta (Segundos)</TableCell>
             <TableCell align="right">Porcentaje de error (%)  </TableCell>
-            <TableCell align="right">Fecha</TableCell>
+            <TableCell align="right">Fecha y Hora de Inicio</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -171,12 +171,10 @@ export default function BasicTable() {
               </TableCell>
               <TableCell align="right">{row.number_errors}</TableCell>
               <TableCell align="right">{row.answered}</TableCell>
-              <TableCell align="right">{row.finished}</TableCell>
+              <TableCell align="right">{row.finished? "Sí" : "No"}</TableCell>
               <TableCell align="right">{row.total_latency}</TableCell>
-              <TableCell align="right">{row.errors}</TableCell>
-              <TableCell align="right">{
-                row.started_on ? new Date(row.started_on).toLocaleDateString() : new Date().toLocaleDateString()
-              }</TableCell>
+              <TableCell align="right">{row.errors*100}</TableCell>
+              <TableCell align="right">{new Date(row.started_on).toLocaleString() }</TableCell>
              
 
             </TableRow>
