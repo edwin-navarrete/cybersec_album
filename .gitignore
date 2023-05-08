@@ -33,3 +33,5 @@ tmp/
 .env.production
 client/.env.production
 .idea
+server/dist/
+statClient/build/
