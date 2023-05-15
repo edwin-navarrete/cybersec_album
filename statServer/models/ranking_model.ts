@@ -5,6 +5,7 @@ import { RowDataPacket } from "mysql2";
 
 export const findAll = (callback: Function) => {
 const queryString = `
+
 SELECT t.*, ROW_NUMBER() OVER () AS ranking
 FROM (
 SELECT a.album_id,

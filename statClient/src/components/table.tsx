@@ -33,38 +33,6 @@ interface IData {
   album_id: string,
 }
 
-function sortArray (dataToSort:any) {
-  if (dataToSort.length > 0) {
-    // setDataSorted(dataToSort);
-   dataToSort.sort(function(a: any,b:any) {
-        //Sort by less time
-        return a.total_response_time - b.total_response_time;
-    })
-   dataToSort.sort(function(a: any,b:any) {
-        //Sort by status of album (enden or not)
-        if (a.ended_album > b.ended_album) {
-            return -1;
-        }
-
-        if (a.ended_album < b.ended_album) {
-            return 1;
-        }
-        // //Sort by less error number
-        return a.error_number - b.error_number ;
-    })
-  }
-  return addRank(dataToSort)
-}
-//Método que añade posiciones
-function addRank(arrayData:any) {
-  let position = 1
-  for (let index = 0; index < arrayData.length; index++) {
-    const element = arrayData[index];
-    element.rank = position++;
-  }
-  // console.log(arrayData)
-  return arrayData
-}
 
 
 export default function BasicTable() {
@@ -72,7 +40,22 @@ export default function BasicTable() {
   const [selectedDate, setSelectedDate] = useState(today);
 
   const handleDateChange = (date: any) => {
-    setSelectedDate(date);
+    setSelectedDate(date)
+    console.log(date);
+    axios
+      .get(`http://localhost:8001/ranking2?date=${new Date(date.valueOf()).toLocaleDateString('es-ES')}`)//Url api server
+      .then((res) => {
+        setData(res.data.data);
+        console.log(new Date(date.valueOf()).toLocaleDateString('es-ES'));
+
+        //console.log(data.valueOf().toLocaleString());
+
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
   };
 
   // Hooks for query data from server API
@@ -80,29 +63,20 @@ export default function BasicTable() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8001/ranking")//Url api server
+      .get(`http://localhost:8001/ranking`)
       .then((res) => {
-        setData(sortArray(res.data.data));
+        setData(res.data.data);
+        console.log(new Date(selectedDate.valueOf()).toLocaleDateString('es-ES'));
+
+        //console.log(data.valueOf().toLocaleString());
+
 
       })
       .catch((error) => {
         console.log(error);
       });
+
   }, []);
-
-  // Filter data to show only rows with matching dates
-  const filteredData = data.filter(row => {
-    const rowDate = dayjs(row.started_on);
-    if (selectedDate == today) {
-      return rowDate
-    }
-    else {
-
-      return rowDate.isSame(selectedDate, 'day');
-    }
-
-  });
-  ;
 
   return (
 
@@ -149,7 +123,7 @@ export default function BasicTable() {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-          <TableCell>Posición</TableCell>
+            <TableCell>Posición</TableCell>
             <TableCell>Album Id</TableCell>
             <TableCell align="right">Número de errores</TableCell>
             <TableCell align="right">Preguntas respondidas</TableCell>
@@ -160,7 +134,7 @@ export default function BasicTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {filteredData.map((row) => (
+          {data.map((row) => (
             <TableRow
               key={row.album_id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -171,11 +145,11 @@ export default function BasicTable() {
               </TableCell>
               <TableCell align="right">{row.number_errors}</TableCell>
               <TableCell align="right">{row.answered}</TableCell>
-              <TableCell align="right">{row.finished? "Sí" : "No"}</TableCell>
+              <TableCell align="right">{row.finished ? "Sí" : "No"}</TableCell>
               <TableCell align="right">{Math.round(row.total_latency)}</TableCell>
-              <TableCell align="right">{Math.round(row.errors*100)} % </TableCell>
-              <TableCell align="right">{new Date(row.started_on).toLocaleString() }</TableCell>
-             
+              <TableCell align="right">{Math.round(row.errors * 100)} % </TableCell>
+              <TableCell align="right">{new Date(row.started_on).toLocaleString()}</TableCell>
+
 
             </TableRow>
           ))}
