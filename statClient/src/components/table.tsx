@@ -17,8 +17,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-
+const baseURL = process.env.REACT_APP_API_URL
 const today = dayjs();
+
 
 interface IData {
 
@@ -36,19 +37,17 @@ interface IData {
 
 
 export default function BasicTable() {
-
+  
   const [selectedDate, setSelectedDate] = useState(today);
 
   const handleDateChange = (date: any) => {
     setSelectedDate(date)
     console.log(date);
     axios
-      .get(`http://localhost:8001/ranking2?date=${new Date(date.valueOf()).toLocaleDateString('es-ES')}`)//Url api server
+      .get(`${baseURL}?date=${new Date(date.valueOf()).toLocaleDateString('es-ES')}`)//Url api server
       .then((res) => {
         setData(res.data.data);
         console.log(new Date(date.valueOf()).toLocaleDateString('es-ES'));
-
-        //console.log(data.valueOf().toLocaleString());
 
 
       })
@@ -61,19 +60,19 @@ export default function BasicTable() {
   // Hooks for query data from server API
   const [data, setData] = useState<IData[]>([]);
 
-  useEffect(() => {
+  useEffect(() => {    
     axios
-      .get(`http://localhost:8001/ranking`)
+      .get(`${baseURL}`)
       .then((res) => {
         setData(res.data.data);
-        console.log(new Date(selectedDate.valueOf()).toLocaleDateString('es-ES'));
+        console.log("Example:" + new Date(selectedDate.valueOf()).toLocaleDateString('es-ES'));
 
         //console.log(data.valueOf().toLocaleString());
 
 
       })
       .catch((error) => {
-        console.log(error);
+        console.log("Error: " + error);
       });
 
   }, []);
