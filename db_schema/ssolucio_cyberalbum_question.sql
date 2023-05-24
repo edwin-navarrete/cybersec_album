@@ -28,7 +28,7 @@ CREATE TABLE `question` (
   `lang` char(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `question` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci NOT NULL,
   `options` json NOT NULL,
-  `solution` json NOT NULL,
+  `solution` char(1) COLLATE utf8mb4_spanish_ci NOT NULL,
   `feedback` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci DEFAULT NULL,
   `difficulty` float NOT NULL,
   PRIMARY KEY (`id`)
@@ -44,4 +44,4 @@ CREATE TABLE `question` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-22 18:00:26
+-- Dump completed on 2023-05-24 18:39:51
