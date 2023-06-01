@@ -47,7 +47,7 @@
   },
   {
     "id": 4,
-    "type": "single",
+    "type": "multiple",
     "question": "¿Cuál de estos son activos de información?",
     "options": [
       "Pagina web",

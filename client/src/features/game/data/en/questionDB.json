@@ -47,7 +47,7 @@
   },
   {
     "id": 4,
-    "type": "single",
+    "type": "multiple",
     "question": "Which of these are information assets?",
     "options": [
       "Web page",
