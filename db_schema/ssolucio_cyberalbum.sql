@@ -103,13 +103,9 @@ CREATE TABLE question (
   options JSON NOT NULL,
   solution JSON NOT NULL,
   difficulty FLOAT NOT NULL,
-  feedback TEXT,
+  feedback TEXT
 );
 
--- Cambiar un valor en una celda específica
-UPDATE question
-SET type = 'multiple'
-WHERE id = <id_de_la_pregunta>;
 
 -- Insertando las preguntas en español
 INSERT INTO question (type, lang, question, options, solution, difficulty, feedback) VALUES
