@@ -11,7 +11,7 @@ dotenv.config();
 app.use(bodyParser.json());
 app.use(`${process.env.SERVER_PATH}/album`, albumRouter);
 app.use(`${process.env.SERVER_PATH}/user`, user_answerRouter)
-app.use(`${process.env.SERVER_PATH}/ranking`", rankingRouter)
+app.use(`${process.env.SERVER_PATH}/ranking`, rankingRouter)
 
 app.listen(process.env.PORT, () => {
 console.log("Node server started running " + process.env.PORT);
