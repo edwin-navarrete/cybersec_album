@@ -37,14 +37,14 @@ interface IData {
 
 
 export default function BasicTable() {
-  
+
   const [selectedDate, setSelectedDate] = useState(today);
 
   const handleDateChange = (date: any) => {
     setSelectedDate(date)
     console.log(date);
     axios
-      .get(`${baseURL}?date=${new Date(date.valueOf()).toLocaleDateString('es-ES')}`)//Url api server
+      .get(`${baseURL}/ranking?date=${new Date(date.valueOf()).toLocaleDateString('es-ES')}`)//Url api server
       .then((res) => {
         setData(res.data.data);
         console.log(new Date(date.valueOf()).toLocaleDateString('es-ES'));
@@ -60,9 +60,9 @@ export default function BasicTable() {
   // Hooks for query data from server API
   const [data, setData] = useState<IData[]>([]);
 
-  useEffect(() => {    
+  useEffect(() => {
     axios
-      .get(`${baseURL}`)
+      .get(`${baseURL}/ranking`)
       .then((res) => {
         setData(res.data.data);
         console.log("Example:" + new Date(selectedDate.valueOf()).toLocaleDateString('es-ES'));
