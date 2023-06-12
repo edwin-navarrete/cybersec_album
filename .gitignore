@@ -35,3 +35,4 @@ client/.env.production
 .idea
 server/dist/
 statClient/build/
+statClient/build.zip
