@@ -4,9 +4,12 @@ import * as bodyParser from "body-parser";
 import {albumRouter} from "./routes/albumRouter";
 import { user_answerRouter } from './routes/user_answerRouter'
 import { rankingRouter } from './routes/rankingRouter';
+import cors from 'cors'
 
 const app = express();
 dotenv.config();
+
+app.use(cors()); // Habilitar CORS
 
 app.use(bodyParser.json());
 app.use(`${process.env.SERVER_PATH}/album`, albumRouter);
