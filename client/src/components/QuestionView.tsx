@@ -26,8 +26,39 @@ const QuestionView = () => {
         // eslint-disable-next-line
     }, [dispatch, questionState]);
 
-    let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6)
+
+
+    let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6 + moreTimeForQuestion())
     let optCount = questionState?.options.length || 4;
+
+
+    function moreTimeForQuestion(){
+        /* 
+        La constante o el número 0,24 se obtuvo de obtener la velocidad de lectura promedio
+        de una persona la cual es entre 200 y 300 palabras por minuto.
+        Siguiendo esta lógica, se obtienen el número de palabras tanto en la pregunta, como en
+        su respuesta y se suma al calculo del tiempo límite.
+        */
+
+        let questionSize = questionState?.question.match(/\b\w+\b/g)
+
+        let lengthQuestionSize = Math.floor(questionSize? questionSize.length : 0);
+
+        let totalWords = 0;
+          
+          
+        questionState?.options.forEach((elemento) => {
+            const words = elemento.match(/\b\w+\b/g);
+            totalWords += words ? words.length : 0;
+          });
+
+        return (lengthQuestionSize + totalWords) * 0.24
+
+    }
+
+
+
+
 
     const [timer, setTimer] = useState(-1)
     const [timestamp, setTimestamp] = useState(-1)

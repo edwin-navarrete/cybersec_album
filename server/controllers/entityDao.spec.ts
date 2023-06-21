@@ -1,4 +1,4 @@
-import EntityDAO from './entityDAO'
+import EntityDAO from './entityDao'
 
 interface Row extends Object {
     user_id: string

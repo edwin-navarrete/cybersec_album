@@ -1,0 +1,36 @@
+# Este es un ejemplo de como declare los .env
+
+# .env en CLIENT #################################################################
+
+
+
+PORT = 3008
+REACT_APP_API=http://localhost:8008/album_api/api
+
+
+
+# .env en SERVER #################################################################
+
+PORT = 8008
+
+SERVER_PATH = /album_api
+ 
+DB_USER = *******
+DB_PWD = *******
+DB_NAME = ssolucio_cyberalbum
+DB_HOST = localhost
+
+
+# .env en STAT__CLIENT #################################################################
+
+REACT_APP_API=http://localhost:3001/album_api/api
+PORT = 3001
+
+
+# .env en STAT__SERVER #################################################################
+
+PORT=8001
+DB_HOST= localhost
+DB_USER= *******
+DB_PWD= *******
+DB_NAME= ssolucio_cyberalbum
