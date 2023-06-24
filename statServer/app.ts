@@ -9,7 +9,10 @@ import cors from 'cors'
 const app = express();
 dotenv.config();
 
-app.use(cors()); // Habilitar CORS
+app.use(cors({origin: process.env.UI_URL})); // Habilitar CORS
+
+
+
 
 app.use(bodyParser.json());
 app.use(`${process.env.SERVER_PATH}/album`, albumRouter);
