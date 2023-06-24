@@ -6,7 +6,11 @@ import {Ranking} from "../types/ranking";
 const rankingRouter = express.Router();
 
 rankingRouter.get("/", async (req: Request, res: Response) => {
+<<<<<<< HEAD
+  
+=======
   res.header('Access-Control-Allow-Origin', process.env.UI_URL);
+>>>>>>> main
 
   const date = req.query.date as string;
   
