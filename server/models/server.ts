@@ -18,7 +18,7 @@ export class Server {
 
   middlewares () {
     this.app.use(cors()) // Enable CORS
-    // this.app.options('*', cors());
+    this.app.options('*', cors());
     this.app.use(express.json())
     this.app.use(useragent.express())
     this.app.use(recaptcha)

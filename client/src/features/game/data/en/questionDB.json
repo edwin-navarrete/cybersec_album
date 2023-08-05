@@ -12,7 +12,7 @@
     "solution": [
       3
     ],
-    "difficulty": 0.4,
+    "difficulty": 1.4,
     "feedback": "Remember that security in the broadest sense includes the protection of members of a group from harm as well as individual perception of risk."
   },
   {
@@ -28,7 +28,7 @@
     "solution": [
       2
     ],
-    "difficulty": 0.5
+    "difficulty": 1.7
   },
   {
     "id": 3,
@@ -43,11 +43,11 @@
     "solution": [
       0
     ],
-    "difficulty": 0.7
+    "difficulty": 2.1
   },
   {
     "id": 4,
-    "type": "single",
+    "type": "multiple",
     "question": "Which of these are information assets?",
     "options": [
       "Web page",
@@ -60,7 +60,7 @@
       1,
       3
     ],
-    "difficulty": 0.8
+    "difficulty": 2.4
   },
   {
     "id": 5,
@@ -77,7 +77,7 @@
       2,
       3
     ],
-    "difficulty": 0.8
+    "difficulty": 1.9
   },
   {
     "id": 6,
@@ -92,7 +92,7 @@
     "solution": [
       1
     ],
-    "difficulty": 0.6
+    "difficulty": 1.2
   },
   {
     "id": 7,
@@ -107,7 +107,7 @@
     "solution": [
       1
     ],
-    "difficulty": 0.4
+    "difficulty": 0.7
   },
   {
     "id": 8,
@@ -122,7 +122,7 @@
     "solution": [
       2
     ],
-    "difficulty": 0.7
+    "difficulty": 1.9
   },
   {
     "id": 9,
@@ -137,7 +137,7 @@
     "solution": [
       2
     ],
-    "difficulty": 0.7
+    "difficulty": 0.9
   },
   {
     "id": 10,
@@ -152,7 +152,7 @@
     "solution": [
       0
     ],
-    "difficulty": 0.8
+    "difficulty": 2.0
   },
   {
     "id": 11,
@@ -169,7 +169,7 @@
       1,
       2
     ],
-    "difficulty": 0.8
+    "difficulty": 2.1
   },
   {
     "id": 12,
@@ -184,7 +184,7 @@
     "solution": [
       3
     ],
-    "difficulty": 0.9
+    "difficulty": 0.8
   },
   {
     "id": 13,
@@ -199,7 +199,7 @@
     "solution": [
       0
     ],
-    "difficulty": 0.4
+    "difficulty": 1.0
   },
   {
     "id": 14,
@@ -214,7 +214,7 @@
     "solution": [
       1
     ],
-    "difficulty": 0.7
+    "difficulty": 1.9
   },
   {
     "id": 15,
@@ -244,7 +244,7 @@
     "solution": [
       2
     ],
-    "difficulty": 0.7
+    "difficulty": 1.2
   },
   {
     "id": 17,
@@ -259,7 +259,7 @@
     "solution": [
       0
     ],
-    "difficulty": 0.6
+    "difficulty": 1.7
   },
   {
     "id": 18,
@@ -274,7 +274,7 @@
     "solution": [
       3
     ],
-    "difficulty": 0.7
+    "difficulty": 1.8
   },
   {
     "id": 19,
@@ -289,7 +289,7 @@
     "solution": [
       1
     ],
-    "difficulty": 0.6
+    "difficulty": 1.3
   },
   {
     "id": 20,
@@ -304,7 +304,7 @@
     "solution": [
       0
     ],
-    "difficulty": 0.7
+    "difficulty": 2.0
   },
   {
     "id": 21,
@@ -321,7 +321,7 @@
       1,
       3
     ],
-    "difficulty": 0.9
+    "difficulty": 3.0
   },
   {
     "id": 22,
@@ -338,6 +338,6 @@
       2,
       3
     ],
-    "difficulty": 0.9
+    "difficulty": 2.3
   }
 ]

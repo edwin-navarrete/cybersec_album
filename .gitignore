@@ -3,7 +3,7 @@
 # dependencies
 node_modules
 
-/dist
+
 
 /.pnp
 .pnp.js
@@ -12,7 +12,7 @@ node_modules
 /coverage
 
 # production
-/build
+
 
 # misc
 .DS_Store
@@ -34,4 +34,5 @@ tmp/
 client/.env.production
 .idea
 server/dist/
-statClient/build/
+
+statClient/build.zip
