@@ -9,7 +9,7 @@ rankingRouter.get("/", async (req: Request, res: Response) => {
 
   
   const date = req.query.date as string;
-  
+
   ranking_model.findAll((err: Error, albumIds: Ranking[]) => {
     if (err) {
       return res.status(500).json({"errorMessage": err.message});

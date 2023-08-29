@@ -10,7 +10,8 @@ import cors from 'cors'
 const app = express();
 dotenv.config();
 
-app.use(cors({origin: process.env.UI_URL})); // Habilitar CORS
+// app.use(cors({origin: process.env.UI_URL})); // Habilitar CORS
+app.use(cors()); // Habilitar CORS
 
 
 

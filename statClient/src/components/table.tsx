@@ -42,7 +42,8 @@ export default function BasicTable() {
 
   const handleDateChange = (date: any) => {
     setSelectedDate(date)
-    console.log(date);
+    console.log('fecha entrada: ',date);
+    console.log('estado: ',selectedDate)
     axios
       .get(`${baseURL}/ranking?date=${new Date(date.valueOf()).toLocaleDateString('es-ES')}`)//Url api server
       .then((res) => {
@@ -52,7 +53,7 @@ export default function BasicTable() {
 
       })
       .catch((error) => {
-        console.log(error);
+        console.log('Error Fecha',error);
       });
 
   };
@@ -61,7 +62,12 @@ export default function BasicTable() {
   const [data, setData] = useState<IData[]>([]);
 
   useEffect(() => {
-    axios
+    getAlbums();
+
+  }, []);
+
+    const getAlbums = () => {
+      axios
       .get(`${baseURL}/ranking`)
       .then((res) => {
         setData(res.data.data);
@@ -72,11 +78,15 @@ export default function BasicTable() {
 
       })
       .catch((error) => {
-        console.log("Error: " + error);
+        console.log("Error Efect: " + error);
       });
+    }
 
-  }, []);
+    const handleButtonClick = () => {
+      setSelectedDate(today);
+      getAlbums();
 
+    } 
   return (
 
     <TableContainer component={Paper}>
@@ -103,16 +113,17 @@ export default function BasicTable() {
           alignItems: 'center',
         }}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={['DatePicker']}>
-              <DemoItem>
-                <DatePicker
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  format="DD/MM/YYYY"
-                  views={['year', 'month', 'day']}
-                />
-              </DemoItem>
-            </DemoContainer>
+          <DemoContainer components={['DatePicker']}>
+          <DemoItem>
+            <DatePicker
+              value={selectedDate}
+              onChange={(event) => handleDateChange(event)}
+              format="DD/MM/YYYY"
+              views={['year', 'month', 'day']}
+            />
+              <button onClick={handleButtonClick}>Click Me</button>
+            </DemoItem>
+          </DemoContainer>  
           </LocalizationProvider>
         </Tooltip>
 
