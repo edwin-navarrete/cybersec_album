@@ -24,18 +24,18 @@ FROM (
                 WHERE DATE(FROM_UNIXTIME(started_on/1000)) = STR_TO_DATE("${date}", '%d/%m/%Y')
             )
             THEN DATE(FROM_UNIXTIME(started_on/1000)) = STR_TO_DATE("${date}", '%d/%m/%Y')
-            
+            ELSE 1 = 1
         END
     GROUP BY started_on, album_id
     ORDER BY finalizacion_album DESC, tiempo_total_de_respuesta, SUM(success)/COUNT(DISTINCT question_id) DESC
 ) t;
 
 `;
-    console.log(queryString);
     db_1.db.query(queryString, (err, result) => {
         if (err) {
             callback(err);
         }
+        console.log(queryString);
         const rows = result;
         const ranking = [];
         rows.forEach(row => {

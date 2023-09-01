@@ -73,7 +73,7 @@ export default function BasicTable() {
         setData(res.data.data);
         console.log("Example:" + new Date(selectedDate.valueOf()).toLocaleDateString('es-ES'));
 
-        //console.log(data.valueOf().toLocaleString());
+        console.log(data.valueOf().toLocaleString());
 
 
       })

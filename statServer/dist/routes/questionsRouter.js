@@ -42,11 +42,18 @@ const questionsRouter = express_1.default.Router();
 exports.questionsRouter = questionsRouter;
 questionsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
-    const date = req.query.date;
-    questions_model.findAll((err, albumIds) => {
-        if (err) {
-            return res.status(500).json({ "errorMessage": err.message });
-        }
-        res.status(200).json({ "data": albumIds });
-    }, date);
+    const since = req.query.since;
+    const to = req.query.to;
+    try {
+        questions_model.getQuetionsByDates((err, albumIds) => {
+            if (err) {
+                return res.status(500).json({ "errorMessage": err.message });
+            }
+            res.status(200).json({ "data": albumIds });
+        }, { since, to });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ "errorMessage": error });
+    }
 }));

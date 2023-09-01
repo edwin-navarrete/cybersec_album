@@ -10,13 +10,22 @@ rankingRouter.get("/", async (req: Request, res: Response) => {
   
   const date = req.query.date as string;
 
-  ranking_model.findAll((err: Error, albumIds: Ranking[]) => {
-    if (err) {
-      return res.status(500).json({"errorMessage": err.message});
-    }
+  try {
+    
+    ranking_model.findAll((err: Error, albumIds: Ranking[]) => {
+      if (err) {
+        return res.status(500).json({"errorMessage": err.message});
+      }
+  
+      res.status(200).json({"data":albumIds});
+    }, date);
 
-    res.status(200).json({"data":albumIds});
-  }, date);
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({"errorMessage" : error});
+  }
+
+
 });
 
 

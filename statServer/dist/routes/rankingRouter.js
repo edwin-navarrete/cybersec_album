@@ -42,10 +42,16 @@ const rankingRouter = express_1.default.Router();
 exports.rankingRouter = rankingRouter;
 rankingRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const date = req.query.date;
-    ranking_model.findAll((err, albumIds) => {
-        if (err) {
-            return res.status(500).json({ "errorMessage": err.message });
-        }
-        res.status(200).json({ "data": albumIds });
-    }, date);
+    try {
+        ranking_model.findAll((err, albumIds) => {
+            if (err) {
+                return res.status(500).json({ "errorMessage": err.message });
+            }
+            res.status(200).json({ "data": albumIds });
+        }, date);
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ "errorMessage": error });
+    }
 }));

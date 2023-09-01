@@ -8,15 +8,25 @@ const questionsRouter = express.Router();
 questionsRouter.get("/", async (req: Request, res: Response) => {
   //res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
 
-  const date = req.query.date as string;
-  
-  questions_model.findAll((err: Error, albumIds: Questions[]) => {
-    if (err) {
-      return res.status(500).json({"errorMessage": err.message});
-    }
+  const since = req.query.since as string;
+  const to = req.query.to as string;
 
-    res.status(200).json({"data":albumIds});
-  }, date);
+
+
+  try {
+    questions_model.getQuetionsByDates((err: Error, albumIds: Questions[]) => {
+      if (err) {
+        return res.status(500).json({"errorMessage": err.message});
+      }
+  
+      res.status(200).json({"data":albumIds});
+    }, {since, to});
+    
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({"errorMessage": error});
+  }
+
 });
 
 
