@@ -2,8 +2,30 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findAll = void 0;
 const db_1 = require("../db");
+let queryString;
 const findAll = (callback, date) => {
-    const queryString = `
+    if (date === 'Invalid Date') {
+        queryString = `
+
+    SELECT t.*, ROW_NUMBER() OVER () AS ranking
+    FROM (
+        SELECT a.album_id,
+        a.started_on,
+        a.ended_on IS NOT NULL finalizacion_album,
+        COUNT(DISTINCT question_id) preguntas_respondidas,
+        COUNT(DISTINCT question_id) - SUM(success) numero_de_errores,
+        1 - SUM(success)/COUNT(DISTINCT question_id) porcentaje_error,
+        SUM(latency)/1000 AS tiempo_total_de_respuesta
+        FROM vw_user_answer ua
+        JOIN album a ON ua.album_id = a.album_id
+        GROUP BY started_on, album_id
+        ORDER BY finalizacion_album DESC, tiempo_total_de_respuesta, SUM(success)/COUNT(DISTINCT question_id) DESC
+    ) t;
+    
+`;
+    }
+    else {
+        queryString = `
 
 SELECT t.*, ROW_NUMBER() OVER () AS ranking
 FROM (
@@ -24,18 +46,17 @@ FROM (
                 WHERE DATE(FROM_UNIXTIME(started_on/1000)) = STR_TO_DATE("${date}", '%d/%m/%Y')
             )
             THEN DATE(FROM_UNIXTIME(started_on/1000)) = STR_TO_DATE("${date}", '%d/%m/%Y')
-            ELSE 1 = 1
         END
     GROUP BY started_on, album_id
     ORDER BY finalizacion_album DESC, tiempo_total_de_respuesta, SUM(success)/COUNT(DISTINCT question_id) DESC
 ) t;
 
 `;
+    }
     db_1.db.query(queryString, (err, result) => {
         if (err) {
             callback(err);
         }
-        console.log(queryString);
         const rows = result;
         const ranking = [];
         rows.forEach(row => {
