@@ -11,14 +11,13 @@ import Tooltip from '@mui/material/Tooltip';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Divider } from '@mui/material';
-import dayjs from 'dayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats'
-const today = dayjs();
+let today: string;
 
 
 interface IData {
@@ -38,17 +37,15 @@ interface IData {
 
 export default function BasicTable() {
 
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [selectedDate, setSelectedDate] = useState('');
 
   const handleDateChange = (date: any) => {
     setSelectedDate(date)
-    console.log('fecha entrada: ',date);
-    console.log('estado: ',selectedDate)
+    const fecha = new Date(date?.valueOf()).toLocaleDateString('es-ES');
     axios
-      .get(`${baseURL}/ranking?date=${new Date(date.valueOf()).toLocaleDateString('es-ES')}`)//Url api server
+      .get(`${baseURL}/ranking?date=${fecha}`)//Url api server
       .then((res) => {
         setData(res.data.data);
-        console.log(new Date(date.valueOf()).toLocaleDateString('es-ES'));
 
 
       })
@@ -66,27 +63,22 @@ export default function BasicTable() {
 
   }, []);
 
+  useEffect(() => {
+    handleDateChange(selectedDate);
+
+  }, [selectedDate]);
+
     const getAlbums = () => {
       axios
       .get(`${baseURL}/ranking`)
       .then((res) => {
         setData(res.data.data);
-        console.log("Example:" + new Date(selectedDate.valueOf()).toLocaleDateString('es-ES'));
-
-        console.log(data.valueOf().toLocaleString());
-
-
       })
       .catch((error) => {
         console.log("Error Efect: " + error);
       });
     }
 
-    const handleButtonClick = () => {
-      setSelectedDate(today);
-      getAlbums();
-
-    } 
   return (
 
     <TableContainer component={Paper}>
@@ -117,11 +109,10 @@ export default function BasicTable() {
           <DemoItem>
             <DatePicker
               value={selectedDate}
-              onChange={(event) => handleDateChange(event)}
+              onAccept={(event) => setSelectedDate(event as string)}
               format="DD/MM/YYYY"
               views={['year', 'month', 'day']}
             />
-              <button onClick={handleButtonClick}>Click Me</button>
             </DemoItem>
           </DemoContainer>  
           </LocalizationProvider>
