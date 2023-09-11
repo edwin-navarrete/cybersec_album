@@ -1,6 +1,6 @@
-import { Ranking } from '../types/ranking';
-import {db} from "../db";
 import { RowDataPacket } from "mysql2";
+import { db } from "../db";
+import { Ranking } from '../types/ranking';
 
 
 export const findAll = (callback: Function, date: any) => {
@@ -17,7 +17,7 @@ FROM (
     SUM(latency)/1000 AS tiempo_total_de_respuesta
     FROM vw_user_answer ua
     JOIN album a ON ua.album_id = a.album_id
-    WHERE 
+    WHERE
         CASE
             WHEN EXISTS (
                 SELECT 1

@@ -15,28 +15,18 @@ since: fecha para considerar los datos sólo después de la fecha dada, es opcio
 Para los textos de las preguntas se va a usar el resultado del issue Issue 54
 */
 
-import { Questions } from '../types/questions';
-import { db } from "../db";
 import { RowDataPacket } from "mysql2";
+import { db } from "../db";
+import { Questions } from '../types/questions';
 
 
-export const getQuetionsByDates = (callback: Function, dates: any) => {
+export const getQuetionsByDates = (callback: Function, since: string , to: any) => {
 
-    let { since, to } = dates;
-    // console.log(since)
-    // console.log(to)
 
-    if (since === '' || to === '') {
-        console.log('cambio de since o to')
-        since = '01/01/0001'
-        to = '12/12/9999'
-    }
 
-    // console.log(since)
-    // console.log(to)
-    
+    since = (since ?? '1970-01-01') || '1970-01-01'
+    to = (to ?? '3000-01-01') || '3000-01-01'
 
-    console.log(dates)
     const queryString = `
     
     SELECT
@@ -61,7 +51,7 @@ export const getQuetionsByDates = (callback: Function, dates: any) => {
         END
     GROUP BY
         q.id, q.question
-    ORDER BY  avgLatency DESC   
+    ORDER BY  avgLatency DESC
     ;
     `
 
@@ -75,7 +65,7 @@ export const getQuetionsByDates = (callback: Function, dates: any) => {
             const a_id: Questions = {
                 questionId: row.questionId, // Identificación de la pregunta
                 question: row.question, // Texto de la pregunta en español
-                attempts: row.attempts, // Número de veces que la pregunta se ha intentado 
+                attempts: row.attempts, // Número de veces que la pregunta se ha intentado
                 avgLatency: row.avgLatency, // Tiempo promedio en segundos que la gente necesita para responder esta pregunta
                 successProb: row.successProb //  La probabilidad de tener éxito respondiendo esta pregunta (valor entre cero y uno)
             }

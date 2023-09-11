@@ -1,19 +1,16 @@
+import * as bodyParser from "body-parser";
+import cors from 'cors';
 import * as dotenv from "dotenv";
 import express from "express";
-import * as bodyParser from "body-parser";
-import {albumRouter} from "./routes/albumRouter";
-import { user_answerRouter } from './routes/user_answerRouter'
-import { rankingRouter } from './routes/rankingRouter';
+import { albumRouter } from "./routes/albumRouter";
 import { questionsRouter } from "./routes/questionsRouter";
-import cors from 'cors'
+import { rankingRouter } from './routes/rankingRouter';
+import { user_answerRouter } from './routes/user_answerRouter';
 
 const app = express();
 dotenv.config();
 
-// app.use(cors({origin: process.env.UI_URL})); // Habilitar CORS
-app.use(cors()); // Habilitar CORS
-
-
+app.use(cors({origin: process.env.UI_URL})); // Habilitar CORS
 
 
 app.use(bodyParser.json());

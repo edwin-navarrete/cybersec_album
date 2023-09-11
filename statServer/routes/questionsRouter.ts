@@ -1,6 +1,6 @@
-import express, {Request, Response} from "express";
+import express, { Request, Response } from "express";
 import * as questions_model from "../models/questions_model";
-import {Questions} from "../types/questions";
+import { Questions } from "../types/questions";
 
 
 const questionsRouter = express.Router();
@@ -15,13 +15,8 @@ questionsRouter.get("/", async (req: Request, res: Response) => {
 
   try {
     questions_model.getQuetionsByDates((err: Error, albumIds: Questions[]) => {
-      if (err) {
-        return res.status(500).json({"errorMessage": err.message});
-      }
-  
       res.status(200).json({"data":albumIds});
-    }, {since, to});
-    
+    }, since, to);
   } catch (error) {
     console.log(error)
     return res.status(500).json({"errorMessage": error});
@@ -31,4 +26,5 @@ questionsRouter.get("/", async (req: Request, res: Response) => {
 
 
 
-export {questionsRouter};
+export { questionsRouter };
+

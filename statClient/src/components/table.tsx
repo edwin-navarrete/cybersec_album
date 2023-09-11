@@ -1,3 +1,5 @@
+import { Divider } from '@mui/material';
+import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -5,17 +7,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Tooltip from '@mui/material/Tooltip';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Divider } from '@mui/material';
-import dayjs from 'dayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import Typography from '@mui/material/Typography';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import axios from 'axios';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 
 const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats'
 const today = dayjs();
@@ -62,11 +62,11 @@ export default function BasicTable() {
   const [data, setData] = useState<IData[]>([]);
 
   useEffect(() => {
-    getAlbums();
+    getRanking();
 
   }, []);
 
-    const getAlbums = () => {
+    const getRanking = () => {
       axios
       .get(`${baseURL}/ranking`)
       .then((res) => {
@@ -84,9 +84,9 @@ export default function BasicTable() {
 
     const handleButtonClick = () => {
       setSelectedDate(today);
-      getAlbums();
+      getRanking();
 
-    } 
+    }
   return (
 
     <TableContainer component={Paper}>
@@ -123,7 +123,7 @@ export default function BasicTable() {
             />
               <button onClick={handleButtonClick}>Click Me</button>
             </DemoItem>
-          </DemoContainer>  
+          </DemoContainer>
           </LocalizationProvider>
         </Tooltip>
 
