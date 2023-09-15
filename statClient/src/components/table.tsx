@@ -17,8 +17,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats'
-let today: string;
-
 
 interface IData {
 
@@ -33,42 +31,45 @@ interface IData {
   album_id: string,
 }
 
-
-
 export default function BasicTable() {
-
   const [selectedDate, setSelectedDate] = useState('');
-
-  const handleDateChange = (date: any) => {
-    setSelectedDate(date)
-    const fecha = new Date(date?.valueOf()).toLocaleDateString('es-ES');
-    axios
-      .get(`${baseURL}/ranking?date=${fecha}`)//Url api server
-      .then((res) => {
-        setData(res.data.data);
-
-
-      })
-      .catch((error) => {
-        console.log('Error Fecha',error);
-      });
-
-  };
+  
+const handleDateChange = (date: any) => {
+  setSelectedDate(date);
+  if (date) {
+    const partes = new Date(date).toLocaleDateString('es-ES').split('/');
+    if (partes.length === 3) {
+      const dd = partes[0];
+      const mm = partes[1];
+      const yyyy = partes[2];
+      const fechaFormateada = `${yyyy}/${mm}/${dd}`;
+      
+      axios
+        .get(`${baseURL}/ranking?date=${fechaFormateada}`)
+        .then((res) => {
+          setData(res.data.data);
+        })
+        .catch((error) => {
+          console.log('Error Fecha', error);
+        });
+    } else {
+      console.log('Fecha no válida');
+    }
+  } else {
+    getRanking();
+  }
+};
 
   // Hooks for query data from server API
   const [data, setData] = useState<IData[]>([]);
-
   useEffect(() => {
-    getAlbums();
-
+    getRanking();
   }, []);
 
   useEffect(() => {
     handleDateChange(selectedDate);
-
   }, [selectedDate]);
-
-    const getAlbums = () => {
+    const getRanking = () => {
       axios
       .get(`${baseURL}/ranking`)
       .then((res) => {
@@ -80,7 +81,6 @@ export default function BasicTable() {
     }
 
   return (
-
     <TableContainer component={Paper}>
       <Toolbar sx={{
         border: '5px solid white',
