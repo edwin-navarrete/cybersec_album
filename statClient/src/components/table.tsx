@@ -1,5 +1,3 @@
-import { Divider } from '@mui/material';
-import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,19 +5,18 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-import axios from 'axios';
-import dayjs from 'dayjs';
+import Paper from '@mui/material/Paper';
+import Tooltip from '@mui/material/Tooltip';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Divider } from '@mui/material';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats'
-const today = dayjs();
-
 
 interface IData {
 
@@ -34,61 +31,56 @@ interface IData {
   album_id: string,
 }
 
-
-
 export default function BasicTable() {
-
-  const [selectedDate, setSelectedDate] = useState(today);
-
-  const handleDateChange = (date: any) => {
-    setSelectedDate(date)
-    console.log('fecha entrada: ',date);
-    console.log('estado: ',selectedDate)
-    axios
-      .get(`${baseURL}/ranking?date=${new Date(date.valueOf()).toLocaleDateString('es-ES')}`)//Url api server
-      .then((res) => {
-        setData(res.data.data);
-        console.log(new Date(date.valueOf()).toLocaleDateString('es-ES'));
-
-
-      })
-      .catch((error) => {
-        console.log('Error Fecha',error);
-      });
-
-  };
+  const [selectedDate, setSelectedDate] = useState('');
+  
+const handleDateChange = (date: any) => {
+  setSelectedDate(date);
+  if (date) {
+    const partes = new Date(date).toLocaleDateString('es-ES').split('/');
+    if (partes.length === 3) {
+      const dd = partes[0];
+      const mm = partes[1];
+      const yyyy = partes[2];
+      const fechaFormateada = `${yyyy}/${mm}/${dd}`;
+      
+      axios
+        .get(`${baseURL}/ranking?date=${fechaFormateada}`)
+        .then((res) => {
+          setData(res.data.data);
+        })
+        .catch((error) => {
+          console.log('Error Fecha', error);
+        });
+    } else {
+      console.log('Fecha no válida');
+    }
+  } else {
+    getRanking();
+  }
+};
 
   // Hooks for query data from server API
   const [data, setData] = useState<IData[]>([]);
-
   useEffect(() => {
     getRanking();
-
   }, []);
 
+  useEffect(() => {
+    handleDateChange(selectedDate);
+  }, [selectedDate]);
     const getRanking = () => {
       axios
       .get(`${baseURL}/ranking`)
       .then((res) => {
         setData(res.data.data);
-        console.log("Example:" + new Date(selectedDate.valueOf()).toLocaleDateString('es-ES'));
-
-        console.log(data.valueOf().toLocaleString());
-
-
       })
       .catch((error) => {
         console.log("Error Efect: " + error);
       });
     }
 
-    const handleButtonClick = () => {
-      setSelectedDate(today);
-      getRanking();
-
-    }
   return (
-
     <TableContainer component={Paper}>
       <Toolbar sx={{
         border: '5px solid white',
@@ -117,13 +109,12 @@ export default function BasicTable() {
           <DemoItem>
             <DatePicker
               value={selectedDate}
-              onChange={(event) => handleDateChange(event)}
+              onAccept={(event) => setSelectedDate(event as string)}
               format="DD/MM/YYYY"
               views={['year', 'month', 'day']}
             />
-              <button onClick={handleButtonClick}>Click Me</button>
             </DemoItem>
-          </DemoContainer>
+          </DemoContainer>  
           </LocalizationProvider>
         </Tooltip>
 

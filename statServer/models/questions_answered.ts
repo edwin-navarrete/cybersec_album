@@ -1,6 +1,6 @@
-import { RowDataPacket } from "mysql2";
-import { db } from "../db";
 import { AlbumId } from '../types/album';
+import {db} from "../db";
+import { OkPacket, RowDataPacket } from "mysql2";
 
 export const findAll = (callback: Function) => {
     const queryString = `SELECT count(question_id) FROM user_answer WHERE success=true GROUP BY album_id;`
@@ -13,7 +13,7 @@ export const findAll = (callback: Function) => {
   
       rows.forEach(row => {
         const a_id: AlbumId =  {
-            album_id: row.album_id,
+            album_id: row.album_id,      
         
         }
             albumIds.push(a_id);
