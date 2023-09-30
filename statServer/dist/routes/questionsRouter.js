@@ -38,22 +38,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.questionsRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const questions_model = __importStar(require("../models/questions_model"));
+const commonRoutes_1 = require("./commonRoutes");
 const questionsRouter = express_1.default.Router();
 exports.questionsRouter = questionsRouter;
 questionsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    //res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
-    const since = req.query.since;
-    const to = req.query.to;
+    const since = (0, commonRoutes_1.sanitizeDate)(req.query.since);
+    const to = (0, commonRoutes_1.sanitizeDate)(req.query.to);
     try {
-        questions_model.getQuetionsByDates((err, albumIds) => {
-            if (err) {
-                return res.status(500).json({ "errorMessage": err.message });
-            }
-            res.status(200).json({ "data": albumIds });
-        }, { since, to });
+        const albumIds = yield questions_model.getQuestionsByDates(since, to);
+        res.status(200).json({ data: albumIds });
     }
     catch (error) {
         console.log(error);
-        return res.status(500).json({ "errorMessage": error });
+        return res.status(500).json({ errorMessage: error });
     }
 }));

@@ -1,12 +1,13 @@
 import express, {Request, Response} from "express";
 import * as questions_model from "../models/questions_model";
+import { sanitizeDate } from "./commonRoutes";
 
 
 const questionsRouter = express.Router();
 
 questionsRouter.get("/", async (req: Request, res: Response) => {
-  const since = req.query.since as string;
-  const to = req.query.to as string;
+  const since = sanitizeDate(req.query.since as string);
+  const to = sanitizeDate(req.query.to as string);
 
   try {
     const albumIds = await questions_model.getQuestionsByDates( since, to );

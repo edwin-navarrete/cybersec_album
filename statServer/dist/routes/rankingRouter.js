@@ -38,20 +38,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.rankingRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const ranking_model = __importStar(require("../models/ranking_model"));
+const commonRoutes_1 = require("./commonRoutes");
 const rankingRouter = express_1.default.Router();
 exports.rankingRouter = rankingRouter;
 rankingRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const date = req.query.date;
+    const date = (0, commonRoutes_1.sanitizeDate)(req.query.date);
     try {
-        ranking_model.findAll((err, albumIds) => {
-            if (err) {
-                return res.status(500).json({ "errorMessage": err.message });
-            }
-            res.status(200).json({ "data": albumIds });
-        }, date);
+        const ranking = yield ranking_model.getRankingByDate(date);
+        res.status(200).json({ data: ranking });
     }
     catch (error) {
-        console.log(error);
-        return res.status(500).json({ "errorMessage": error });
+        console.error(error);
+        return res.status(500).json({ errorMessage: error });
     }
 }));

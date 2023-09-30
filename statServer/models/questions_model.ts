@@ -21,30 +21,27 @@ import { db } from "../db";
 import { RowDataPacket } from "mysql2";
 
 
-    export const getQuestionsByDates = ( since:string, to:string) => {    
+    export const getQuestionsByDates = ( since:string | undefined, to:string | undefined) => {    
         
         return new Promise((resolve, reject) => {
-    
-        since = (since ?? '1970/01/01')||'1970/01/01';
-        to = (to ?? '3000/01/01')||'3000/01/01';
+        
+        since = (since ?? '1970-01-01')||'1970-01-01';
+        to = (to ?? '3000-01-01')||'3000-01-01';
+        console.log(`Since ${since} to ${to}`)
 
         const queryString = `
             SELECT
-            q.id AS questionId,
-            q.question,
-            COUNT(ua.question_id) AS attempts,
-            AVG(ua.latency / 1000) AS avgLatency,
-            SUM(ua.success) / COUNT(ua.question_id) AS successProb
-            FROM
-            question q
-            LEFT JOIN
-            user_answer ua ON q.id = ua.question_id
+                q.id AS questionId,
+                q.question,
+                COUNT(ua.question_id) AS attempts,
+                AVG(ua.latency / 1000) AS avgLatency,
+                SUM(ua.success) / COUNT(ua.question_id) AS successProb
+            FROM question q
+            LEFT JOIN user_answer ua ON q.id = ua.question_id
             WHERE
-            ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
-            GROUP BY
-            q.id, q.question
-            ORDER BY
-            avgLatency DESC;
+                ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
+            GROUP BY q.id, q.question
+            ORDER BY avgLatency DESC;
         `;
     
         db.query(queryString, (err, result) => {
