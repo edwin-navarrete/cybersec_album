@@ -27,7 +27,6 @@ import { RowDataPacket } from "mysql2";
         
         since = (since ?? '1970-01-01')||'1970-01-01';
         to = (to ?? '3000-01-01')||'3000-01-01';
-        console.log(`Since ${since} to ${to}`)
 
         const queryString = `
             SELECT

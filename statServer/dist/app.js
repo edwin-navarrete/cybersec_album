@@ -45,3 +45,4 @@ app.use(`${process.env.SERVER_PATH}/questions`, questionsRouter_1.questionsRoute
 app.listen(process.env.PORT, () => {
     console.log("Node server started running " + process.env.PORT);
 });
+//# sourceMappingURL=app.js.map

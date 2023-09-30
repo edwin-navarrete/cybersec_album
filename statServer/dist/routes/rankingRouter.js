@@ -52,3 +52,4 @@ rankingRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function*
         return res.status(500).json({ errorMessage: error });
     }
 }));
+//# sourceMappingURL=rankingRouter.js.map

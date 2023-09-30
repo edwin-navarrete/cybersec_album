@@ -15,3 +15,4 @@ function sanitizeDate(date) {
     return formattedDate;
 }
 exports.sanitizeDate = sanitizeDate;
+//# sourceMappingURL=commonRoutes.js.map

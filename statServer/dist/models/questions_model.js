@@ -22,7 +22,6 @@ const getQuestionsByDates = (since, to) => {
     return new Promise((resolve, reject) => {
         since = (since !== null && since !== void 0 ? since : '1970-01-01') || '1970-01-01';
         to = (to !== null && to !== void 0 ? to : '3000-01-01') || '3000-01-01';
-        console.log(`Since ${since} to ${to}`);
         const queryString = `
             SELECT
                 q.id AS questionId,
@@ -59,3 +58,4 @@ const getQuestionsByDates = (since, to) => {
     });
 };
 exports.getQuestionsByDates = getQuestionsByDates;
+//# sourceMappingURL=questions_model.js.map

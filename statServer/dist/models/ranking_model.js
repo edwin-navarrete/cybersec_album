@@ -51,3 +51,4 @@ const getRankingByDate = (date) => {
     });
 };
 exports.getRankingByDate = getRankingByDate;
+//# sourceMappingURL=ranking_model.js.map

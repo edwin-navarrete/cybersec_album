@@ -53,3 +53,4 @@ questionsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.status(500).json({ errorMessage: error });
     }
 }));
+//# sourceMappingURL=questionsRouter.js.map
