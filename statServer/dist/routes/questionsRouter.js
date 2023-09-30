@@ -35,17 +35,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.user_answerRouter = void 0;
+exports.questionsRouter = void 0;
 const express_1 = __importDefault(require("express"));
-const user_answer_model = __importStar(require("../models/user_answer_model"));
-const user_answerRouter = express_1.default.Router();
-exports.user_answerRouter = user_answerRouter;
-user_answerRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    user_answer_model.findAll((err, albumIds) => {
-        if (err) {
-            return res.status(500).json({ "errorMessage": err.message });
-        }
-        res.status(200).json({ "data": albumIds });
-    });
+const questions_model = __importStar(require("../models/questions_model"));
+const commonRoutes_1 = require("./commonRoutes");
+const questionsRouter = express_1.default.Router();
+exports.questionsRouter = questionsRouter;
+questionsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const since = (0, commonRoutes_1.sanitizeDate)(req.query.since);
+    const to = (0, commonRoutes_1.sanitizeDate)(req.query.to);
+    try {
+        const albumIds = yield questions_model.getQuestionsByDates(since, to);
+        res.status(200).json({ data: albumIds });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ errorMessage: error });
+    }
 }));
-//# sourceMappingURL=user_answerRouter.js.map
+//# sourceMappingURL=questionsRouter.js.map

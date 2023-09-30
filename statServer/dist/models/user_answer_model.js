@@ -84,3 +84,4 @@ GROUP BY album_id
     });
 };
 exports.findAll = findAll;
+//# sourceMappingURL=user_answer_model.js.map
