@@ -21,3 +21,4 @@ const findAll = (callback) => {
     });
 };
 exports.findAll = findAll;
+//# sourceMappingURL=album.js.map

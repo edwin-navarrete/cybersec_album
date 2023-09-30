@@ -7,12 +7,10 @@ exports.getRankingByDate = void 0;
 const db_1 = require("../db");
 const getRankingByDate = (date) => {
     return new Promise((resolve, reject) => {
-        // Verifica si date es undefined o nulo
         const isDateProvided = date !== undefined && date !== null;
-        // Crea la parte del WHERE de la consulta SQL basada en si date es proporcionado o no
         const whereClause = isDateProvided
-            ? `DATE(FROM_UNIXTIME(started_on / 1000)) = STR_TO_DATE("${date}", '%Y/%m/%d')`
-            : '1=1'; // No se aplica ningún filtro de fecha
+            ? `DATE(FROM_UNIXTIME(started_on / 1000)) = "${date}"`
+            : '1=1';
         const queryString = `
       SELECT t.*, ROW_NUMBER() OVER () AS ranking
       FROM (
@@ -56,3 +54,4 @@ const getRankingByDate = (date) => {
     });
 };
 exports.getRankingByDate = getRankingByDate;
+//# sourceMappingURL=ranking_model.js.map

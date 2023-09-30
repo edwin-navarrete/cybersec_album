@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
      
-    
+    "sourceMap": true,
+    "rootDir": ".", 
     "outDir": "dist",
 
     "experimentalDecorators": true,

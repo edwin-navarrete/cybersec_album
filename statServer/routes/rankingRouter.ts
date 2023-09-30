@@ -1,10 +1,11 @@
 import express, { Request, Response } from "express";
 import * as ranking_model from "../models/ranking_model";
+import { sanitizeDate } from './commonRoutes';
 
 const rankingRouter = express.Router();
 
 rankingRouter.get("/", async (req: Request, res: Response) => {
-  const date = req.query.date as string;
+  const date = sanitizeDate(req.query.date as string);
 
   try {
     const ranking = await ranking_model.getRankingByDate(date);

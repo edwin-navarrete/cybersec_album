@@ -48,3 +48,4 @@ user_answerRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(200).json({ "data": albumIds });
     });
 }));
+//# sourceMappingURL=user_answerRouter.js.map

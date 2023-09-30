@@ -26,14 +26,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const bodyParser = __importStar(require("body-parser"));
+const cors_1 = __importDefault(require("cors"));
 const dotenv = __importStar(require("dotenv"));
 const express_1 = __importDefault(require("express"));
-const bodyParser = __importStar(require("body-parser"));
 const albumRouter_1 = require("./routes/albumRouter");
-const user_answerRouter_1 = require("./routes/user_answerRouter");
-const rankingRouter_1 = require("./routes/rankingRouter");
 const questionsRouter_1 = require("./routes/questionsRouter");
-const cors_1 = __importDefault(require("cors"));
+const rankingRouter_1 = require("./routes/rankingRouter");
+const user_answerRouter_1 = require("./routes/user_answerRouter");
 const app = (0, express_1.default)();
 dotenv.config();
 // app.use(cors({origin: process.env.UI_URL})); // Habilitar CORS
@@ -46,3 +46,4 @@ app.use(`${process.env.SERVER_PATH}/questions`, questionsRouter_1.questionsRoute
 app.listen(process.env.PORT, () => {
     console.log("Node server started running " + process.env.PORT);
 });
+//# sourceMappingURL=app.js.map

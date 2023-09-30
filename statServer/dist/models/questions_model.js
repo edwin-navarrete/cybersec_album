@@ -20,25 +20,21 @@ exports.getQuestionsByDates = void 0;
 const db_1 = require("../db");
 const getQuestionsByDates = (since, to) => {
     return new Promise((resolve, reject) => {
-        since = (since !== null && since !== void 0 ? since : '1970/01/01') || '1970/01/01';
-        to = (to !== null && to !== void 0 ? to : '3000/01/01') || '3000/01/01';
+        since = (since !== null && since !== void 0 ? since : '1970-01-01') || '1970-01-01';
+        to = (to !== null && to !== void 0 ? to : '3000-01-01') || '3000-01-01';
         const queryString = `
             SELECT
-            q.id AS questionId,
-            q.question,
-            COUNT(ua.question_id) AS attempts,
-            AVG(ua.latency / 1000) AS avgLatency,
-            SUM(ua.success) / COUNT(ua.question_id) AS successProb
-            FROM
-            question q
-            LEFT JOIN
-            user_answer ua ON q.id = ua.question_id
+                q.id AS questionId,
+                q.question,
+                COUNT(ua.question_id) AS attempts,
+                AVG(ua.latency / 1000) AS avgLatency,
+                SUM(ua.success) / COUNT(ua.question_id) AS successProb
+            FROM question q
+            LEFT JOIN user_answer ua ON q.id = ua.question_id
             WHERE
-            ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
-            GROUP BY
-            q.id, q.question
-            ORDER BY
-            avgLatency DESC;
+                ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
+            GROUP BY q.id, q.question
+            ORDER BY avgLatency DESC;
         `;
         db_1.db.query(queryString, (err, result) => {
             if (err) {
@@ -62,3 +58,4 @@ const getQuestionsByDates = (since, to) => {
     });
 };
 exports.getQuestionsByDates = getQuestionsByDates;
+//# sourceMappingURL=questions_model.js.map
