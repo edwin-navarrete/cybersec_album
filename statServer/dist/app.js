@@ -36,8 +36,7 @@ const questionsRouter_1 = require("./routes/questionsRouter");
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 dotenv.config();
-//app.use(cors({ origin: process.env.UI_URL })); // Habilitar CORS
-app.use((0, cors_1.default)()); // Habilitar CORS
+app.use((0, cors_1.default)({ origin: process.env.UI_URL })); // Habilitar CORS
 app.use(bodyParser.json());
 app.use(`${process.env.SERVER_PATH}/album`, albumRouter_1.albumRouter);
 app.use(`${process.env.SERVER_PATH}/user`, user_answerRouter_1.user_answerRouter);
