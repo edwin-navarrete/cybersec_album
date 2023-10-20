@@ -16,7 +16,7 @@ since: fecha para considerar los datos sólo después de la fecha dada, es opcio
 Para los textos de las preguntas se va a usar el resultado del issue Issue 54
 */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getQuestionsByDates = void 0;
+exports.getQuestionsLang = exports.getQuestionsByDates = void 0;
 const db_1 = require("../db");
 const getQuestionsByDates = (since, to) => {
     return new Promise((resolve, reject) => {
@@ -62,3 +62,53 @@ const getQuestionsByDates = (since, to) => {
     });
 };
 exports.getQuestionsByDates = getQuestionsByDates;
+const getQuestionsLang = (lang) => {
+    console.log(lang);
+    if (lang !== null)
+        return new Promise((resolve, reject) => {
+            let queryString = '';
+            if (lang !== undefined) {
+                console.log('entramos al if');
+                queryString = `
+                SELECT
+                    id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
+                FROM
+                    question 
+                WHERE
+                    lang = '${lang}';  
+                `;
+            }
+            else {
+                console.log("esta es la opcion sin lang");
+                queryString = `
+                SELECT
+                    id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
+                FROM
+                    question
+                `;
+            }
+            db_1.db.query(queryString, (err, result) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                const rows = result;
+                const questions = [];
+                rows.forEach(row => {
+                    const questionsInfo = {
+                        questionId: row.questionId,
+                        questionType: row.typeQ,
+                        lang: row.lang,
+                        question: row.question,
+                        options: row.options,
+                        solution: row.solution,
+                        dificult: row.difficulty,
+                        feedback: row.feedback,
+                    };
+                    questions.push(questionsInfo);
+                });
+                resolve(questions);
+            });
+        });
+};
+exports.getQuestionsLang = getQuestionsLang;

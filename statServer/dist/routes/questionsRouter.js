@@ -35,17 +35,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.questionsRouter = void 0;
+exports.questionsRouterinfo = exports.questionsRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const questions_model = __importStar(require("../models/questions_model"));
 const questionsRouter = express_1.default.Router();
 exports.questionsRouter = questionsRouter;
+const questionsRouterinfo = express_1.default.Router();
+exports.questionsRouterinfo = questionsRouterinfo;
 questionsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const since = req.query.since;
     const to = req.query.to;
     try {
         const albumIds = yield questions_model.getQuestionsByDates(since, to);
         res.status(200).json({ data: albumIds });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ errorMessage: error });
+    }
+}));
+questionsRouterinfo.get("/info/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const lang = req.query.lang;
+    try {
+        const albumIdsQuest = yield questions_model.getQuestionsLang(lang);
+        res.status(200).json({ data: albumIdsQuest });
     }
     catch (error) {
         console.log(error);

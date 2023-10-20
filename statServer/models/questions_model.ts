@@ -15,7 +15,7 @@ since: fecha para considerar los datos sólo después de la fecha dada, es opcio
 Para los textos de las preguntas se va a usar el resultado del issue Issue 54
 */
 
-import { Questions } from '../types/questions';
+import { Questions, QuestionsLang } from '../types/questions';
 import { db } from "../db";
 import { RowDataPacket } from "mysql2";
 
@@ -71,3 +71,59 @@ import { RowDataPacket } from "mysql2";
         });
     };
     
+
+    export const getQuestionsLang = (lang:string | null) => {    
+        console.log(lang);
+        if(lang !== null) 
+        
+        
+        return new Promise((resolve, reject) => {
+            let queryString = '';
+        if(lang !== undefined){
+            console.log('entramos al if')
+            queryString = `
+                SELECT
+                    id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
+                FROM
+                    question 
+                WHERE
+                    lang = '${lang}';  
+                `;
+
+            }else{
+                console.log("esta es la opcion sin lang")
+            queryString = `
+                SELECT
+                    id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
+                FROM
+                    question
+                `;
+            }
+    
+        db.query(queryString, (err, result) => {
+            if (err) {
+            reject(err);
+            return;
+            }
+    
+            const rows = <RowDataPacket[]>result;
+            const questions: QuestionsLang[] = [];
+    
+            rows.forEach(row => {
+            const questionsInfo: QuestionsLang = {
+                questionId:     row.questionId,
+                questionType:   row.typeQ,
+                lang:           row.lang,
+                question:       row.question,
+                options:        row.options,
+                solution:       row.solution,
+                dificult:       row.difficulty,
+                feedback:       row.feedback,
+            };
+            questions.push(questionsInfo);
+            });
+    
+            resolve(questions);
+        });
+        });
+    };

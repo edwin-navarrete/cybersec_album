@@ -4,6 +4,7 @@ import {Questions} from "../types/questions";
 
 
 const questionsRouter = express.Router();
+const questionsRouterinfo = express.Router();
 
 questionsRouter.get("/", async (req: Request, res: Response) => {
   const since = req.query.since as string;
@@ -18,4 +19,17 @@ questionsRouter.get("/", async (req: Request, res: Response) => {
   }
 
 });
-export {questionsRouter};
+
+questionsRouterinfo.get("/info/", async (req: Request, res: Response) => {
+  const lang = req.query.lang as string;
+
+  try {
+    const albumIdsQuest = await questions_model.getQuestionsLang( lang );
+    res.status(200).json({ data: albumIdsQuest });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ errorMessage: error });
+  }
+
+});
+export {questionsRouter, questionsRouterinfo};

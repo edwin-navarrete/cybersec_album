@@ -1,18 +1,13 @@
 "use strict";
-// import { Ranking } from '../types/ranking';
-// import { db } from "../db";
-// import { RowDataPacket } from "mysql2";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRankingByDate = void 0;
 const db_1 = require("../db");
 const getRankingByDate = (date) => {
     return new Promise((resolve, reject) => {
-        // Verifica si date es undefined o nulo
         const isDateProvided = date !== undefined && date !== null;
-        // Crea la parte del WHERE de la consulta SQL basada en si date es proporcionado o no
         const whereClause = isDateProvided
             ? `DATE(FROM_UNIXTIME(started_on / 1000)) = STR_TO_DATE("${date}", '%Y/%m/%d')`
-            : '1=1'; // No se aplica ningún filtro de fecha
+            : '1=1';
         const queryString = `
       SELECT t.*, ROW_NUMBER() OVER () AS ranking
       FROM (
