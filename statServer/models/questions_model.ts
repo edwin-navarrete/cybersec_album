@@ -80,7 +80,6 @@ import { RowDataPacket } from "mysql2";
         return new Promise((resolve, reject) => {
             let queryString = '';
         if(lang !== undefined){
-            console.log('entramos al if')
             queryString = `
                 SELECT
                     id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
@@ -91,7 +90,6 @@ import { RowDataPacket } from "mysql2";
                 `;
 
             }else{
-                console.log("esta es la opcion sin lang")
             queryString = `
                 SELECT
                     id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
