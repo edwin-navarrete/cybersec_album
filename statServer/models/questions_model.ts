@@ -36,7 +36,7 @@ import { RowDataPacket } from "mysql2";
                 AVG(ua.latency / 1000) AS avgLatency,
                 SUM(ua.success) / COUNT(ua.question_id) AS successProb
             FROM question q
-            LEFT JOIN user_answer ua ON q.id = ua.question_id
+            LEFT JOIN vw_user_answer ua ON q.id = ua.question_id
             WHERE
                 ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
             GROUP BY q.id, q.question
