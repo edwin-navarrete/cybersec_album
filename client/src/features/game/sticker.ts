@@ -31,7 +31,7 @@ export module Sticker {
             this.stickerDAO = stickerDAO
             // fibbonaccy reward
             this.latencySchema = new Map<number, number>([[2_000, 5], [5_000, 3], [7_000, 2], [Number.MAX_SAFE_INTEGER, 1]])
-            this.difficultySchema = new Map<number, number>([[0.5, 1], [0.7, 2], [0.9, 3], [1, 5]]);
+            this.difficultySchema = new Map<number, number>([[1.6, 1], [2.1, 2], [Number.MAX_SAFE_INTEGER, 3]]);
             this.config = config;
         }
 

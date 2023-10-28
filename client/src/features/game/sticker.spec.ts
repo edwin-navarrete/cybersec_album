@@ -181,12 +181,14 @@ describe('Reward', () => {
         let expected = []
         for (const q of questions) {
             await quiz.putAnswer(q, q.solution)
-            switch (q.difficulty) {
-                case 0.1: expected.push(1); break;
-                case 0.25: expected.push(1); break;
-                case 0.5: expected.push(2); break;
-                case 0.7: expected.push(3); break;
-                case 0.8: expected.push(3); break;
+            if(q.difficulty <= 1.6) {
+                expected.push(1);
+            }
+            else if(q.difficulty <= 2.1) {
+                expected.push(2);
+            }
+            else {
+                expected.push(3);
             }
         }
         let expectedRewards = expected.values()
