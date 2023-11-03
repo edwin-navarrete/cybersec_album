@@ -42,7 +42,7 @@ const handleDateChange = (date: any) => {
       const dd = partes[0];
       const mm = partes[1];
       const yyyy = partes[2];
-      const fechaFormateada = `${yyyy}/${mm}/${dd}`;
+      const fechaFormateada = `${dd}/${mm}/${yyyy}`;
       
       axios
         .get(`${baseURL}/ranking?date=${fechaFormateada}`)
