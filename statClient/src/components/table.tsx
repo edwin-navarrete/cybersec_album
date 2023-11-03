@@ -39,8 +39,8 @@ const handleDateChange = (date: any) => {
   if (date) {
     const partes = new Date(date).toLocaleDateString('es-ES').split('/');
     if (partes.length === 3) {
-      const dd = partes[0];
-      const mm = partes[1];
+      const dd = String(partes[0]).padStart(2, '0');
+      const mm = String(partes[1]).padStart(2, '0');
       const yyyy = partes[2];
       const fechaFormateada = `${dd}/${mm}/${yyyy}`;
       
