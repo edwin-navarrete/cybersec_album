@@ -36,3 +36,5 @@ client/.env.production
 server/dist/
 
 statClient/build.zip
+**/.vscode/**
+*.map

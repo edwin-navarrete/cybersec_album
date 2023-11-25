@@ -36,3 +36,4 @@ exports.db = mysql2_1.default.createConnection({
     password: process.env.DB_PWD,
     database: process.env.DB_NAME
 });
+//# sourceMappingURL=db.js.map

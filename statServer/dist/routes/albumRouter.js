@@ -58,3 +58,4 @@ albumRouter.get("/questions_answered", (req, res) => __awaiter(void 0, void 0, v
         res.status(200).json({ "data": questionC });
     });
 }));
+//# sourceMappingURL=albumRouter.js.map

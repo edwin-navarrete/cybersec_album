@@ -33,17 +33,17 @@ interface IData {
 
 export default function BasicTable() {
   const [selectedDate, setSelectedDate] = useState('');
-  
+
 const handleDateChange = (date: any) => {
   setSelectedDate(date);
   if (date) {
     const partes = new Date(date).toLocaleDateString('es-ES').split('/');
     if (partes.length === 3) {
-      const dd = partes[0];
-      const mm = partes[1];
+      const dd = String(partes[0]).padStart(2, '0');
+      const mm = String(partes[1]).padStart(2, '0');
       const yyyy = partes[2];
-      const fechaFormateada = `${yyyy}/${mm}/${dd}`;
-      
+      const fechaFormateada = `${dd}/${mm}/${yyyy}`;
+
       axios
         .get(`${baseURL}/ranking?date=${fechaFormateada}`)
         .then((res) => {
@@ -114,7 +114,7 @@ const handleDateChange = (date: any) => {
               views={['year', 'month', 'day']}
             />
             </DemoItem>
-          </DemoContainer>  
+          </DemoContainer>
           </LocalizationProvider>
         </Tooltip>
 

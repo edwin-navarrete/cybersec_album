@@ -20,3 +20,4 @@ const findAll = (callback) => {
     });
 };
 exports.findAll = findAll;
+//# sourceMappingURL=questions_answered.js.map

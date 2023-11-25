@@ -8,7 +8,7 @@ export const getRankingByDate = (date: string | undefined) => {
     const isDateProvided = date !== undefined && date !== null;
 
     const whereClause = isDateProvided
-      ? `DATE(FROM_UNIXTIME(started_on / 1000)) = STR_TO_DATE("${date}", '%Y/%m/%d')`
+      ? `DATE(FROM_UNIXTIME((a.ended_on - 18000000)/ 1000)) = "${date}"`
       : '1=1';
 
     const queryString = `

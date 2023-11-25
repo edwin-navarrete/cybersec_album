@@ -6,7 +6,7 @@ const getRankingByDate = (date) => {
     return new Promise((resolve, reject) => {
         const isDateProvided = date !== undefined && date !== null;
         const whereClause = isDateProvided
-            ? `DATE(FROM_UNIXTIME(started_on / 1000)) = STR_TO_DATE("${date}", '%Y/%m/%d')`
+            ? `DATE(FROM_UNIXTIME(started_on / 1000)) = "${date}"`
             : '1=1';
         const queryString = `
       SELECT t.*, ROW_NUMBER() OVER () AS ranking
@@ -51,3 +51,4 @@ const getRankingByDate = (date) => {
     });
 };
 exports.getRankingByDate = getRankingByDate;
+//# sourceMappingURL=ranking_model.js.map
