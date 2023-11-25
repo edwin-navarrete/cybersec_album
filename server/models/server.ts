@@ -1,3 +1,4 @@
+/* eslint-disable space-before-function-paren */
 import express from 'express'
 import cors from 'cors'
 import recaptcha from './recaptcha'
@@ -18,17 +19,18 @@ export class Server {
 
   middlewares () {
     this.app.use(cors()) // Enable CORS
-    this.app.options('*', cors());
+    this.app.options('*', cors())
     this.app.use(express.json())
     this.app.use(useragent.express())
     this.app.use(recaptcha)
   }
 
   // Bind controllers to routes
-  routes () {
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userSticker'))
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userAnswer'))
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/album'))
+  routes() {
+    this.app.use(`${process.env.SERVER_PATH}/api/stickers`, require('../routes/userSticker'))
+    this.app.use(`${process.env.SERVER_PATH}/api/answers`, require('../routes/userAnswer'))
+    this.app.use(`${process.env.SERVER_PATH}/api/albums`, require('../routes/album'))
+    this.app.use(`${process.env.SERVER_PATH}/api/questions`, require('../routes/questionRouter'))
   }
 
   listen () {
