@@ -42,6 +42,7 @@ const questionsCount = __importStar(require("../models/questions_answered"));
 const albumRouter = express_1.default.Router();
 exports.albumRouter = albumRouter;
 albumRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log;
     albumModel.findAll((err, albumIds) => {
         if (err) {
             return res.status(500).json({ "errorMessage": err.message });

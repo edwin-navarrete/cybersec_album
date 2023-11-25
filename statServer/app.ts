@@ -20,6 +20,6 @@ app.use(`${process.env.SERVER_PATH}/ranking`, rankingRouter)
 app.use(`${process.env.SERVER_PATH}/questions`, questionsRouter);
 
 app.listen(process.env.PORT, () => {
-    console.log("Node server started running " + process.env.PORT);
+console.log("Node server started running " + process.env.PORT);
 
 });

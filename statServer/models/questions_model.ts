@@ -5,9 +5,9 @@ El nuevo entrypoint tiene la siguiente estructura:
 GET /questions?since=2022-03-04
 
 {
-   "questionId": ".. ",  // Identificación de la pregunta
+   "questionId": ".. ",  // Identificación de la pregunta 
    "question": ".. ",  // Texto de la pregunta en español
-   "attempts":  #  // Número de veces que la pregunta se ha intentado
+   "attempts":  #  // Número de veces que la pregunta se ha intentado 
    "avgLatency": # // Tiempo promedio en segundo que la gente necesita para responder esta pregunta
    "successProb": # //  La probabilidad de tener éxito respondiendo esta pregunta (valor entre cero y uno)
 }
@@ -21,10 +21,10 @@ import { db } from "../db";
 import { RowDataPacket } from "mysql2";
 
 
-    export const getQuestionsByDates = ( since:string | undefined, to:string | undefined) => {
-
+    export const getQuestionsByDates = ( since:string | undefined, to:string | undefined) => {    
+        
         return new Promise((resolve, reject) => {
-
+        
         since = (since ?? '1970-01-01')||'1970-01-01';
         to = (to ?? '3000-01-01')||'3000-01-01';
 
@@ -42,16 +42,16 @@ import { RowDataPacket } from "mysql2";
             GROUP BY q.id, q.question
             ORDER BY avgLatency DESC;
         `;
-
+    
         db.query(queryString, (err, result) => {
             if (err) {
             reject(err);
             return;
             }
-
+    
             const rows = <RowDataPacket[]>result;
             const questions: Questions[] = [];
-
+    
             rows.forEach(row => {
             const a_id: Questions = {
                 questionId: row.questionId,
@@ -62,7 +62,7 @@ import { RowDataPacket } from "mysql2";
             };
             questions.push(a_id);
             });
-
+    
             resolve(questions);
         });
         });
