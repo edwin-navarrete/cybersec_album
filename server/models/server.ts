@@ -1,4 +1,3 @@
-/* eslint-disable space-before-function-paren */
 import express from 'express'
 import cors from 'cors'
 import recaptcha from './recaptcha'
@@ -27,10 +26,10 @@ export class Server {
 
   // Bind controllers to routes
   routes() {
-    this.app.use(`${process.env.SERVER_PATH}/api/stickers`, require('../routes/userSticker'))
-    this.app.use(`${process.env.SERVER_PATH}/api/answers`, require('../routes/userAnswer'))
-    this.app.use(`${process.env.SERVER_PATH}/api/albums`, require('../routes/album'))
-    this.app.use(`${process.env.SERVER_PATH}/api/questions`, require('../routes/questionRouter'))
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userSticker'))
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userAnswer'))
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/album'))
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/questionRouter'))
   }
 
   listen () {
