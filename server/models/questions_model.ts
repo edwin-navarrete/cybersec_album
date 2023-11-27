@@ -1,10 +1,9 @@
 /* eslint-disable indent */
-import { db } from '../db'
 import { RowDataPacket } from 'mysql2'
+import { db } from '../db'
 import { QuestionsLang } from '../interfaces/questions'
 
 export const getQuestionsLang = (lang:string | null) => {
-console.log(lang)
 if (lang !== null) {
     return new Promise((resolve, reject) => {
     let queryString = ''
@@ -13,14 +12,14 @@ if (lang !== null) {
             SELECT
                 id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
             FROM
-                question 
+                question
             WHERE
-                lang = '${lang}';  
+                lang = '${lang}';
             `
     } else {
         queryString = `
             SELECT
-                id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
+                id AS questionId, type AS typeQ, question, options, solution, difficulty,feedback
             FROM
                 question
             `
@@ -37,9 +36,8 @@ if (lang !== null) {
 
         rows.forEach(row => {
             const questionsInfo: QuestionsLang = {
-                questionId: row.questionId,
-                questionType: row.typeQ,
-                lang: row.lang,
+                id: row.questionId,
+                type: row.typeQ,
                 question: row.question,
                 options: row.options,
                 solution: row.solution,
