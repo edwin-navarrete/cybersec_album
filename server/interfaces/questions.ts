@@ -3,7 +3,7 @@
 export interface QuestionsLang {
     id: number, // Identificación de la pregunta
     type: string, // Tipo de la progunta unica o multiple
-    //lang: string | undefined, // ES español o EN ingles
+    // lang: string | undefined, // ES español o EN ingles
     question: string, // Texto de la pregunta
     options: string[], // Posibles opciones
     solution: number[], // respuestas

@@ -10,7 +10,7 @@ if (lang !== null) {
     if (lang !== undefined) {
         queryString = `
             SELECT
-                id AS questionId, type AS typeQ, lang, question, options, solution, difficulty,feedback
+                id AS questionId, type AS typeQ, question, options, solution, difficulty,feedback
             FROM
                 question
             WHERE
