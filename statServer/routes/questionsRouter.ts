@@ -4,8 +4,6 @@ import { sanitizeDate } from "./commonRoutes";
 
 
 const questionsRouter = express.Router();
-console.log('Estamos aca')
-console.log(questionsRouter)
 
 questionsRouter.get("/", async (req: Request, res: Response) => {
   const since = sanitizeDate(req.query.since as string);
