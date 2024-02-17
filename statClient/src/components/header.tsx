@@ -124,18 +124,17 @@ export default function Header() {
         </DrawerHeader>
         <Divider />
         <List>
-          {['Estadísticas', 'Configuración'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton href={index % 2 === 0 ? '/' : '/configuracion'} >
-                <ListItemIcon>
-                  {index % 2 === 0 ? <BarChartIcon /> : <SettingsIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-     
+        {['Estadísticas', 'Configuración', 'Respuestas'].map((text, index) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton href={index === 0 ? '/' : index === 1 ? '/configuracion' : '/answers'}>
+              <ListItemIcon>
+                {index === 0 ? <BarChartIcon /> : index === 1 ? <SettingsIcon /> : <BarChartIcon/>}
+              </ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
       </Drawer>
     </Box>
   );

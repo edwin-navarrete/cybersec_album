@@ -117,7 +117,7 @@ const handleDateChange = (date: any) => {
           </DemoContainer>
           </LocalizationProvider>
         </Tooltip>
-
+        
       </Toolbar>
 
       <Divider></Divider>
@@ -150,8 +150,6 @@ const handleDateChange = (date: any) => {
               <TableCell align="right">{Math.round(row.total_latency)}</TableCell>
               <TableCell align="right">{Math.round(row.errors * 100)} % </TableCell>
               <TableCell align="right">{new Date(row.started_on).toLocaleString()}</TableCell>
-
-
             </TableRow>
           ))}
         </TableBody>
