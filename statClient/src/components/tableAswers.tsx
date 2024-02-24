@@ -24,8 +24,8 @@ interface IAnswerData {
   questionId: number,
   question: string,
   attempts: number,
-  avgLatency: string,
-  successProb: string
+  avgLatency: number,
+  successProb: number
 }
 
 export default function AnswersTable() {
@@ -34,53 +34,53 @@ export default function AnswersTable() {
   const [orderBy, setOrderBy] = useState<string>('');
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-const handleDateChange = (dateSince: any, dateTo : any) => {
-  setSelectedDateSince(dateSince);
-  setSelectedDateTo(dateTo);
-  if (dateSince || dateTo ) {
-    
-    dateSince = (dateSince ?? '1970-01-01')||'1970-01-01';
-    dateTo = (dateTo ?? '3000-01-01')||'3000-01-01';
-    
-  
-    const partesSince = new Date(dateSince).toLocaleDateString('es-ES').split('/');
-    const partesTo = new Date(dateTo).toLocaleDateString('es-ES').split('/');
-    
-    if (partesSince.length === 3 ) {
-      const ddSince = String(partesSince[0]).padStart(2, '0');
-      const mmSince = String(partesSince[1]).padStart(2, '0');
-      const yyyySince = partesSince[2];
-      const fechaFormateadaSince = `${ddSince}/${mmSince}/${yyyySince}`;
+    // Hooks for query data from server API
+    const [data, setData] = useState<IAnswerData[]>([]);
+    useEffect(() => {
+      getAnswers();
+    }, []);
 
-      const ddTo = String(partesTo[0]).padStart(2, '0');
-      const mmTo = String(partesTo[1]).padStart(2, '0');
-      const yyyyTo = partesTo[2];
-      const fechaFormateadaTo = `${ddTo}/${mmTo}/${yyyyTo}`;
-      axios
-        .get(`${baseURL}/questions?since=${fechaFormateadaSince}&to=${fechaFormateadaTo}`)
-        .then((res) => {
-          setData(res.data.data);
-        })
-        .catch((error) => {
-          console.log('Error Fecha', error);
-        });
-    } else {
-      console.log('Fecha no válida');
-    } 
-  } else {
-    getAnswers();
-  }
-};
-
-  // Hooks for query data from server API
-  const [data, setData] = useState<IAnswerData[]>([]);
-  useEffect(() => {
-    getAnswers();
-  }, []);
-
-  useEffect(() => {
-    handleDateChange(selectedDateSince, selectedDateTo);
-  }, [selectedDateSince,selectedDateTo]);
+    useEffect(() => {
+      const handleDateChange = (dateSince: any, dateTo : any) => {
+        setSelectedDateSince(dateSince);
+        setSelectedDateTo(dateTo);
+        if (dateSince || dateTo ) {
+          
+          dateSince = (dateSince ?? '1970-01-01')||'1970-01-01';
+          dateTo = (dateTo ?? '3000-01-01')||'3000-01-01';
+          
+        
+          const partesSince = new Date(dateSince).toLocaleDateString('es-ES').split('/');
+          const partesTo = new Date(dateTo).toLocaleDateString('es-ES').split('/');
+          
+          if (partesSince.length === 3 ) {
+            const ddSince = String(partesSince[0]).padStart(2, '0');
+            const mmSince = String(partesSince[1]).padStart(2, '0');
+            const yyyySince = partesSince[2];
+            const fechaFormateadaSince = `${ddSince}/${mmSince}/${yyyySince}`;
+    
+            const ddTo = String(partesTo[0]).padStart(2, '0');
+            const mmTo = String(partesTo[1]).padStart(2, '0');
+            const yyyyTo = partesTo[2];
+            const fechaFormateadaTo = `${ddTo}/${mmTo}/${yyyyTo}`;
+            axios
+              .get(`${baseURL}/questions?since=${fechaFormateadaSince}&to=${fechaFormateadaTo}`)
+              .then((res) => {
+                setData(res.data.data);
+              })
+              .catch((error) => {
+                console.log('Error Fecha', error);
+              });
+          } else {
+            console.log('Fecha no válida');
+          } 
+        } else {
+          getAnswers();
+        }
+      };
+      handleDateChange(selectedDateSince, selectedDateTo);
+    }, [selectedDateSince, selectedDateTo]);
+    
     const getAnswers = () => {
       axios
       .get(`${baseURL}/questions`)
@@ -105,6 +105,7 @@ const handleDateChange = (dateSince: any, dateTo : any) => {
         }
         return isAsc ? comparison : -comparison;
       });
+      console.log(sortedData)
       setData(sortedData);
     };
     
@@ -224,8 +225,8 @@ const handleDateChange = (dateSince: any, dateTo : any) => {
                 <TableCell  align="center">{row.questionId}</TableCell>
                 <TableCell  align="left">{row.question}</TableCell>
                 <TableCell  align="center">{row.attempts}</TableCell>
-                <TableCell  align="center">{Math.round(parseFloat(row.avgLatency))}</TableCell>
-                <TableCell  align="center">{Math.round(parseFloat(row.successProb)*100)} %</TableCell>
+                <TableCell  align="center">{Math.round(row.avgLatency)}</TableCell>
+                <TableCell  align="center">{Math.round(row.successProb*100)} %</TableCell>
               </TableRow>
             ))}
           </TableBody>
