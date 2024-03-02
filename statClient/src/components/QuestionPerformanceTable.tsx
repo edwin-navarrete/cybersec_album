@@ -19,7 +19,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats'
 
-interface IAnswerData {
+interface IQuestionData {
   // define la estructura de los datos que esperas recibir de la API
   questionId: number,
   question: string,
@@ -28,7 +28,7 @@ interface IAnswerData {
   successProb: string
 }
 
-export default function AnswersTable() {
+export default function QuestionPerformanceTable() {
   const [selectedDateTo, setSelectedDateTo] = useState('');
   const [selectedDateSince, setSelectedDateSince] = useState('');
   const [orderBy, setOrderBy] = useState<string>('');
@@ -73,7 +73,7 @@ const handleDateChange = (dateSince: any, dateTo : any) => {
 };
 
   // Hooks for query data from server API
-  const [data, setData] = useState<IAnswerData[]>([]);
+  const [data, setData] = useState<IQuestionData[]>([]);
   useEffect(() => {
     getAnswers();
   }, []);
@@ -92,10 +92,10 @@ const handleDateChange = (dateSince: any, dateTo : any) => {
       });
     }
 
-    const handleSort = (columnId: keyof IAnswerData) => {
-      const isAsc = orderBy === columnId && order === 'asc';
+    const handleSort = (columnId: keyof IQuestionData) => {
+      const isAsc = orderBy === columnId && order === 'desc';
       setOrderBy(columnId);
-      setOrder(isAsc ? 'desc' : 'asc');
+      setOrder(isAsc ? 'asc' : 'desc');
       const sortedData = [...data].sort((a, b) => {
         let comparison = 0;
         if (a[columnId] > b[columnId]) {
@@ -103,7 +103,7 @@ const handleDateChange = (dateSince: any, dateTo : any) => {
         } else if (a[columnId] < b[columnId]) {
           comparison = -1;
         }
-        return isAsc ? comparison : -comparison;
+        return isAsc ? -comparison : comparison;
       });
       setData(sortedData);
     };
@@ -127,7 +127,7 @@ const handleDateChange = (dateSince: any, dateTo : any) => {
           id="tableTitle"
           component="div"
         >
-          Tabla de Clasificación de preguntas
+          Desempeño de Preguntas
         </Typography>
 
         <Tooltip title="Filtrar por fecha desde" sx={{
@@ -195,7 +195,7 @@ const handleDateChange = (dateSince: any, dateTo : any) => {
                   direction={orderBy === 'attempts' ? order : 'asc'}
                   onClick={() => handleSort('attempts')}
                 >
-                  Número de veces que la pregunta se ha intentado
+                  Número de Intentos
                 </TableSortLabel>
               </TableCell>
               <TableCell align="center">

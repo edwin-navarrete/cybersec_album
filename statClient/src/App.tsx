@@ -3,7 +3,7 @@ import EnhancedTable from './components/table';
 import Configuracion from './components/configuracion'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from './components/header';
-import AnswersTable from './components/tableAswers';
+import QuestionPerformanceTable from './components/QuestionPerformanceTable';
 
 export default function App() {
   return (
@@ -12,7 +12,7 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<EnhancedTable />} />
-        <Route path="/answers" element={<AnswersTable />} />
+        <Route path="/answers" element={<QuestionPerformanceTable />} />
         <Route path="/configuracion" element={<Configuracion />}  />
         <Route path="*" element={NotFound()}  />
       </Routes>
