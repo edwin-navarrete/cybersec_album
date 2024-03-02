@@ -57,8 +57,8 @@ import { RowDataPacket } from "mysql2";
                 questionId: row.questionId,
                 question: row.question,
                 attempts: row.attempts,
-                avgLatency: row.avgLatency,
-                successProb: row.successProb
+                avgLatency: parseFloat(row.avgLatency),
+                successProb: parseFloat(row.successProb)
             };
             questions.push(a_id);
             });

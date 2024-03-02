@@ -34,32 +34,6 @@ interface IData {
 export default function BasicTable() {
   const [selectedDate, setSelectedDate] = useState('');
 
-const handleDateChange = (date: any) => {
-  setSelectedDate(date);
-  if (date) {
-    const partes = new Date(date).toLocaleDateString('es-ES').split('/');
-    if (partes.length === 3) {
-      const dd = String(partes[0]).padStart(2, '0');
-      const mm = String(partes[1]).padStart(2, '0');
-      const yyyy = partes[2];
-      const fechaFormateada = `${dd}/${mm}/${yyyy}`;
-
-      axios
-        .get(`${baseURL}/ranking?date=${fechaFormateada}`)
-        .then((res) => {
-          setData(res.data.data);
-        })
-        .catch((error) => {
-          console.log('Error Fecha', error);
-        });
-    } else {
-      console.log('Fecha no válida');
-    }
-  } else {
-    getRanking();
-  }
-};
-
   // Hooks for query data from server API
   const [data, setData] = useState<IData[]>([]);
   useEffect(() => {
@@ -67,6 +41,31 @@ const handleDateChange = (date: any) => {
   }, []);
 
   useEffect(() => {
+    const handleDateChange = (date: any) => {
+      setSelectedDate(date);
+      if (date) {
+        const partes = new Date(date).toLocaleDateString('es-ES').split('/');
+        if (partes.length === 3) {
+          const dd = String(partes[0]).padStart(2, '0');
+          const mm = String(partes[1]).padStart(2, '0');
+          const yyyy = partes[2];
+          const fechaFormateada = `${dd}/${mm}/${yyyy}`;
+    
+          axios
+            .get(`${baseURL}/ranking?date=${fechaFormateada}`)
+            .then((res) => {
+              setData(res.data.data);
+            })
+            .catch((error) => {
+              console.log('Error Fecha', error);
+            });
+        } else {
+          console.log('Fecha no válida');
+        }
+      } else {
+        getRanking();
+      }
+    };
     handleDateChange(selectedDate);
   }, [selectedDate]);
     const getRanking = () => {
@@ -117,7 +116,7 @@ const handleDateChange = (date: any) => {
           </DemoContainer>
           </LocalizationProvider>
         </Tooltip>
-
+        
       </Toolbar>
 
       <Divider></Divider>
@@ -150,8 +149,6 @@ const handleDateChange = (date: any) => {
               <TableCell align="right">{Math.round(row.total_latency)}</TableCell>
               <TableCell align="right">{Math.round(row.errors * 100)} % </TableCell>
               <TableCell align="right">{new Date(row.started_on).toLocaleString()}</TableCell>
-
-
             </TableRow>
           ))}
         </TableBody>

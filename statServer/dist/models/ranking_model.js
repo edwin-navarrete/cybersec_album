@@ -6,7 +6,7 @@ const getRankingByDate = (date) => {
     return new Promise((resolve, reject) => {
         const isDateProvided = date !== undefined && date !== null;
         const whereClause = isDateProvided
-            ? `DATE(FROM_UNIXTIME(started_on / 1000)) = "${date}"`
+            ? `DATE(FROM_UNIXTIME((a.ended_on - 18000000)/ 1000)) = "${date}"`
             : '1=1';
         const queryString = `
       SELECT t.*, ROW_NUMBER() OVER () AS ranking
