@@ -142,7 +142,7 @@
       "Security"
     ],
     "solution": [
-      2
+      1
     ],
     "difficulty": 0.9,
     "Feedback" : "Cybersecurity: Focuses on protecting computer systems, networks, and data locally. It includes measures such as installing firewalls, antivirus software, and access management. Cibersecurity: Expands cybersecurity to address threats originating from cyberspace, such as online attacks, hacking, data theft, and other cybercrimes."
@@ -337,7 +337,7 @@
     ],
     "solution": [
       0,
-      1,
+      2,
       3
     ],
     "difficulty": 3.0
