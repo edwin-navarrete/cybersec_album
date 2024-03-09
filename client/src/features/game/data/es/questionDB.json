@@ -28,7 +28,8 @@
     "solution": [
       2
     ],
-    "difficulty": 1.7
+    "difficulty": 1.7,
+    "feedback": "La seguridad de la información se refiere a la práctica de proteger la confidencialidad, integridad y disponibilidad de los activos de información. Esto incluye datos, sistemas, redes y cualquier otra forma de información que sea vital para una organización."
   },
   {
     "id": 3,
@@ -43,7 +44,8 @@
     "solution": [
       0
     ],
-    "difficulty": 2.1
+    "difficulty": 2.1,
+    "feedback": "Esto implica asegurar los datos almacenados digitalmente, así como proteger los sistemas informáticos y las redes que facilitan la comunicación y el intercambio de información."
   },
   {
     "id": 4,
@@ -60,7 +62,8 @@
       1,
       3
     ],
-    "difficulty": 2.4
+    "difficulty": 2.4,
+    "feedback": "Los activos de información son elementos cruciales para una organización y pueden existir en diversas formas."
   },
   {
     "id": 5,
@@ -77,7 +80,8 @@
       2,
       3
     ],
-    "difficulty": 1.9
+    "difficulty": 1.9,
+    "feedback": "Confidencialidad Se refiere a la protección de la información contra accesos no autorizados, asegurando que solo las personas autorizadas tengan acceso a la información confidencial. Integridad  Se centra en mantener la exactitud y completitud de la información, evitando cualquier tipo de alteración no autorizada. Disponibilidad Garantiza que la información esté disponible y accesible cuando sea necesario, asegurando que los usuarios autorizados puedan utilizarla de manera oportuna."
   },
   {
     "id": 6,
@@ -92,7 +96,8 @@
     "solution": [
       1
     ],
-    "difficulty": 1.2
+    "difficulty": 1.2,
+    "feedback": "La confidencialidad se refiere a la protección de la información sensible para evitar que caiga en manos no autorizadas."
   },
   {
     "id": 7,
@@ -107,7 +112,8 @@
     "solution": [
       1
     ],
-    "difficulty": 0.7
+    "difficulty": 0.7,
+    "feedback": "Los 3 pilares de seguridad de la información son: onfidencialidad, integridad y disponibilidad."
   },
   {
     "id": 8,
@@ -122,7 +128,8 @@
     "solution": [
       2
     ],
-    "difficulty": 1.9
+    "difficulty": 1.9,
+    "feeback: ": "En situaciones en las que un empleado está insatisfecho, existe la posibilidad de que tome acciones perjudiciales, como divulgar información confidencial, realizar acciones maliciosas o comprometer la integridad de los sistemas."
   },
   {
     "id": 9,
@@ -137,7 +144,8 @@
     "solution": [
       1
     ],
-    "difficulty": 0.9
+    "difficulty": 0.9,
+    "feedback": "Seguridad Informática: Se centra en proteger los sistemas de cómputo, redes y datos a nivel local. Incluye medidas como la instalación de firewalls, antivirus y la gestión de accesos. Ciberseguridad: Amplía la seguridad informática para abordar amenazas que provienen del ciberespacio, como ataques en línea, hacking, robo de datos y otros delitos cibernéticos."
   },
   {
     "id": 10,
@@ -152,7 +160,8 @@
     "solution": [
       0
     ],
-    "difficulty": 2.0
+    "difficulty": 2.0,
+    "feedback": "En este tipo de ataque, los ciberdelincuentes se centran en individuos de alto perfil con el objetivo de obtener acceso a información sensible, como datos financieros o estratégicos."
   },
   {
     "id": 11,
@@ -169,7 +178,8 @@
       1,
       2
     ],
-    "difficulty": 2.1
+    "difficulty": 2.1,
+    "feedback": "Financiero: Los ataques informáticos pueden resultar en costos significativos, como la pérdida de ingresos, costos de recuperación, y posiblemente sanciones financieras.Reputacional: La reputación de una entidad puede verse seriamente afectada tras un ataque informático. La pérdida de confianza por parte de clientes, socios comerciales y el público en general puede tener consecuencias a largo plazo.Legal: Dependiendo de la naturaleza del ataque, una entidad puede enfrentar consecuencias legales. Esto puede incluir multas, demandas y otras implicaciones jurídicas."
   },
   {
     "id": 12,
@@ -184,7 +194,8 @@
     "solution": [
       3
     ],
-    "difficulty": 0.8
+    "difficulty": 0.8,
+    "feedback": "Todas las técnicas nombradas son técnicas de influencia usadas en la ingeniería social. Autoridad: Pretender tener una posición de poder o conocimiento para influir en los demás. Empatía: Conectar emocionalmente con la otra parte para ganar su confianza y simpatía. Concesión: Hacer pequeñas concesiones para luego pedir algo más grande, aprovechando la reciprocidad. Urgencia: Crear la sensación de que la acción debe tomarse rápidamente para influir en la toma de decisiones. Reciprocidad: Ofrecer algo a cambio para obtener una respuesta positiva en el futuro. Lenguaje no verbal: Utilizar gestos, expresiones faciales y posturas corporales para comunicar mensajes de manera no verbal."
   },
   {
     "id": 13,
@@ -199,7 +210,8 @@
     "solution": [
       0
     ],
-    "difficulty": 1.0
+    "difficulty": 1.0,
+    "feedback": "Acceder a enlaces sospechosos puede llevar a ataques de phishing, descargas de malware u otras amenazas cibernéticas. Las buenas prácticas de seguridad sugieren evitar hacer clic en enlaces sospechosos y verificar siempre la autenticidad de los enlaces antes de acceder a ellos."
   },
   {
     "id": 14,
@@ -214,7 +226,8 @@
     "solution": [
       1
     ],
-    "difficulty": 1.9
+    "difficulty": 1.9,
+    "feedback": "Almacenar copias de seguridad en dos lugares diferentes dentro del mismo edificio no es una buena práctica de seguridad de la información. En caso de un desastre natural, incendio u otro evento que afecte al edificio, ambas copias podrían estar en riesgo simultáneamente. Es recomendable tener copias de seguridad almacenadas en ubicaciones geográficas diferentes para garantizar la recuperación de datos en situaciones adversas."
   },
   {
     "id": 15,
@@ -229,7 +242,8 @@
     "solution": [
       0
     ],
-    "difficulty": 0.6
+    "difficulty": 0.6,
+    "feedback": "Estas políticas definen las reglas, procedimientos y prácticas que una organización implementa para garantizar la seguridad de sus activos de información."
   },
   {
     "id": 16,
@@ -244,7 +258,8 @@
     "solution": [
       2
     ],
-    "difficulty": 1.2
+    "difficulty": 1.2,
+    "feedback": "Una contraseña segura generalmente se caracteriza por no incluir información personal fácilmente adivinable, ya que esto podría hacerla vulnerable a ataques de fuerza bruta o adivinanzas. Las contraseñas fuertes suelen contener combinaciones de letras, números y caracteres especiales, y no deben basarse en información personal fácilmente accesible o conocida. "
   },
   {
     "id": 17,
@@ -259,85 +274,89 @@
     "solution": [
       0
     ],
-    "difficulty": 1.7
-  },
-  {
-    "id": 18,
-    "type": "single",
-    "question": "Un dato personal público es aquel que:",
-    "options": [
-      "Es de naturaleza íntima, solo le interesa al titular",
-      "Es de interés para el titular y para un sector específico",
-      "Con su uso indebido se puede generar discriminación",
-      "Puede ser consultado por cualquiera sin el consentimiento del titular"
-    ],
-    "solution": [
-      3
-    ],
-    "difficulty": 1.8
-  },
-  {
-    "id": 19,
-    "type": "single",
-    "question": "Es un ejemplo de dato sensible:",
-    "options": [
-      "El nombre",
-      "Información de salud",
-      "El número telefónico",
-      "Fecha y lugar de nacimiento"
-    ],
-    "solution": [
-      1
-    ],
-    "difficulty": 1.3
-  },
-  {
-    "id": 20,
-    "type": "single",
-    "question": "Una amenaza física de factor humano:",
-    "options": [
-      "Robo de información",
-      "Daño de equipo por cambio de voltaje",
-      "Inundación de centro de datos",
-      "Terremoto"
-    ],
-    "solution": [
-      0
-    ],
-    "difficulty": 2.0
-  },
-  {
-    "id": 21,
-    "type": "multiple",
-    "question": "Son clases de amenazas:",
-    "options": [
-      "Deliberada, Accidental",
-      "Imaginarias, reales",
-      "Internas, Externas",
-      "Ambientales"
-    ],
-    "solution": [
-      0,
-      1,
-      3
-    ],
-    "difficulty": 3.0
-  },
-  {
-    "id": 22,
-    "type": "multiple",
-    "question": "Son clases de vulnerabilidades:",
-    "options": [
-      "Deliberada, Accidental ",
-      "Red, Lugar",
-      "Hardware, Software",
-      "Personal, Organización"
-    ],
-    "solution": [
-      1,
-      2,
-      3
-    ],
-    "difficulty": 2.3
-  }
+    "difficulty": 1.7,
+    "feedback" : "Riesgos Ambientales: Incluyen eventos o condiciones externas que pueden afectar la seguridad de la información, como desastres naturales, fallas en la infraestructura, cortes de energía, entre otros. Riesgos Humanos: Se refieren a acciones o comportamientos de las personas que pueden representar una amenaza para la seguridad de la información, como errores humanos, negligencia, mala intención, o falta de conciencia de seguridad."
+     
+},
+{
+  "id": 18,
+  "type": "single",
+  "question": "Un dato personal público es aquel que:",
+  "options": [
+    "Es de naturaleza íntima, solo le interesa al titular",
+    "Es de interés para el titular y para un sector específico",
+    "Con su uso indebido se puede generar discriminación",
+    "Puede ser consultado por cualquiera sin el consentimiento del titular"
+  ],
+  "solution": [
+    3
+  ],
+  "difficulty": 1.8,
+  "feedback": "Esto significa que la información no está protegida de acceso general y puede ser accesible de manera abierta al público. Es importante que las personas sean conscientes de qué información consideran pública y estén alerta sobre cómo manejar sus datos personales."
+},
+{
+  "id": 19,
+  "type": "single",
+  "question": "Es un ejemplo de dato sensible:",
+  "options": [
+    "El nombre",
+    "Información de salud",
+    "El número telefónico",
+    "Fecha y lugar de nacimiento"
+  ],
+  "solution": [
+    1
+  ],
+  "difficulty": 1.3,
+  "feedback": "La información de salud, que puede incluir detalles médicos, historiales clínicos o cualquier otra información relacionada con la salud de una persona, se considera sensible debido a su naturaleza privada y personal. Este tipo de datos a menudo está sujeto a regulaciones estrictas para garantizar su confidencialidad y protección."
+},
+{
+  "id": 20,
+  "type": "single",
+  "question": "Una amenaza física de factor humano:",
+  "options": [
+    "Robo de información",
+    "Daño de equipo por cambio de voltaje",
+    "Inundación de centro de datos",
+    "Terremoto"
+  ],
+  "solution": [
+    0
+  ],
+  "difficulty": 2.0
+},
+{
+  "id": 21,
+  "type": "multiple",
+  "question": "Son clases de amenazas:",
+  "options": [
+    "Deliberada, Accidental",
+    "Imaginarias, reales",
+    "Internas, Externas",
+    "Ambientales"
+  ],
+  "solution": [
+    0,
+    2,
+    3
+  ],
+  "difficulty": 3.0
+},
+{
+  "id": 22,
+  "type": "multiple",
+  "question": "Son clases de vulnerabilidades:",
+  "options": [
+    "Deliberada, Accidental ",
+    "Red, Lugar",
+    "Hardware, Software",
+    "Personal, Organización"
+  ],
+  "solution": [
+    1,
+    2,
+    3
+  ],
+  "difficulty": 2.3
+}
 ]
