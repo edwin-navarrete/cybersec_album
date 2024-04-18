@@ -28,8 +28,7 @@
     "solution": [
       2
     ],
-    "difficulty": 1.7,
-    "feedback" : "The security of information refers to the practice of safeguarding the confidentiality, integrity, and availability of information assets. This includes data, systems, networks, and any other form of information that is crucial for an organization."
+    "difficulty": 1.7
   },
   {
     "id": 3,
@@ -44,8 +43,7 @@
     "solution": [
       0
     ],
-    "difficulty": 2.1,
-    "Feedback" : "This involves securing digitally stored data as well as protecting computer systems and networks that facilitate communication and the exchange of information."
+    "difficulty": 2.1
   },
   {
     "id": 4,
@@ -62,8 +60,7 @@
       1,
       3
     ],
-    "difficulty": 2.4,
-    "Feedback" :"Information assets are crucial elements for an organization and can exist in various forms."
+    "difficulty": 2.4
   },
   {
     "id": 5,
@@ -80,8 +77,7 @@
       2,
       3
     ],
-    "difficulty": 1.9,
-    "Feedback" : "Confidentiality: It pertains to the protection of information against unauthorized access, ensuring that only authorized individuals have access to confidential information. Integrity: It focuses on maintaining the accuracy and completeness of information, preventing any unauthorized alterations. Availability: Ensures that information is available and accessible when needed, ensuring that authorized users can use it in a timely manner."
+    "difficulty": 1.9
   },
   {
     "id": 6,
@@ -96,8 +92,7 @@
     "solution": [
       1
     ],
-    "difficulty": 1.2,
-    "Feedback" : "Confidentiality refers to the protection of sensitive information to prevent it from falling into unauthorized hands."
+    "difficulty": 1.2
   },
   {
     "id": 7,
@@ -112,8 +107,7 @@
     "solution": [
       1
     ],
-    "difficulty": 0.7,
-    "Feedback" : "The three pillars of information security are: confidentiality, integrity, and availability."
+    "difficulty": 0.7
   },
   {
     "id": 8,
@@ -128,8 +122,7 @@
     "solution": [
       2
     ],
-    "difficulty": 1.9,
-    "Feedback" : "In situations where an employee is dissatisfied, there is a possibility that they may take detrimental actions, such as disclosing confidential information, engaging in malicious activities, or compromising the integrity of systems."
+    "difficulty": 1.9
   },
   {
     "id": 9,
@@ -142,10 +135,9 @@
       "Security"
     ],
     "solution": [
-      1
+      2
     ],
-    "difficulty": 0.9,
-    "Feedback" : "Cybersecurity: Focuses on protecting computer systems, networks, and data locally. It includes measures such as installing firewalls, antivirus software, and access management. Cibersecurity: Expands cybersecurity to address threats originating from cyberspace, such as online attacks, hacking, data theft, and other cybercrimes."
+    "difficulty": 0.9
   },
   {
     "id": 10,
@@ -160,8 +152,7 @@
     "solution": [
       0
     ],
-    "difficulty": 2.0,
-    "Feedback" : "In this type of attack, cybercriminals target high-profile individuals with the aim of gaining access to sensitive information, such as financial or strategic data."
+    "difficulty": 2.0
   },
   {
     "id": 11,
@@ -178,8 +169,7 @@
       1,
       2
     ],
-    "difficulty": 2.1,
-    "Feedback" : "Financial: Cyberattacks can result in significant costs, such as loss of revenue, recovery expenses, and potentially financial penalties. Reputational: The reputation of an entity can be severely affected after a cyberattack. The loss of trust from customers, business partners, and the general public can have long-term consequences. Legal: Depending on the nature of the attack, an entity may face legal consequences. This may include fines, lawsuits, and other legal implications."
+    "difficulty": 2.1
   },
   {
     "id": 12,
@@ -194,8 +184,7 @@
     "solution": [
       3
     ],
-    "difficulty": 0.8,
-    "Feedback" : "All the techniques mentioned are influence techniques used in social engineering. Authority: Pretending to have a position of power or knowledge to influence others. Empathy: Emotionally connecting with the other party to gain their trust and sympathy. Concession: Making small concessions and then asking for something larger, leveraging reciprocity. Urgency: Creating the sense that action must be taken quickly to influence decision-making. Reciprocity: Offering something in return to obtain a positive response in the future. Nonverbal Communication: Using gestures, facial expressions, and body postures to convey messages nonverbally."
+    "difficulty": 0.8
   },
   {
     "id": 13,
@@ -210,8 +199,7 @@
     "solution": [
       0
     ],
-    "difficulty": 1.0,
-    "Feedback": "Accessing suspicious links can lead to phishing attacks, malware downloads, or other cyber threats. Best security practices recommend avoiding clicking on suspicious links and always verifying the authenticity of links before accessing them."
+    "difficulty": 1.0
   },
   {
     "id": 14,
@@ -226,8 +214,7 @@
     "solution": [
       1
     ],
-    "difficulty": 1.9,
-    "Feedback" : "Storing backups in two different locations within the same building is not a good information security practice. In the event of a natural disaster, fire, or another incident affecting the building, both copies could be at risk simultaneously. It is advisable to have backups stored in geographically different locations to ensure data recovery in adverse situations."
+    "difficulty": 1.9
   },
   {
     "id": 15,
@@ -242,9 +229,7 @@
     "solution": [
       0
     ],
-    "difficulty": 0.6,
-    "Feedback" : "These policies define the rules, procedures, and practices that an organization implements to ensure the security of its information assets."
-
+    "difficulty": 0.6
   },
   {
     "id": 16,
@@ -259,8 +244,7 @@
     "solution": [
       2
     ],
-    "difficulty": 1.2,
-    "Feedback" : "A strong password is typically characterized by not including easily guessable personal information, as this could make it vulnerable to brute force attacks or guessing. Strong passwords often consist of combinations of letters, numbers, and special characters and should not be based on easily accessible or known personal information."
+    "difficulty": 1.2
   },
   {
     "id": 17,
@@ -275,8 +259,7 @@
     "solution": [
       0
     ],
-    "difficulty": 1.7,
-    "Feedback" : "Environmental Risks: Encompass events or external conditions that can impact information security, such as natural disasters, infrastructure failures, power outages, among others. Human Risks: Refer to actions or behaviors of individuals that can pose a threat to information security, including human errors, negligence, malicious intent, or lack of security awareness."
+    "difficulty": 1.7
   },
   {
     "id": 18,
@@ -291,8 +274,7 @@
     "solution": [
       3
     ],
-    "difficulty": 1.8,
-    "Feedback" : "This means that the information is not protected from general access and may be openly accessible to the public. It is important for individuals to be aware of what information they consider public and to be vigilant about how they handle their personal data."
+    "difficulty": 1.8
   },
   {
     "id": 19,
@@ -307,8 +289,7 @@
     "solution": [
       1
     ],
-    "difficulty": 1.3,
-    "Feedback" : "Health information, which may include medical details, clinical records, or any other information related to a person's health, is considered sensitive due to its private and personal nature. This type of data is often subject to strict regulations to ensure its confidentiality and protection."
+    "difficulty": 1.3
   },
   {
     "id": 20,
@@ -337,7 +318,7 @@
     ],
     "solution": [
       0,
-      2,
+      1,
       3
     ],
     "difficulty": 3.0
