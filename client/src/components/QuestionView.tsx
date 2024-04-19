@@ -88,7 +88,7 @@ const QuestionView = () => {
         }
         if (success === false || success === null) {
             return (<div>
-                {questionState?.feedback && <p className="feedbackMsg">{questionState.feedback}</p>}
+                {questionState?.feedback && <p className="feedbackContent">{questionState.feedback}</p>}
                 <p className="feedbackMsg">{t("quiz.fail")}</p>
             </div>)
         }
