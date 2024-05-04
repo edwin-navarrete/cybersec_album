@@ -81,7 +81,7 @@
          3
       ],
       "difficulty":1.9,
-      "feedback":"Confidentiality: It pertains to the protection of information against unauthorized access, ensuring that only authorized individuals have access to confidential information. Integrity: It focuses on maintaining the accuracy and completeness of information, preventing any unauthorized alterations. Availability: Ensures that information is available and accessible when needed, ensuring that authorized users can use it in a timely manner."
+      "feedback":"Confidentiality protects against unauthorized access, ensuring access only to authorized individuals. Integrity maintains the accuracy and completeness of the information, preventing unauthorized alterations. Availability ensures timely and authorized access to information when needed."
    },
    {
       "id":6,
@@ -129,7 +129,7 @@
          2
       ],
       "difficulty":1.9,
-      "feedback":"In situations where an employee is dissatisfied, there is a possibility that they may take detrimental actions, such as disclosing confidential information, engaging in malicious activities, or compromising the integrity of systems."
+      "feedback":"Security informatics protects local systems with firewalls, antivirus, and access management. Cybersecurity expands this protection to cyber threats, such as online attacks, hacking, and data theft."
    },
    {
       "id":9,
@@ -145,7 +145,7 @@
          1
       ],
       "difficulty":0.9,
-      "feedback":"Cybersecurity: Focuses on protecting computer systems, networks, and data locally. It includes measures such as installing firewalls, antivirus software, and access management. Cibersecurity: Expands cybersecurity to address threats originating from cyberspace, such as online attacks, hacking, data theft, and other cybercrimes."
+      "feedback":"Cybersecurity: Focuses on protecting computer systems, networks, and data locally. It includes measures such as installing firewalls, antivirus software, and access management. Cybersecurity: Expands cybersecurity to address threats originating from cyberspace, such as online attacks, hacking, data theft, and other cybercrimes."
    },
    {
       "id":10,
@@ -179,7 +179,7 @@
          2
       ],
       "difficulty":2.1,
-      "feedback":"Financial: Cyberattacks can result in significant costs, such as loss of revenue, recovery expenses, and potentially financial penalties. Reputational: The reputation of an entity can be severely affected after a cyberattack. The loss of trust from customers, business partners, and the general public can have long-term consequences. Legal: Depending on the nature of the attack, an entity may face legal consequences. This may include fines, lawsuits, and other legal implications."
+      "feedback":"Los ataques informáticos conllevan costos financieros significativos, como pérdida de ingresos y gastos de recuperación. Además, afectan la reputación de la entidad, erosionando la confianza de clientes y socios, con consecuencias a largo plazo. Legalmente, pueden acarrear multas, demandas y otras implicaciones jurídicas."
    },
    {
       "id":12,
@@ -195,7 +195,7 @@
          3
       ],
       "difficulty":0.8,
-      "feedback":"All the techniques mentioned are influence techniques used in social engineering. Authority: Pretending to have a position of power or knowledge to influence others. Empathy: Emotionally connecting with the other party to gain their trust and sympathy. Concession: Making small concessions and then asking for something larger, leveraging reciprocity. Urgency: Creating the sense that action must be taken quickly to influence decision-making. Reciprocity: Offering something in return to obtain a positive response in the future. Nonverbal Communication: Using gestures, facial expressions, and body postures to convey messages nonverbally."
+      "feedback":"The techniques of influence in social engineering include: authority (pretending to have power or knowledge), empathy (connecting emotionally), concession (giving and then asking for more), urgency (creating time pressure), reciprocity (offering something in return), and nonverbal communication (gestures, facial expressions, and body postures)."
    },
    {
       "id":13,
@@ -227,7 +227,7 @@
          1
       ],
       "difficulty":1.9,
-      "feedback":"Storing backups in two different locations within the same building is not a good information security practice. In the event of a natural disaster, fire, or another incident affecting the building, both copies could be at risk simultaneously. It is advisable to have backups stored in geographically different locations to ensure data recovery in adverse situations."
+      "feedback":"Storing backups in two locations within the same building is risky. A natural disaster or fire can put both copies in danger simultaneously. It's better to have them in geographically separated locations to ensure data recovery in emergencies."
    },
    {
       "id":15,
@@ -259,7 +259,7 @@
          2
       ],
       "difficulty":1.2,
-      "feedback":"A strong password is typically characterized by not including easily guessable personal information, as this could make it vulnerable to brute force attacks or guessing. Strong passwords often consist of combinations of letters, numbers, and special characters and should not be based on easily accessible or known personal information."
+      "feedback":"A secure password avoids easily guessable personal data, reducing risks of brute force or guessing attacks. It consists of letters, numbers, and special characters, and is not based on accessible or known personal information."
    },
    {
       "id":17,
@@ -275,7 +275,7 @@
          0
       ],
       "difficulty":1.7,
-      "feedback":"Environmental Risks: Encompass events or external conditions that can impact information security, such as natural disasters, infrastructure failures, power outages, among others. Human Risks: Refer to actions or behaviors of individuals that can pose a threat to information security, including human errors, negligence, malicious intent, or lack of security awareness."
+      "feedback":"Environmental risks encompass external events such as natural disasters, infrastructure failures, and power outages, affecting information security. Human risks include actions such as errors, negligence, malicious intent, or lack of security awareness, representing threats to information."
    },
    {
       "id":18,
@@ -307,7 +307,7 @@
          1
       ],
       "difficulty":1.3,
-      "feedback":"Health information, which may include medical details, clinical records, or any other information related to a person's health, is considered sensitive due to its private and personal nature. This type of data is often subject to strict regulations to ensure its confidentiality and protection."
+      "feedback":"Health information, which encompasses medical details, clinical histories, and other related data, is considered sensitive due to its personal and private nature. It is often subject to strict regulations to ensure its confidentiality and protection."
    },
    {
       "id":20,
