@@ -11,7 +11,7 @@ const app = express();
 dotenv.config();
 
 app.use(cors({origin: process.env.UI_URL})); // Habilitar CORS
-
+//app.use(cors())
 
 app.use(bodyParser.json());
 app.use(`${process.env.SERVER_PATH}/album`, albumRouter);

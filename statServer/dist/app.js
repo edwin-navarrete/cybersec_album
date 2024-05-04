@@ -37,6 +37,7 @@ const user_answerRouter_1 = require("./routes/user_answerRouter");
 const app = (0, express_1.default)();
 dotenv.config();
 app.use((0, cors_1.default)({ origin: process.env.UI_URL })); // Habilitar CORS
+//app.use(cors())
 app.use(bodyParser.json());
 app.use(`${process.env.SERVER_PATH}/album`, albumRouter_1.albumRouter);
 app.use(`${process.env.SERVER_PATH}/user`, user_answerRouter_1.user_answerRouter);
