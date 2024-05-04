@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, ChangeEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
+import TextField from '@mui/material/TextField';
+import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
 import { nextQuestion, stickerSample, glueSticker } from '../features/game/gameMiddleware';
@@ -22,19 +23,12 @@ const AlbumView = () => {
 
     const [splash, setSplash] = useState(true);
     const [intro, setIntro] = useState(true);
+    const [playerName, setPlayerName] = useState('');
 
     useEffect(() => {
         setTimeout(() => {
             setIntro(false);
         }, 5500);
-    });
-
-    useEffect(() => {
-        if (isFull) {
-            setTimeout(() => {
-                setSplash(false);
-            }, 4500);
-        }
     });
 
     const handleCaptcha = useCallback(async (token : string) => {
@@ -65,8 +59,43 @@ const AlbumView = () => {
         return intro && (<div className='introSplash'><span className="introMsg bubble-bottom-left">{t("introMsg")}</span></div>);
     }
 
+//     useEffect(() => {
+//         if (isFull && playerName !== '') {
+//             setTimeout(() => {
+//                 setSplash(false);
+//             }, 4500);
+//         }
+//     });
+
+    const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPlayerName(event.target.value);
+    };
+
+
+    function handleSubmit() {
+        if (playerName !== '') {
+            setSplash(false);
+            // @FIXME send name to server
+        } else {
+            // @FIXME Error message
+        }
+    }
+
     function success() {
-        return splash && (<div className='successSplash'><span className="completed">{t("quiz.completed")}</span></div>);
+        return splash && (
+            <form className='successSplash' onSubmit={handleSubmit}>
+                <div className="successForm">
+                    <p className="completed" >{t("quiz.completed")}</p>
+                    <TextField
+                        type="text"
+                        variant="standard"
+                        value={playerName}
+                        onChange={handleNameChange}
+                        placeholder={t("hint.register")}
+                        required />
+                    <Button type="submit" className="glowingBtn">{t("button.register")}</Button>
+                </div>
+            </form>);
     }
     const digest = (localStorage.getItem("albumId") || '').slice(-4);
 

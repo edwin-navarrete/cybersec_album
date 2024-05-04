@@ -221,6 +221,8 @@ code {
 }
 
 .successSplash {
+    place-items: end;
+    display: grid;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -231,6 +233,15 @@ code {
     background-size:     cover;
     background-repeat:   no-repeat;
     background-position: center center;
+}
+
+.successForm
+{
+    margin: 10px 10px;
+    text-align: center;
+}
+.successForm button {
+    color: cyan;
 }
 
 .rewardMsg {
@@ -262,7 +273,6 @@ code {
     text-align: center;
     width: 100%;
     bottom: 50px;
-    position: absolute;
     font-family: 'Covered By Your Grace', cursive;
     font-size: xx-large;
     color: darkorchid;
