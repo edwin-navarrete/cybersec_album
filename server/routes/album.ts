@@ -22,6 +22,7 @@ CREATE TABLE `ssolucio_cyberalbum`.`album` (
 
 interface AlbumRow {
     album_id: string
+    player_name: string
     started_on: number
     ended_on?: number
     language: number
@@ -47,13 +48,14 @@ const validateInput = (req: Request, res: Response, next: NextFunction) => {
 router.post('/album', [
   check('albumId', 'album_id is required').isUUID(4),
   check('startedOn', 'startedOn is required').isNumeric(),
-  check('endedOn', 'endedOn is required').optional({ nullable: true }).isNumeric(),
+  check('endedOn', 'endedOn must be numeric').optional({ nullable: true }).isNumeric(),
   check('language', 'language is required').matches('\\w+(-\\w+)*'),
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
   const value = {
     album_id: req.body.albumId,
+    player_name: req.body.playerName || null,
     started_on: req.body.startedOn,
     ended_on: req.body.endedOn || null,
     language: req.body.language,

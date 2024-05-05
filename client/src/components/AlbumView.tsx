@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
-import { nextQuestion, stickerSample, glueSticker } from '../features/game/gameMiddleware';
+import { nextQuestion, stickerSample, glueSticker, registerPlayer } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
@@ -26,6 +26,8 @@ const AlbumView = () => {
     const [playerName, setPlayerName] = useState('');
 
     useEffect(() => {
+        var player = localStorage.getItem('playerName')
+        player && setPlayerName(player);
         setTimeout(() => {
             setIntro(false);
         }, 5500);
@@ -59,25 +61,15 @@ const AlbumView = () => {
         return intro && (<div className='introSplash'><span className="introMsg bubble-bottom-left">{t("introMsg")}</span></div>);
     }
 
-//     useEffect(() => {
-//         if (isFull && playerName !== '') {
-//             setTimeout(() => {
-//                 setSplash(false);
-//             }, 4500);
-//         }
-//     });
-
     const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPlayerName(event.target.value);
     };
 
 
     function handleSubmit() {
-        if (playerName !== '') {
+        if (playerName.trim() !== '') {
+            dispatch(registerPlayer(playerName));
             setSplash(false);
-            // @FIXME send name to server
-        } else {
-            // @FIXME Error message
         }
     }
 
@@ -87,6 +79,7 @@ const AlbumView = () => {
                 <div className="successForm">
                     <p className="completed" >{t("quiz.completed")}</p>
                     <TextField
+                        id="playerName"
                         type="text"
                         variant="standard"
                         value={playerName}
@@ -97,7 +90,6 @@ const AlbumView = () => {
                 </div>
             </form>);
     }
-    const digest = (localStorage.getItem("albumId") || '').slice(-4);
 
     return (
         <section className="pageContainer">
@@ -111,7 +103,6 @@ const AlbumView = () => {
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
                 {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
-                {isFull && <span className="albumDigest">id: {digest}</span>}
             </div>
         </section>
 

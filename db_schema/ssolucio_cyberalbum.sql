@@ -24,6 +24,7 @@ DROP TABLE IF EXISTS `album`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `album` (
   `album_id` varchar(36) NOT NULL,
+  `player_name` VARCHAR(150) DEFAULT NULL,
   `started_on` bigint(20) NOT NULL,
   `ended_on` bigint(20) DEFAULT NULL,
   `language` varchar(20) NOT NULL,
