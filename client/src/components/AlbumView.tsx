@@ -31,7 +31,7 @@ const AlbumView = () => {
         setTimeout(() => {
             setIntro(false);
         }, 5500);
-    });
+    }, []);
 
     const handleCaptcha = useCallback(async (token : string) => {
         // console.log(token.slice(-5));
