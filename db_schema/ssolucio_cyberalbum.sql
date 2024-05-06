@@ -23,18 +23,18 @@ DROP TABLE IF EXISTS `album`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `album` (
-  `album_id` varchar(36) NOT NULL,
-  `player_name` VARCHAR(150) DEFAULT NULL,
-  `started_on` bigint(20) NOT NULL,
-  `ended_on` bigint(20) DEFAULT NULL,
-  `language` varchar(20) NOT NULL,
-  `os` tinytext DEFAULT NULL,
-  `platform` tinytext DEFAULT NULL,
-  `browser` tinytext DEFAULT NULL,
-  `version` tinytext DEFAULT NULL,
-  `is_mobile` tinyint(1) DEFAULT NULL,
+  `album_id` varchar(36) NOT NULL COMMENT 'Universal unique identifier for the album',
+  `player_name` VARCHAR(150) DEFAULT NULL COMMENT 'Name of the player associated with the album',
+  `started_on` bigint(20) NOT NULL COMMENT 'Timestamp when the album was started',
+  `ended_on` bigint(20) DEFAULT NULL COMMENT 'Timestamp when the album was ended',
+  `language` varchar(20) NOT NULL COMMENT 'Language used in the album',
+  `os` tinytext DEFAULT NULL COMMENT 'Operating system associated with the album',
+  `platform` tinytext DEFAULT NULL COMMENT 'Platform associated with the album',
+  `browser` tinytext DEFAULT NULL COMMENT 'Browser used in the album',
+  `version` tinytext DEFAULT NULL COMMENT 'Version information associated with the album',
+  `is_mobile` tinyint(1) DEFAULT NULL COMMENT 'Flag indicating whether the album is accessed from a mobile device',
   PRIMARY KEY (`album_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci COMMENT='Table storing information about albums';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,16 +45,16 @@ DROP TABLE IF EXISTS `user_answer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_answer` (
-  `user_answer_id` int(11) NOT NULL AUTO_INCREMENT,
-  `album_id` varchar(36) NOT NULL,
-  `question_id` int(11) NOT NULL,
-  `success` tinyint(1) DEFAULT NULL,
-  `latency` int(11) DEFAULT NULL,
-  `attempts` int(11) DEFAULT NULL,
-  `answered_on` bigint(20) NOT NULL,
+  `user_answer_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for each user answer',
+  `album_id` varchar(36) NOT NULL COMMENT 'Identifier of the album associated with the user answer',
+  `question_id` int(11) NOT NULL COMMENT 'Identifier of the question associated with the user answer',
+  `success` tinyint(1) DEFAULT NULL COMMENT 'Indicator of whether the user answered the question successfully',
+  `latency` int(11) DEFAULT NULL COMMENT 'Time taken by the user to answer the question',
+  `attempts` int(11) DEFAULT NULL COMMENT 'Number of attempts made by the user to answer the question',
+  `answered_on` bigint(20) NOT NULL COMMENT 'Timestamp when the user answered the question',
   PRIMARY KEY (`user_answer_id`),
   KEY `album_id_idx` (`album_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=671 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=671 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci COMMENT='Table storing user answers to questions';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 ALTER TABLE `user_answer`
@@ -72,14 +72,14 @@ DROP TABLE IF EXISTS `user_sticker`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_sticker` (
-  `user_sticker_id` int(11) NOT NULL AUTO_INCREMENT,
-  `album_id` varchar(36) NOT NULL,
-  `sticker_id` int(11) NOT NULL,
-  `in_album` tinyint(1) NOT NULL DEFAULT 0,
-  `added_on` bigint(20) NOT NULL,
+  `user_sticker_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for each user sticker',
+  `album_id` varchar(36) NOT NULL COMMENT 'Identifier of the album associated with the user sticker',
+  `sticker_id` int(11) NOT NULL COMMENT 'Identifier of the sticker',
+  `in_album` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Indicator of whether the sticker is in the album',
+  `added_on` bigint(20) NOT NULL COMMENT 'Timestamp when the sticker was added to the user collection',
   PRIMARY KEY (`user_sticker_id`),
   KEY `album_id_idx` (`album_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=675 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=675 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci COMMENT='Table storing user stickers and their associations with albums';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 ALTER TABLE `user_sticker`
@@ -104,15 +104,15 @@ ON UPDATE CASCADE;
 -- Crear la tabla question
 
 CREATE TABLE question (
-  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  type VARCHAR(10) NOT NULL,
-  lang VARCHAR(10) NOT NULL,
-  question TEXT NOT NULL,
-  options JSON NOT NULL,
-  solution JSON NOT NULL,
-  difficulty FLOAT NOT NULL,
-  feedback TEXT
-);
+  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT COMMENT 'Unique identifier for each question',
+  type VARCHAR(10) NOT NULL COMMENT 'Type of the question (e.g., multiple choice, true/false)',
+  lang VARCHAR(10) NOT NULL COMMENT 'Language of the question',
+  question TEXT NOT NULL COMMENT 'The text of the question',
+  options JSON NOT NULL COMMENT 'JSON array containing options for the question',
+  solution JSON NOT NULL COMMENT 'JSON object containing the solution to the question',
+  difficulty FLOAT NOT NULL COMMENT 'Difficulty level of the question',
+  feedback TEXT COMMENT 'Additional feedback or explanation for the question'
+)ENGINE=InnoDB AUTO_INCREMENT=675 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci COMMENT='Table storing questions for the game';
 
 
 -- Insertando las preguntas en español
