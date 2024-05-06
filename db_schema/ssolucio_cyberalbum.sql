@@ -37,12 +37,6 @@ CREATE TABLE `album` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE VIEW vw_user_answer AS
-SELECT u.album_id, u.question_id, MAX(u.success) success, SUM(u.latency) latency, SUM(u.attempts) attempts, MAX(u.answered_on) answered_on -- SELECT u.album_id, u.question_id, count(*)
-FROM user_answer u
-GROUP BY u.album_id, u.question_id;
-
-
 --
 -- Table structure for table `user_answer`
 --
@@ -63,6 +57,13 @@ CREATE TABLE `user_answer` (
 ) ENGINE=InnoDB AUTO_INCREMENT=671 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+ALTER TABLE `user_answer`
+ADD CONSTRAINT `fk_user_answer_album_id`
+FOREIGN KEY (`album_id`)
+REFERENCES `album` (`album_id`)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
 --
 -- Table structure for table `user_sticker`
 --
@@ -81,6 +82,12 @@ CREATE TABLE `user_sticker` (
 ) ENGINE=InnoDB AUTO_INCREMENT=675 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+ALTER TABLE `user_sticker`
+ADD CONSTRAINT `fk_user_sticker_album_id`
+FOREIGN KEY (`album_id`)
+REFERENCES `album` (`album_id`)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -158,3 +165,9 @@ INSERT INTO question (type, lang, question, options, solution, difficulty, feedb
 ('single', 'EN', 'A human factor physical threat:', '["Information theft", "Equipment damage due to voltage change", "Data Center flood", "Earthquake"]', '[0]', 0.7, NULL),
 ('multiple', 'EN', 'Threat classes:', '["Deliberate, Accidental", "Imaginary, real", "Internal, External", "Environmental"]', '[0, 1, 3]', 0.9, NULL),
 ('multiple', 'EN', 'These are vulnerability classes:', '["Deliberate, Accidental", "Network, Place", "Hardware,Software", "Staff, Organization"]', '[1, 2, 3]', 0.9, NULL);
+
+CREATE VIEW vw_user_answer AS
+SELECT u.album_id, u.question_id, MAX(u.success) success, SUM(u.latency) latency, SUM(u.attempts) attempts, MAX(u.answered_on) answered_on -- SELECT u.album_id, u.question_id, count(*)
+FROM user_answer u
+GROUP BY u.album_id, u.question_id;
+
