@@ -41,7 +41,6 @@ const questions_model = __importStar(require("../models/questions_model"));
 const commonRoutes_1 = require("./commonRoutes");
 const questionsRouter = express_1.default.Router();
 exports.questionsRouter = questionsRouter;
-
 questionsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const since = (0, commonRoutes_1.sanitizeDate)(req.query.since);
     const to = (0, commonRoutes_1.sanitizeDate)(req.query.to);

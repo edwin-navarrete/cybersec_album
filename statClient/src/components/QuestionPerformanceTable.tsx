@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -72,7 +73,7 @@ const handleDateChange = (dateSince: any, dateTo : any) => {
   }
 };
 
-  // Hooks for query data from server API
+
   const [data, setData] = useState<IQuestionData[]>([]);
   useEffect(() => {
     getAnswers();
