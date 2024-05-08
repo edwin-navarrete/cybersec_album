@@ -13,7 +13,7 @@
       3
     ],
     "difficulty": 1.4,
-    "feedback": "Remember that security in the broadest sense includes the protection of members of a group from harm as well as individual perception of risk."
+    "feedback": "The security is the foundation of trust and a fundamental human need."
   },
   {
     "id": 2,
@@ -28,7 +28,8 @@
     "solution": [
       2
     ],
-    "difficulty": 1.7
+    "difficulty": 1.7,
+    "feedback": "Information security involves protecting the confidentiality, integrity, and availability of information assets such as data, systems, and networks, essential for an organization."
   },
   {
     "id": 3,
@@ -43,7 +44,8 @@
     "solution": [
       0
     ],
-    "difficulty": 2.1
+    "difficulty": 2.1,
+    "feedback": "This entails securing digitally stored data as well as protecting computer systems and networks that facilitate communication and information exchange."
   },
   {
     "id": 4,
@@ -60,7 +62,8 @@
       1,
       3
     ],
-    "difficulty": 2.4
+    "difficulty": 2.4,
+    "feedback": "Information assets are crucial elements for an organization and can exist in various forms."
   },
   {
     "id": 5,
@@ -77,7 +80,8 @@
       2,
       3
     ],
-    "difficulty": 1.9
+    "difficulty": 1.9,
+    "feedback": "The dimensions of information security are: availability, integrity, and confidentiality. Each plays a crucial role in protecting an organization's information assets!"
   },
   {
     "id": 6,
@@ -92,7 +96,8 @@
     "solution": [
       1
     ],
-    "difficulty": 1.2
+    "difficulty": 1.2,
+    "feedback": "Confidentiality refers to the protection of sensitive information to prevent it from falling into unauthorized hands."
   },
   {
     "id": 7,
@@ -107,7 +112,8 @@
     "solution": [
       1
     ],
-    "difficulty": 0.7
+    "difficulty": 0.7,
+    "feedback": "The three pillars of information security are: confidentiality, integrity, and availability."
   },
   {
     "id": 8,
@@ -122,7 +128,8 @@
     "solution": [
       2
     ],
-    "difficulty": 1.9
+    "difficulty": 1.9,
+    "feedback": "A dissatisfied employee poses a threat to the organization. Their dissatisfaction can represent a risk in terms of security and stability."
   },
   {
     "id": 9,
@@ -135,9 +142,10 @@
       "Security"
     ],
     "solution": [
-      2
+      1
     ],
-    "difficulty": 0.9
+    "difficulty": 0.9,
+    "feedback": "Information security encompasses both cybersecurity and computer security, ensuring comprehensive protection of data and systems against threats and vulnerabilities."
   },
   {
     "id": 10,
@@ -152,7 +160,8 @@
     "solution": [
       0
     ],
-    "difficulty": 2.0
+    "difficulty": 2.0,
+    "feedback": "A computer attack specifically targeted at leaders or top executives is known as 'Whaling'. These attacks often target key individuals within an organization."
   },
   {
     "id": 11,
@@ -169,7 +178,8 @@
       1,
       2
     ],
-    "difficulty": 2.1
+    "difficulty": 2.1,
+    "feedback": "A cyber attack can cause financial, reputational, and legal impacts on an entity. It is crucial to be prepared to prevent and manage these situations."
   },
   {
     "id": 12,
@@ -184,7 +194,8 @@
     "solution": [
       3
     ],
-    "difficulty": 0.8
+    "difficulty": 0.8,
+    "feedback": "Adversaries' influence and manipulation techniques include authority, empathy, concession, urgency, reciprocity, and non-verbal language. Be aware to protect yourself!"
   },
   {
     "id": 13,
@@ -199,7 +210,8 @@
     "solution": [
       0
     ],
-    "difficulty": 1.0
+    "difficulty": 1.0,
+    "feedback": "Avoiding suspicious links is not enough to protect yourself. Make backups, use strong passwords, and enable two-factor authentication for added security."
   },
   {
     "id": 14,
@@ -214,7 +226,8 @@
     "solution": [
       1
     ],
-    "difficulty": 1.9
+    "difficulty": 1.9,
+    "feedback": "A poor practice in backing up data is storing copies in two locations within the same building. Diversifying the location is crucial for enhanced security. Protect your information!"
   },
   {
     "id": 15,
@@ -229,7 +242,8 @@
     "solution": [
       0
     ],
-    "difficulty": 0.6
+    "difficulty": 0.6,
+    "feedback": "These policies define the rules, procedures, and practices that an organization implements to ensure the security of its information assets."
   },
   {
     "id": 16,
@@ -244,7 +258,8 @@
     "solution": [
       2
     ],
-    "difficulty": 1.2
+    "difficulty": 1.2,
+    "feedback": "An error in creating a secure password is using a favorite movie quote or poem, as it can be predictable. It's better to use unique combinations and avoid easily remembered personal information."
   },
   {
     "id": 17,
@@ -259,7 +274,8 @@
     "solution": [
       0
     ],
-    "difficulty": 1.7
+    "difficulty": 1.7,
+    "feedback": "Risks are divided into information loss and identity theft. Being aware of these categories is key to protecting yourself."
   },
   {
     "id": 18,
@@ -274,7 +290,8 @@
     "solution": [
       3
     ],
-    "difficulty": 1.8
+    "difficulty": 1.8,
+    "feedback": "A public personal data is one that, when accessible without the consent of the owner, can expose to risks of privacy or discrimination."
   },
   {
     "id": 19,
@@ -289,7 +306,8 @@
     "solution": [
       1
     ],
-    "difficulty": 1.3
+    "difficulty": 1.3,
+    "feedback": "An example of sensitive data is health information. It is crucial to protect this type of data to ensure privacy and security."
   },
   {
     "id": 20,
@@ -304,7 +322,8 @@
     "solution": [
       0
     ],
-    "difficulty": 2.0
+    "difficulty": 2.0,
+    "feedback": "A physical threat from human factors would be information theft. It is important to protect data against potential malicious actions."
   },
   {
     "id": 21,
@@ -318,10 +337,11 @@
     ],
     "solution": [
       0,
-      1,
+      2,
       3
     ],
-    "difficulty": 3.0
+    "difficulty": 3.0,
+    "feedback": "Threat classes include deliberate and accidental, as well as internal, external, and environmental. Being aware of all of them is important to protect information security."
   },
   {
     "id": 22,
@@ -338,6 +358,7 @@
       2,
       3
     ],
-    "difficulty": 2.3
+    "difficulty": 2.3,
+    "feedback": "Vulnerability classes include those related to hardware, software, and personal or organizational aspects. It is crucial to identify and address each one to maintain information security."
   }
 ]
