@@ -19,7 +19,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats'
 
 interface IData {
-
   // define la estructura de los datos que esperas recibir de la API
   started_on: number,
   number_errors: number,
@@ -29,7 +28,7 @@ interface IData {
   errors: number,
   rank: number,
   album_id: string,
-  name: string,
+  player_name: string,
 }
 
 export default function BasicTable() {
@@ -142,7 +141,7 @@ export default function BasicTable() {
             >
               <TableCell>{row.rank}</TableCell>
               <TableCell align="right" >
-                {row.name ===  null || row.name.length < 3 ? row.album_id.slice(-5) : row.name}
+                {row.player_name === '' || row.player_name === null ? row.album_id.slice(-5): row.player_name}
               </TableCell>
               <TableCell align="right">{row.number_errors}</TableCell>
               <TableCell align="right">{row.answered}</TableCell>

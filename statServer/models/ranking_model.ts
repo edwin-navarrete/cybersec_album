@@ -16,6 +16,7 @@ export const getRankingByDate = (date: string | undefined) => {
       FROM (
           SELECT a.album_id,
               a.started_on,
+              player_name,
               a.ended_on IS NOT NULL finalizacion_album,
               COUNT(DISTINCT question_id) preguntas_respondidas,
               COUNT(DISTINCT question_id) - SUM(success) numero_de_errores,
@@ -48,10 +49,10 @@ export const getRankingByDate = (date: string | undefined) => {
           errors: row.porcentaje_error,
           rank: row.ranking,
           album_id: row.album_id,
+          player_name: row.player_name,
         };
         ranking.push(a_id);
       });
-
       resolve(ranking);
     });
   });

@@ -37,7 +37,7 @@ CREATE TABLE `album` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 CREATE VIEW vw_user_answer AS
-SELECT u.album_id, u.question_id, MAX(u.success) success, SUM(u.latency) latency, SUM(u.attempts) attempts, MAX(u.answered_on) answered_on -- SELECT u.album_id, u.question_id, count(*)
+SELECT u.album_id,player_name, u.question_id, MAX(u.success) success, SUM(u.latency) latency, SUM(u.attempts) attempts, MAX(u.answered_on) answered_on -- SELECT u.album_id, u.question_id, count(*)
 FROM user_answer u
 GROUP BY u.album_id, u.question_id;
 
@@ -51,6 +51,7 @@ DROP TABLE IF EXISTS `user_answer`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_answer` (
   `user_answer_id` int(11) NOT NULL AUTO_INCREMENT,
+  `player_name` varchar(36),
   `album_id` varchar(36) NOT NULL,
   `question_id` int(11) NOT NULL,
   `success` tinyint(1) DEFAULT NULL,

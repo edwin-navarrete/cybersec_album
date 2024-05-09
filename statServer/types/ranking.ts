@@ -7,6 +7,7 @@ export interface Ranking{
     errors: number,
     rank: number,
     album_id: string,
+    player_name: string,
     } 
 /*
     "data":[
