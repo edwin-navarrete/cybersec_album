@@ -138,9 +138,16 @@ code {
     margin: 20px;
 }
 
+.feedbackContent {
+    font-family: 'Itim', cursive;
+    font-size: 20px;
+    margin-right: 20px;
+}
+
 .feedbackMsg {
     font-family: 'Itim', cursive;
     font-size: 20px;
+    padding-bottom: 35px;
 }
 
 @keyframes entrance {
