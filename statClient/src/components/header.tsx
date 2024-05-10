@@ -126,7 +126,7 @@ export default function Header() {
         <List>
         {['Tabla de Clasificación', 'Desempeño de Preguntas','Configuración'].map((text, index) => (
           <ListItem key={text} disablePadding>
-            <ListItemButton href={index === 0 ? '/' : index === 1 ? '/answers' : '/configuracion'}>
+            <ListItemButton href={index === 0 ? '/' : index === 1 ? '/questions_perf' : '/configuration'}>
               <ListItemIcon>
                 {index === 0 ? <BarChartIcon /> : index === 1 ? <BarChartIcon/> : <SettingsIcon/>}
               </ListItemIcon>
