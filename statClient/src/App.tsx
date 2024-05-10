@@ -12,8 +12,8 @@ export default function App() {
     <Router>
       <Routes>
         <Route path="/" element={<EnhancedTable />} />
-        <Route path="/answers" element={<QuestionPerformanceTable />} />
-        <Route path="/configuracion" element={<Configuracion />}  />
+        <Route path="/questions_perf" element={<QuestionPerformanceTable />} />
+        <Route path="/configuration" element={<Configuracion />}  />
         <Route path="*" element={NotFound()}  />
       </Routes>
     </Router>
