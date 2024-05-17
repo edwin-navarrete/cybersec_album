@@ -172,7 +172,7 @@ export default function BasicTable() {
             <TableCell align="center" onClick={() => handleSort('errors')}>
               Porcentaje de error (%)
             </TableCell>
-            <TableCell align="center">Fecha y Hora de Inico</TableCell>
+            <TableCell align="center">Fecha y Hora de Inicio</TableCell>
             {/* <TableCell align="right">Fecha y Hora de finalizacion</TableCell> */}
           </TableRow>
         </TableHead>
