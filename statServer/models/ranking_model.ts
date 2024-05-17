@@ -51,6 +51,7 @@ export const getRankingByDate = (date: string | undefined) => {
           rank: row.ranking,
           album_id: row.album_id,
           player_name: row.player_name,
+          player_name: row.player_name,
         };
         ranking.push(a_id);
       });

@@ -46,6 +46,7 @@ rankingRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const ranking = yield ranking_model.getRankingByDate(date);
         res.status(200).json({ data: ranking });
+        console.log(ranking);
     }
     catch (error) {
         console.error(error);
