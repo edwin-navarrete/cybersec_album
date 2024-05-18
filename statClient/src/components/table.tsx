@@ -188,7 +188,7 @@ export default function BasicTable() {
               </TableCell>
               <TableCell align="center">{row.number_errors}</TableCell>
               <TableCell align="center">{row.answered}</TableCell>
-              <TableCell align="center">{row.finished ? "Sí" : "No Finalizo"}</TableCell>
+              <TableCell align="center">{row.finished ? "Si" : "No"}</TableCell>
               <TableCell align="center">{Math.round(row.total_latency)}</TableCell>
               <TableCell align="center">{Math.round(row.errors * 100)} % </TableCell>
               <TableCell align="center">{new Date(row.started_on).toLocaleString()}</TableCell>
