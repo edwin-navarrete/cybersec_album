@@ -24,9 +24,10 @@ import { RowDataPacket } from "mysql2";
     export const getQuestionsByDates = ( since:string | undefined, to:string | undefined) => {    
         
         return new Promise((resolve, reject) => {
-        
+
+        // NOTE 2038-01-18 is the limit for DB working UNIX_TIMESTAMP with 32 bits
         since = (since ?? '1970-01-01')||'1970-01-01';
-        to = (to ?? '3000-01-01')||'3000-01-01';
+        to = (to ?? '2038-01-18')||'2038-01-18';
 
         const queryString = `
             SELECT
