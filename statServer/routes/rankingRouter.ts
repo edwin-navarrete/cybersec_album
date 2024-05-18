@@ -6,7 +6,6 @@ const rankingRouter = express.Router();
 
 rankingRouter.get("/", async (req: Request, res: Response) => {
   const date = sanitizeDate(req.query.date as string);
-
   try {
     const ranking = await ranking_model.getRankingByDate(date);
     res.status(200).json({ data: ranking });

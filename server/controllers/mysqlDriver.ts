@@ -11,20 +11,60 @@ class MySQLDriver {
     this.pool = mysql.createPool(this.config)
   }
 
+  async getConnection(timeoutMs: number): Promise<mysql.PoolConnection | null> {
+    let connection: mysql.PoolConnection | null = null;
+    let timeout: NodeJS.Timeout | null = null;
+    try {
+      connection = await Promise.race([
+        this.pool.getConnection(),
+        new Promise<mysql.PoolConnection>((resolve, reject) => {
+          timeout = setTimeout(() => {
+            reject(new Error('Timeout: Unable to acquire connection within specified time'));
+          }, timeoutMs);
+        })
+      ]);
+    } catch (error) {
+      throw error;
+    } finally {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    }
+    return connection;
+  }
+
   fetch: Fetch = async (query: string) => {
-    console.log('FETCH', query)
-    const connection = await  this.pool.getConnection()
-    const [rows] = await connection.execute(query)
-    connection.release();
-    return rows as any[]
+    const connection = await this.getConnection(1000);
+    if (!connection) {
+      throw new Error('Unable to acquire database connection');
+    }
+    try {
+        console.log('FETCH', query)
+        const connection = await this.getConnection(1000)
+        const [rows] = await connection.execute(query)
+        connection.release();
+        return rows as any[]
+    } catch (error) {
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 
   insert: Insert = async (stm: string, values: any[]): Promise<any> => {
-    console.log('INSERT', stm)
-    const connection = await  this.pool.getConnection()
-    const [result] = await connection.execute(stm, values);
-    connection.release();
-    return result
+    const connection = await this.getConnection(1000);
+    if (!connection) {
+      throw new Error('Unable to acquire database connection');
+    }
+    try {
+      console.log('INSERT', stm);
+      const [result] = await connection.execute(stm, values);
+      return result;
+    } catch (error) {
+      throw error;
+    } finally {
+      connection.release();
+    }
   }
 }
 
@@ -32,5 +72,6 @@ export default new MySQLDriver({
   user: process.env.DB_USER,
   password: process.env.DB_PWD,
   database: process.env.DB_NAME,
-  host: process.env.DB_HOST
+  host: process.env.DB_HOST,
+  connectionLimit: 3
 })

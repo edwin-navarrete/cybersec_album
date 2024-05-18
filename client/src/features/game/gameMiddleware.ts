@@ -71,6 +71,12 @@ export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state:
         } as FeedbackAndStickers;
     })
 
+export const registerPlayer = createAsyncThunk<string, string>
+    ('album/registerPlayer', async (playerName: string) => {
+        await theAlbum.registerPlayer(playerName)
+        return playerName
+    })
+
 export const glueSticker = createAsyncThunk<Sticker.AlbumStiker[], Sticker.AlbumStiker>
     ('album/glueSticker', async (userSticker) => {
         await theAlbum.glueSticker(userSticker)

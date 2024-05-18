@@ -144,6 +144,25 @@ export module Sticker {
             return Promise.all(upserts)
         }
 
+        async registerPlayer(playerName: string): Promise<string> {
+           localStorage.setItem("playerName", playerName);
+           try {
+                let uri = process.env.REACT_APP_API+`/album`;
+                await axios.post(uri,{
+                    albumId: localStorage.getItem("albumId"),
+                    playerName: localStorage.getItem("playerName"),
+                    startedOn: localStorage.getItem("startedOn"),
+                    endedOn: localStorage.getItem("endedOn"),
+                    language: navigator.language
+                },{
+                    headers:{"g-recaptcha-response": Question.DAO.token
+                }});
+            } catch (error){
+                console.error("API error", error);
+            }
+            return playerName;
+        }
+
         async glueSticker(albumStiker: AlbumStiker): Promise<UserSticker> {
             try{
                 if (!albumStiker.inAlbum) {
@@ -167,12 +186,19 @@ export module Sticker {
                     .reduce((cnt, s) => s.inAlbum ? cnt + 1 : cnt, 0)
             if(filled === 1 || filled >= allSpots){
                 // Album started or finished
+                if(filled >= allSpots){
+                    localStorage.setItem("endedOn", Date.now().toString());
+                }
+                else {
+                    localStorage.removeItem("endedOn");
+                }
+
                 try {
                     let uri = process.env.REACT_APP_API+`/album`;
                     await axios.post(uri,{
                         albumId: localStorage.getItem("albumId"),
                         startedOn: localStorage.getItem("startedOn"),
-                        endedOn: filled >= allSpots? Date.now() : null,
+                        endedOn: localStorage.getItem("endedOn"),
                         language: navigator.language
                     },{
                         headers:{"g-recaptcha-response": Question.DAO.token

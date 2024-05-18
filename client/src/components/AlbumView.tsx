@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, ChangeEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
+import TextField from '@mui/material/TextField';
+import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
-import { nextQuestion, stickerSample, glueSticker } from '../features/game/gameMiddleware';
+import { nextQuestion, stickerSample, glueSticker, registerPlayer } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
@@ -22,20 +23,15 @@ const AlbumView = () => {
 
     const [splash, setSplash] = useState(true);
     const [intro, setIntro] = useState(true);
+    const [playerName, setPlayerName] = useState('');
 
     useEffect(() => {
+        var player = localStorage.getItem('playerName')
+        player && setPlayerName(player);
         setTimeout(() => {
             setIntro(false);
         }, 5500);
-    });
-
-    useEffect(() => {
-        if (isFull) {
-            setTimeout(() => {
-                setSplash(false);
-            }, 4500);
-        }
-    });
+    }, []);
 
     const handleCaptcha = useCallback(async (token : string) => {
         // console.log(token.slice(-5));
@@ -65,10 +61,35 @@ const AlbumView = () => {
         return intro && (<div className='introSplash'><span className="introMsg bubble-bottom-left">{t("introMsg")}</span></div>);
     }
 
-    function success() {
-        return splash && (<div className='successSplash'><span className="completed">{t("quiz.completed")}</span></div>);
+    const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setPlayerName(event.target.value);
+    };
+
+
+    function handleSubmit() {
+        if (playerName.trim() !== '') {
+            dispatch(registerPlayer(playerName));
+            setSplash(false);
+        }
     }
-    const digest = (localStorage.getItem("albumId") || '').slice(-4);
+
+    function success() {
+        return splash && (
+            <form className='successSplash' onSubmit={handleSubmit}>
+                <div className="successForm">
+                    <p className="completed" >{t("quiz.completed")}</p>
+                    <TextField
+                        id="playerName"
+                        type="text"
+                        variant="standard"
+                        value={playerName}
+                        onChange={handleNameChange}
+                        placeholder={t("hint.register")}
+                        required />
+                    <Button type="submit" className="glowingBtn">{t("button.register")}</Button>
+                </div>
+            </form>);
+    }
 
     return (
         <section className="pageContainer">
@@ -82,7 +103,6 @@ const AlbumView = () => {
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
                 {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
-                {isFull && <span className="albumDigest">id: {digest}</span>}
             </div>
         </section>
 

@@ -1,41 +1,45 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
-import Tooltip from '@mui/material/Tooltip';
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Divider } from '@mui/material';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Toolbar,
+  Typography,
+  Paper,
+  Tooltip,
+  Divider
+} from '@mui/material';
+import {
+  LocalizationProvider,
+  DatePicker
+} from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 
-const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats'
+const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats';
 
 interface IData {
-
-  // define la estructura de los datos que esperas recibir de la API
-  started_on: number,
-  number_errors: number,
-  total_latency: number,
-  finished: boolean,
-  answered: number,
-  errors: number,
-  rank: number,
-  album_id: string,
+  player_name: string;
+  started_on: number;
+  ended_on: number | string;
+  number_errors: number;
+  total_latency: number;
+  finished: boolean;
+  answered: number;
+  errors: number;
+  rank: number;
+  album_id: string;
 }
 
 export default function BasicTable() {
   const [selectedDate, setSelectedDate] = useState('');
-
-  // Hooks for query data from server API
   const [data, setData] = useState<IData[]>([]);
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' | null }>({ key: '', direction: null });
+
   useEffect(() => {
     getRanking();
   }, []);
@@ -50,7 +54,7 @@ export default function BasicTable() {
           const mm = String(partes[1]).padStart(2, '0');
           const yyyy = partes[2];
           const fechaFormateada = `${dd}/${mm}/${yyyy}`;
-    
+
           axios
             .get(`${baseURL}/ranking?date=${fechaFormateada}`)
             .then((res) => {
@@ -68,8 +72,9 @@ export default function BasicTable() {
     };
     handleDateChange(selectedDate);
   }, [selectedDate]);
-    const getRanking = () => {
-      axios
+
+  const getRanking = () => {
+    axios
       .get(`${baseURL}/ranking`)
       .then((res) => {
         setData(res.data.data);
@@ -77,7 +82,37 @@ export default function BasicTable() {
       .catch((error) => {
         console.log("Error Efect: " + error);
       });
+  };
+
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
     }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedData = React.useMemo(() => {
+    let sortableData = [...data];
+    if (sortConfig.key) {
+      sortableData.sort((a, b) => {
+        let aValue = a[sortConfig.key as keyof IData];
+        let bValue = b[sortConfig.key as keyof IData];
+        if (sortConfig.key === 'finished') {
+          aValue = a.finished ? 1 : 0;
+          bValue = b.finished ? 1 : 0;
+        }
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableData;
+  }, [data, sortConfig]);
 
   return (
     <TableContainer component={Paper}>
@@ -104,19 +139,19 @@ export default function BasicTable() {
           alignItems: 'center',
         }}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DemoContainer components={['DatePicker']}>
-          <DemoItem>
-            <DatePicker
-              value={selectedDate}
-              onAccept={(event) => setSelectedDate(event as string)}
-              format="DD/MM/YYYY"
-              views={['year', 'month', 'day']}
-            />
-            </DemoItem>
-          </DemoContainer>
+            <DemoContainer components={['DatePicker']}>
+              <DemoItem>
+                <DatePicker
+                  value={selectedDate}
+                  onAccept={(event) => setSelectedDate(event as string)}
+                  format="DD/MM/YYYY"
+                  views={['year', 'month', 'day']}
+                />
+              </DemoItem>
+            </DemoContainer>
           </LocalizationProvider>
         </Tooltip>
-        
+
       </Toolbar>
 
       <Divider></Divider>
@@ -124,31 +159,40 @@ export default function BasicTable() {
         <TableHead>
           <TableRow>
             <TableCell>Posición</TableCell>
-            <TableCell>Album Id</TableCell>
-            <TableCell align="right">Número de errores</TableCell>
-            <TableCell align="right">Preguntas respondidas</TableCell>
-            <TableCell align="right">Album finalizado</TableCell>
-            <TableCell align="right">Tiempo total de respuesta (Segundos)</TableCell>
-            <TableCell align="right">Porcentaje de error (%)  </TableCell>
-            <TableCell align="right">Fecha y Hora de Inicio</TableCell>
+            <TableCell>Nombre o Album Id</TableCell>
+            <TableCell align="center">Número de errores</TableCell>
+            <TableCell align="center">Preguntas respondidas</TableCell>
+            <TableCell align="center"onClick={() => handleSort('finished')} >
+              Album finalizado
+              </TableCell>
+            {/* <TableCell align="right" onClick={() => handleSort('total_latency')}> */}
+            <TableCell align="center">
+              Tiempo total de respuesta (Segundos)
+            </TableCell>
+            <TableCell align="center" onClick={() => handleSort('errors')}>
+              Porcentaje de error (%)
+            </TableCell>
+            <TableCell align="center">Fecha y Hora de Inicio</TableCell>
+            {/* <TableCell align="right">Fecha y Hora de finalizacion</TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row) => (
+          {sortedData.map((row) => (
             <TableRow
               key={row.album_id}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell>{row.rank}</TableCell>
-              <TableCell align="right" >
-                {row.album_id.slice(-5)}
+              <TableCell align="center">
+                {(row.player_name === '' || row.player_name === null || row.player_name.length < 3) ? row.album_id.slice(-5) : row.player_name}
               </TableCell>
-              <TableCell align="right">{row.number_errors}</TableCell>
-              <TableCell align="right">{row.answered}</TableCell>
-              <TableCell align="right">{row.finished ? "Sí" : "No"}</TableCell>
-              <TableCell align="right">{Math.round(row.total_latency)}</TableCell>
-              <TableCell align="right">{Math.round(row.errors * 100)} % </TableCell>
-              <TableCell align="right">{new Date(row.started_on).toLocaleString()}</TableCell>
+              <TableCell align="center">{row.number_errors}</TableCell>
+              <TableCell align="center">{row.answered}</TableCell>
+              <TableCell align="center">{row.finished ? "Si" : "No"}</TableCell>
+              <TableCell align="center">{Math.round(row.total_latency)}</TableCell>
+              <TableCell align="center">{Math.round(row.errors * 100)} % </TableCell>
+              <TableCell align="center">{new Date(row.started_on).toLocaleString()}</TableCell>
+              {/* <TableCell align="center">{row.ended_on ? new Date(row.ended_on).toLocaleString(): "No finalizado"}</TableCell> */}
             </TableRow>
           ))}
         </TableBody>

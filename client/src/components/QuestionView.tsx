@@ -105,7 +105,7 @@ const QuestionView = () => {
     function renderQuestion(questionState?: QuestionState) {
         if (!questionState) return (<div className='questionFrame' />);
 
-        const { id, question, options, success, solution, wrong } = questionState
+        const { question, options, success, solution, wrong } = questionState
         return (<div className='questionFrame' >
             <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/>
             <h3>{question}</h3>

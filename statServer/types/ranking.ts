@@ -1,5 +1,6 @@
 export interface Ranking{
     started_on: number,
+    ended_on:number,
     number_errors: number,
     total_latency: number,
     finished: boolean,
@@ -7,6 +8,7 @@ export interface Ranking{
     errors: number,
     rank: number,
     album_id: string,
+    player_name: string,
     } 
 /*
     "data":[
