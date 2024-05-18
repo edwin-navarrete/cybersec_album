@@ -53,6 +53,7 @@ router.post('/album', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
+  console.log(req)
   const value = {
     album_id: req.body.albumId,
     player_name: req.body.playerName || null,
