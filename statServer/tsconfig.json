@@ -1,16 +1,15 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
-    "rootDir": ".", 
-    "outDir": "dist",
-    "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "target": "es2016",
-    "module": "commonjs",
     "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "outDir": "dist",
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
     "strict": true,
-    "skipLibCheck": true
+    "target": "es2016"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts"]

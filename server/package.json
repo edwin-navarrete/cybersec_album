@@ -2,9 +2,9 @@
   "name": "cybersec_album",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "dist/src/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "start": "tsc && node dist/src/app.js",
     "lint": "eslint . --ext .ts --fix",
     "server": "nodemon",
     "client": "npm start --prefix client",

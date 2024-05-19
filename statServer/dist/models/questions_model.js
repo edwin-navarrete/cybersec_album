@@ -20,8 +20,9 @@ exports.getQuestionsByDates = void 0;
 const db_1 = require("../db");
 const getQuestionsByDates = (since, to) => {
     return new Promise((resolve, reject) => {
+        // NOTE 2038-01-18 is the limit for DB working UNIX_TIMESTAMP with 32 bits
         since = (since !== null && since !== void 0 ? since : '1970-01-01') || '1970-01-01';
-        to = (to !== null && to !== void 0 ? to : '3000-01-01') || '3000-01-01';
+        to = (to !== null && to !== void 0 ? to : '2038-01-18') || '2038-01-18';
         const queryString = `
             SELECT
                 q.id AS questionId,
