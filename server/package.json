@@ -9,7 +9,7 @@
     "server": "nodemon",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "npm run build --prefix client",
+    "build": "tsc",
     "test": "jest"
   },
   "repository": {
