@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/src/app.js",
   "scripts": {
-    "start": "tsc && node dist/src/app.js",
+    "start": "tsc && node dist/app.js",
     "lint": "eslint . --ext .ts --fix",
     "server": "nodemon",
     "client": "npm start --prefix client",
