@@ -29,7 +29,7 @@
       2
     ],
     "difficulty": 1.7,
-    "feedback": "Information security involves protecting the confidentiality, integrity, and availability of information assets such as data, systems, and networks, essential for an organization."
+    "feedback": "Information security involves safeguarding the confidentiality, integrity, and availability of information assets such as data, systems, and networks, crucial for an organization."
   },
   {
     "id": 3,
@@ -259,7 +259,7 @@
       2
     ],
     "difficulty": 1.2,
-    "feedback": "An error in creating a secure password is using a favorite movie quote or poem, as it can be predictable. It's better to use unique combinations and avoid easily remembered personal information."
+    "feedback": "It is important to avoid using passwords with personal information, as they can be susceptible to security attacks."
   },
   {
     "id": 17,
@@ -275,7 +275,7 @@
       0
     ],
     "difficulty": 1.7,
-    "feedback": "Risks are divided into information loss and identity theft. Being aware of these categories is key to protecting yourself."
+    "feedback": "The risks are divided into environmental and human."
   },
   {
     "id": 18,
@@ -291,7 +291,7 @@
       3
     ],
     "difficulty": 1.8,
-    "feedback": "A public personal data is one that, when accessible without the consent of the owner, can expose to risks of privacy or discrimination."
+    "feedback": "A public datum is information accessible by anyone without restrictions."
   },
   {
     "id": 19,
@@ -323,7 +323,7 @@
       0
     ],
     "difficulty": 2.0,
-    "feedback": "A physical threat from human factors would be information theft. It is important to protect data against potential malicious actions."
+    "feedback": "A physical threat of human factor would be the theft of information. It is important to protect data against possible malicious actions. The other threat factors are environmental in nature.."
   },
   {
     "id": 21,
