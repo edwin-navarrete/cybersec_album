@@ -29,7 +29,7 @@
       2
     ],
     "difficulty": 1.7,
-    "feedback": "La seguridad de la información consiste en proteger la confidencialidad, integridad y disponibilidad de los activos de información, como datos, sistemas y redes, esencial para una organización."
+    "feedback": "La seguridad de la información consiste en proteger la confidencialidad, integridad y disponibilidad de los activos de información, como datos, sistemas y redes, esenciales para una organización."
   },
   {
     "id": 3,
@@ -259,7 +259,7 @@
       2
     ],
     "difficulty": 1.2,
-    "feedback": "Un error en una contraseña segura es usar una frase de película o poema preferido, ya que puede ser predecible. Es mejor usar combinaciones únicas y evitar información personal fácil de recordar."
+    "feedback": "Es importante evitar el uso de contraseñas con información personal, ya que pueden ser susceptibles a ataques de seguridad."
   },
   {
     "id": 17,
@@ -275,7 +275,7 @@
       0
     ],
     "difficulty": 1.7,
-    "feedback": "Los riesgos se dividen en pérdida de información y suplantación de identidad. Estar al tanto de estas categorías es clave para protegerse."
+    "feedback": "Los riesgos se dividen en ambientales y humanos."
   },
   {
     "id": 18,
@@ -291,7 +291,7 @@
       3
     ],
     "difficulty": 1.8,
-    "feedback": "Un dato personal público es aquel que, al ser accesible sin el consentimiento del titular, puede exponer a riesgos de privacidad o discriminación."
+    "feedback": "Un dato personal público es información accesible por cualquier persona sin restricciones."
   },
   {
     "id": 19,
@@ -323,7 +323,7 @@
       0
     ],
     "difficulty": 2.0,
-    "feedback": "Una amenaza física de factor humano sería el robo de información. Es importante proteger los datos contra posibles acciones malintencionadas."
+    "feedback": "Una amenaza física de factor humano sería el robo de información. Es importante proteger los datos contra posibles acciones malintencionadas. Los otros factores de amenaza son de tipo ambiental."
   },
   {
     "id": 21,

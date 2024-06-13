@@ -31,7 +31,7 @@ const resources = {
             "button.register": "Enviar",
             "hint.register": "Ingresa tu nombre",
             "timer.secs": "Segundos",
-            "quiz.multipleWrn": "(Escoje más de una respuesta)",
+            "quiz.multipleWrn": "(Escoge más de una respuesta)",
             "quiz.fail": "Lo lamento, pero sigue intentándolo!",
             "quiz.success": "FELICITACIONES! Reclama cada lámina con un click y sigue jugando!",
             "quiz.completed": "LO LOGRASTE! Regístrate y disfruta tu álbum completado.",
