@@ -1,29 +1,29 @@
 [
-    { "id": 1, "spot": "1A", "weight": 16, "image": "sticker/es/3ad5b52db38cea1ea24eefa8f9dba6ceX.png" },
-    { "id": 2, "spot": "1B", "weight": 4, "image": "sticker/es/3ad5b52db38cea1ea24eefa8f9dba6ceY.png" },
-    { "id": 3, "spot": "1C", "weight": 1, "image": "sticker/es/3ad5b52db38cea1ea24eefa8f9dba6ceZ.png" },
+    { "id": 1, "spot": "1A", "weight": 16, "image": "sticker/es/0d26753bfcf4859609c70e3737c70b8fX.jpg" },
+    { "id": 2, "spot": "1B", "weight": 4, "image": "sticker/es/0e37664cfdg5960710d81f4848d81c9gY.jpg" },
+    { "id": 3, "spot": "1C", "weight": 1, "image": "sticker/es/0f48775dfeh6071821e92g5959e92dahZ.jpg" },
 
-    { "id": 4, "spot": "2A", "weight": 16, "image": "sticker/es/7b914e19fc579879789303edb58d1a11X.png" },
-    { "id": 5, "spot": "2B", "weight": 4, "image": "sticker/es/7b914e19fc579879789303edb58d1a11Y.png" },
-    { "id": 6, "spot": "2C", "weight": 1, "image": "sticker/es/7b914e19fc579879789303edb58d1a11Z.png" },
+    { "id": 4, "spot": "2A", "weight": 16, "image": "sticker/es/1a59886afei7182932f03h6060f03ebjX.jpg" },
+    { "id": 5, "spot": "2B", "weight": 4, "image": "sticker/es/1b60997bfgj8293043g14i7171g14fckY.jpg" },
+    { "id": 6, "spot": "2C", "weight": 1, "image": "sticker/es/1c71008chdk9304154h25j8282h25gdlZ.jpg" },
 
-    { "id": 7, "spot": "3A", "weight": 16, "image": "sticker/es/0c15846afcd3748598b69d2626b69a7eX.png" },
-    { "id": 8, "spot": "3B", "weight": 4, "image": "sticker/es/0c15846afcd3748598b69d2626b69a7eY.png" },
-    { "id": 9, "spot": "3C", "weight": 1, "image": "sticker/es/0c15846afcd3748598b69d2626b69a7eZ.png" },
+    { "id": 7, "spot": "3A", "weight": 16, "image": "sticker/es/2d82119nsyv0415365s36u9393s36vkqX.jpg" },
+    { "id": 8, "spot": "3B", "weight": 4, "image": "sticker/es/2e93220otzw1526476t47v0404t47wlrY.jpg" },
+    { "id": 9, "spot": "3C", "weight": 1, "image": "sticker/es/2f04331puax2637587u58w1515u58xmsZ.jpg" },
 
-    { "id": 10, "spot": "4A", "weight": 16, "image": "sticker/es/8c0ea63b878152a64d02abf8310de822X.png" },
-    { "id": 11, "spot": "4B", "weight": 4, "image": "sticker/es/8c0ea63b878152a64d02abf8310de822Y.png" },
-    { "id": 12, "spot": "4C", "weight": 1, "image": "sticker/es/8c0ea63b878152a64d02abf8310de822Z.png" },
+    { "id": 10, "spot": "4A", "weight": 16, "image": "sticker/es/3g15442qvby3748698v69x2626v69yntX.jpg" },
+    { "id": 11, "spot": "4B", "weight": 4, "image": "sticker/es/3h26553rwdz4859709w70y3737w70zooY.jpg" },
+    { "id": 12, "spot": "4C", "weight": 1, "image": "sticker/es/3i37664iqnt5960810n81p4848n81qgjZ.jpg" },
 
-    { "id": 13, "spot": "5A", "weight": 16, "image": "sticker/es/089b6ce43b671c2ec63fc48329a3bbb9X.png" },
-    { "id": 14, "spot": "5B", "weight": 4, "image": "sticker/es/089b6ce43b671c2ec63fc48329a3bbb9Y.png" },
-    { "id": 15, "spot": "5C", "weight": 1, "image": "sticker/es/089b6ce43b671c2ec63fc48329a3bbb9Z.png" },
+    { "id": 13, "spot": "5A", "weight": 16, "image": "sticker/es/4j48775jrou6071921o92q5959o92rhkX.jpg" },
+    { "id": 14, "spot": "5B", "weight": 4, "image": "sticker/es/4k59886kspv7182032p03r6060p03silY.jpg" },
+    { "id": 15, "spot": "5C", "weight": 1, "image": "sticker/es/4l60997lqtw8293143q14s7171q14tjmZ.jpg" },
 
-    { "id": 16, "spot": "6A", "weight": 16, "image": "sticker/es/811be64d6d4ad97e3ca82542643d0dfeX.png" },
-    { "id": 17, "spot": "6B", "weight": 4, "image": "sticker/es/811be64d6d4ad97e3ca82542643d0dfeY.png" },
-    { "id": 18, "spot": "6C", "weight": 1, "image": "sticker/es/811be64d6d4ad97e3ca82542643d0dfeZ.png" },
+    { "id": 16, "spot": "6A", "weight": 16, "image": "sticker/es/5m71008mrux9304254r25t8282r25ujnX.jpg" },
+    { "id": 17, "spot": "6B", "weight": 4, "image": "sticker/es/5n82119nsyv0415365s36u9393s36vkqY.jpg" },
+    { "id": 18, "spot": "6C", "weight": 1, "image": "sticker/es/5o93220otzw1526476t47v0404t47wlrZ.jpg" },
 
-    { "id": 19, "spot": "7A", "weight": 16, "image": "sticker/es/b0b57f903ffa7685478c92682d1a9067X.png" },
-    { "id": 20, "spot": "7B", "weight": 4, "image": "sticker/es/b0b57f903ffa7685478c92682d1a9067Y.png" },
-    { "id": 21, "spot": "7C", "weight": 1, "image": "sticker/es/b0b57f903ffa7685478c92682d1a9067Z.png" }
+    { "id": 19, "spot": "7A", "weight": 16, "image": "sticker/es/6p04331puax2637587u58w1515u58xmsX.jpg" },
+    { "id": 20, "spot": "7B", "weight": 4, "image": "sticker/es/6q15442qvby3748698v69x2626v69yntY.jpg" },
+    { "id": 21, "spot": "7C", "weight": 1, "image": "sticker/es/6r26553rwdz4859709w70y3737w70zooZ.jpg" }
 ]
