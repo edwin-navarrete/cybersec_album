@@ -1,8 +1,9 @@
-import { Router, Request, Response, NextFunction } from 'express'
-import { check, validationResult } from 'express-validator'
+import { Router, Request, Response } from 'express'
+import { check } from 'express-validator'
 
 import EntityDAO from '../controllers/entityDao'
 import mysqlDriver from '../controllers/mysqlDriver'
+import validateInput from './validateInput'
 
 const router = Router()
 
@@ -27,15 +28,6 @@ interface AnswerRow {
     answered_on: number
 }
 class UserStickerDAO extends EntityDAO<AnswerRow> {
-}
-
-const validateInput = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    console.log('Failed validation for: ', req.body)
-    return res.status(400).json(errors)
-  }
-  next()
 }
 
 router.post('/userAnswer', [

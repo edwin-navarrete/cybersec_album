@@ -3,6 +3,7 @@ import { check, validationResult } from 'express-validator'
 
 import EntityDAO from '../controllers/entityDao'
 import mysqlDriver from '../controllers/mysqlDriver'
+import validateInput from './validateInput'
 
 const router = Router()
 
@@ -34,15 +35,6 @@ interface AlbumRow {
 }
 
 class AlbumDAO extends EntityDAO<AlbumRow> {
-}
-
-const validateInput = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    console.log('Failed validation for: ', req.body)
-    return res.status(400).json(errors)
-  }
-  next()
 }
 
 router.post('/album', [
