@@ -50,8 +50,25 @@ router.post('/userSticker', [
     in_album: req.body.inAlbum !== undefined ? req.body.inAlbum : null,
     added_on: req.body.addedOn
   }
-  dao.post(value)
+  dao.post(value).catch((err) => {
+    console.log('failed userSticker post answer:', err)
+  })
   res.status(200).json(value)
+})
+
+router.get('/userSticker',[ 
+  check('albumId', 'albumId is required').isUUID(4),
+  validateInput
+], async (req: Request, res: Response) => {
+  const albumId = req.query.albumId as string
+  const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
+  try {
+    const userStickers = await dao.get(albumId,{})
+    res.status(200).json({ data: userStickers })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ errorMessage: error })
+  }
 })
 
 module.exports = router

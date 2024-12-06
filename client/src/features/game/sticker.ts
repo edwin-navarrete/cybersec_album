@@ -230,6 +230,7 @@ export module Sticker {
                     if (!found) throw new Error("Invalid DB at UserStickerDAO")
                     found.inAlbum = sticker.inAlbum || false
                     found.addedOn = Date.now()
+                    super.push(found)
                     sticker = found
                 }
                 resolve(sticker)

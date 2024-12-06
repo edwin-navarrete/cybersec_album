@@ -19,26 +19,29 @@ export default class EntityDAO<T extends Object> {
     this.insert = insert
   }
 
-  public async get (albumId: number, options: GetOptions): Promise<T[]> {
-    let qry = `select * from ${this.entityName} where album_id=${albumId}`
-    options.include && (qry += ` and ${this.entityName}_id in (${options.include})`)
-    options.exclude && (qry += ` and ${this.entityName}_id not in (${options.exclude})`)
+  public async get (albumId: string, options: GetOptions): Promise<T[]> {
+    let qry = `SELECT * FROM ${this.entityName} WHERE album_id='${albumId}'`
+    options.include && (qry += ` AND ${this.entityName}_id IN (${options.include})`)
+    options.exclude && (qry += ` AND ${this.entityName}_id NOT IN (${options.exclude})`)
     if (options.order) {
       (typeof options.order === 'string') && (options.order = [options.order])
       const order = []
       for (const o of options.order) {
         const fld = o.substring(1)
-        order.push(`${fld === '_random' ? 'RAND()' : fld} ${o.startsWith('-') ? 'desc' : 'asc'}`)
+        order.push(`${fld === '_random' ? 'RAND()' : fld} ${o.startsWith('-') ? 'DESC' : 'ASC'}`)
       }
-      order && (qry += ` order by ${order}`)
+      order && (qry += ` ORDER BY ${order}`)
     }
-    options.limit && (qry += ` limit ${options.limit}`)
+    options.limit && (qry += ` LIMIT ${options.limit}`)
     return this.fetch(qry)
   }
 
   public async post (row: T): Promise<void> {
-    const fields = Object.keys(row)
-    const stm = `insert into ${this.entityName}(${fields}) values (${fields.map(_f => '?')})`
+    const fields = Object.keys(row)        
+    const updateFields = fields.filter(field => !field.endsWith('_id'));
+    const stm = `INSERT INTO ${this.entityName} (${fields.join(', ')})`+
+      ` VALUES (${fields.map(() => '?').join(', ')})`+
+      ` ON DUPLICATE KEY UPDATE ${updateFields.map(field => `${field} = VALUES(${field})`).join(', ')}`;
     return this.insert(stm, Object.values(row))
   }
 

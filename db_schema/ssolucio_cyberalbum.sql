@@ -171,3 +171,16 @@ SELECT u.album_id, u.question_id, MAX(u.success) success, SUM(u.latency) latency
 FROM user_answer u
 GROUP BY u.album_id, u.question_id;
 
+-- Removing duplicates
+CREATE TEMPORARY TABLE unique_user_sticker AS
+SELECT MAX(user_sticker_id) AS user_sticker_id
+FROM user_sticker
+GROUP BY album_id, sticker_id;
+
+DELETE FROM user_sticker
+WHERE user_sticker_id NOT IN (SELECT user_sticker_id FROM unique_user_sticker);
+
+DROP TEMPORARY TABLE unique_user_sticker;
+
+-- Crear el índice único
+ALTER TABLE user_sticker ADD UNIQUE KEY (album_id, sticker_id);
