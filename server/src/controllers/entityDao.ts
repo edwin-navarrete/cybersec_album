@@ -39,9 +39,9 @@ export default class EntityDAO<T extends Object> {
   public async get (options: GetOptions): Promise<T[]> {
     let qry = `SELECT * FROM ${this.entityName} `
     if (options.filter) {
-      const conditions = Object.entries(options.filter).map(
-        ([key, value]) => `${toSnake(key)}='${value}'`
-      );
+      const conditions = Object.entries(options.filter)
+        .filter( ([key, value]) => value !== undefined )
+        .map( ([key, value]) =>`${toSnake(key)}='${value}'` );
       qry += conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     }
     options.include && (qry += ` AND ${this.entityName}_id IN (${options.include})`)
@@ -60,13 +60,14 @@ export default class EntityDAO<T extends Object> {
     return results?.map(row => this.snakeToCamel(row) as T);
   }
 
-  public async post (row: T): Promise<void> {
+  public async post (row: T, upsert = true): Promise<void> {
     const snakeCaseRow = this.camelToSnake(row);
     const fields = Object.keys(snakeCaseRow)
     const updateFields = fields.filter(field => !field.endsWith('_id'));
-    const stm = `INSERT INTO ${this.entityName} (${fields.join(', ')})`+
-      ` VALUES (${fields.map(() => '?').join(', ')})`+
-      ` ON DUPLICATE KEY UPDATE ${updateFields.map(field => `${field} = VALUES(${field})`).join(', ')}`;
+    let stm = `INSERT INTO ${this.entityName} (${fields.join(', ')})`+
+      ` VALUES (${fields.map(() => '?').join(', ')})`;
+    if (upsert)
+      stm += ` ON DUPLICATE KEY UPDATE ${updateFields.map(field => `${field} = VALUES(${field})`).join(', ')}`;
     return this.insert(stm, Object.values(row))
   }
 

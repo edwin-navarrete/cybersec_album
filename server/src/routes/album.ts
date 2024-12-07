@@ -45,19 +45,19 @@ router.post('/album', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
-  const value = {
+  const value: AlbumRow = {
     albumId: req.body.albumId,
-    playerName: req.body.playerName || null,
+    playerName: req.body.playerName ?? null,
     startedOn: req.body.startedOn,
-    endedOn: req.body.endedOn || null,
+    endedOn: req.body.endedOn ?? null,
     language: req.body.language,
-    os: req.useragent?.os,
-    platform: req.useragent?.platform,
-    browser: req.useragent?.browser,
-    version: req.useragent?.version,
-    isMobile: req.useragent?.isMobile
-  } as AlbumRow
-  dao.upsert(value).catch(err => {
+    os: req.useragent?.os ?? null,
+    platform: req.useragent?.platform ?? null,
+    browser: req.useragent?.browser ?? null,
+    version: req.useragent?.version ?? null,
+    isMobile: req.useragent?.isMobile ?? false
+  };
+  dao.post(value).catch(err => {
     console.log('Failed post album:', err)
   })
   res.status(200).json(value)

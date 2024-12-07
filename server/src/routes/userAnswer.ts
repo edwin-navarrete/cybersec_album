@@ -40,14 +40,13 @@ router.post('/userAnswer', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_answer')
-  const value = {
-    albumId: req.body.albumId,
-    questionId: req.body.questionId,
-    success: req.body.success !== undefined ? req.body.success : null,
-    latency: req.body.latency || null,
-    attempts: req.body.attempts || null,
-    answeredOn: req.body.answeredOn
-  }
+  const value: AnswerRow = {
+    ...req.body,
+    success: req.body.success ?? null,
+    latency: req.body.latency ?? null,
+    attempts: req.body.attempts ?? null
+  };
+
   dao.post(value).catch((err) => {
     console.log('failed userAnswer post answer:', err)
   })

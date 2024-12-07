@@ -35,13 +35,7 @@ router.post('/userSticker', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
-  let value: UserStickerRow = req.body as UserStickerRow
-  value = {
-    albumId: req.body.albumId,
-    stickerId: req.body.stickerId,
-    inAlbum: req.body.inAlbum !== undefined ? req.body.inAlbum : null,
-    addedOn: req.body.addedOn
-  }
+  const value: UserStickerRow = req.body as UserStickerRow
   dao.post(value).catch((err) => {
     console.log('failed userSticker post answer:', err)
   })

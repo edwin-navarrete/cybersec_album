@@ -210,9 +210,10 @@ export module Question {
                     found.success = answer.success
                     if (answer.latency) {
                         found.latency = found.latency
-                            ? (found.latency * 3. + answer.latency) / 4.
+                            ? (found.latency * 3. + answer.latency) / 4. // Moving average for latency
                             : answer.latency
                     }
+                    super.push(found)
                     resolve(found)
                 }
             })
