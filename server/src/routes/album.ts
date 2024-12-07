@@ -22,16 +22,16 @@ CREATE TABLE `ssolucio_cyberalbum`.`album` (
 */
 
 interface AlbumRow {
-    album_id: string
-    player_name: string
-    started_on: number
-    ended_on?: number
+    albumId: string
+    playerName: string
+    startedOn: number
+    endedOn?: number
     language: number
     os?: string
     platform? : string
     browser? : string
     version? : string
-    is_mobile ? : boolean
+    isMobile ? : boolean
 }
 
 class AlbumDAO extends EntityDAO<AlbumRow> {
@@ -46,16 +46,16 @@ router.post('/album', [
 ], async (req: Request, res: Response) => {
   const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
   const value = {
-    album_id: req.body.albumId,
-    player_name: req.body.playerName || null,
-    started_on: req.body.startedOn,
-    ended_on: req.body.endedOn || null,
+    albumId: req.body.albumId,
+    playerName: req.body.playerName || null,
+    startedOn: req.body.startedOn,
+    endedOn: req.body.endedOn || null,
     language: req.body.language,
     os: req.useragent?.os,
     platform: req.useragent?.platform,
     browser: req.useragent?.browser,
     version: req.useragent?.version,
-    is_mobile: req.useragent?.isMobile
+    isMobile: req.useragent?.isMobile
   } as AlbumRow
   dao.upsert(value).catch(err => {
     console.log('Failed post album:', err)

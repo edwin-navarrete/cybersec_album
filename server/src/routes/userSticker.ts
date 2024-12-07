@@ -18,10 +18,10 @@ CREATE TABLE `ssolucio_cyberalbum`.`user_sticker` (
     INDEX `album_id_idx` (`album_id`) ) ENGINE = InnoDB;
 */
 interface UserStickerRow {
-    album_id: string,
-    sticker_id: number,
-    in_album: boolean,
-    added_on: number
+    albumId: string,
+    stickerId: number,
+    inAlbum: boolean,
+    addedOn: number
 }
 
 class UserStickerDAO extends EntityDAO<UserStickerRow> {
@@ -37,10 +37,10 @@ router.post('/userSticker', [
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
   let value: UserStickerRow = req.body as UserStickerRow
   value = {
-    album_id: req.body.albumId,
-    sticker_id: req.body.stickerId,
-    in_album: req.body.inAlbum !== undefined ? req.body.inAlbum : null,
-    added_on: req.body.addedOn
+    albumId: req.body.albumId,
+    stickerId: req.body.stickerId,
+    inAlbum: req.body.inAlbum !== undefined ? req.body.inAlbum : null,
+    addedOn: req.body.addedOn
   }
   dao.post(value).catch((err) => {
     console.log('failed userSticker post answer:', err)
@@ -55,7 +55,7 @@ router.get('/userSticker',[
   const albumId = req.query.albumId as string
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
   try {
-    const userStickers = await dao.get(albumId,{})
+    const userStickers = await dao.get({filter: {album_id: albumId}})
     res.status(200).json({ data: userStickers })
   } catch (error) {
     console.log(error)

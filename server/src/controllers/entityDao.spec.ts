@@ -1,7 +1,7 @@
 import EntityDAO from './entityDao'
 
 interface Row extends Object {
-    user_id: string
+    userId: string
     created: number
 }
 
@@ -17,7 +17,7 @@ describe('EntityDAO', () => {
   })
 
   test('Get works with empty options', async () => {
-    dao.get({filter: {album_id:'123'}})
+    dao.get({filter: {albumId:'123'}})
     expect(mock).toHaveBeenCalled()
     expect(mock).toHaveBeenCalledTimes(1)
     expect(mock).toHaveBeenCalledWith("SELECT * FROM foo WHERE album_id='123'")
@@ -25,7 +25,7 @@ describe('EntityDAO', () => {
 
   test('Get works with include exclude options', async () => {
     dao.get({
-      filter: {album_id:'123'},
+      filter: {albumId:'123'},
       include: [7, 8],
       exclude: [3, 4]
     })
@@ -37,7 +37,7 @@ describe('EntityDAO', () => {
 
   test('Get works with order AND limit options', async () => {
     dao.get({
-      filter: {album_id:'123'},
+      filter: {albumId:'123'},
       limit: 5,
       order: ['-created', '+modified']
     })
@@ -49,19 +49,19 @@ describe('EntityDAO', () => {
 
   test('Get works with random order', async () => {
     dao.get({
-      filter: {album_id:'123'},
+      filter: {albumId:'123'},
       include: [7],
       order: ['__random', '+modified']
     })
     expect(mock).toHaveBeenCalled()
     expect(mock).toHaveBeenCalledTimes(1)
-    expect(mock).toHaveBeenCalledWith('select * from foo where album_id=123 ' +
-            'and foo_id in (7) order by RAND() asc,modified asc')
+    expect(mock).toHaveBeenCalledWith("SELECT * FROM foo WHERE album_id='123' " +
+            'AND foo_id IN (7) ORDER BY RAND() ASC,modified ASC')
   })
 
   test('post works with a simple object', async () => {
     dao.post({
-      user_id: '7fa3',
+      userId: '7fa3',
       created: Date.parse('04 Dec 1995 00:12:00 GMT')
     })
     expect(dummy).toHaveBeenCalled()

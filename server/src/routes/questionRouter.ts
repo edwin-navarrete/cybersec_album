@@ -20,15 +20,15 @@ CREATE TABLE `question` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table storing questions for the game';
 */
 
-interface Question {
-  question_id: number,
+interface QuestionRow {
+  questionId: number,
   type: string
   options: string
   solution: string
   dificult: number
   feedback: string
 }
-class QuestionDAO extends EntityDAO<Question> {
+class QuestionDAO extends EntityDAO<QuestionRow> {
 }
 
 questionsRouterinfo.get('/questions',[

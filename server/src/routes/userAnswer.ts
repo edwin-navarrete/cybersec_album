@@ -20,12 +20,12 @@ CREATE TABLE `ssolucio_cyberalbum`.`user_answer` (
     INDEX `album_id_idx` (`album_id`) ) ENGINE = InnoDB;
 */
 interface AnswerRow {
-    album_id: string
-    question_id: number
+    albumId: string
+    questionId: number
     success?: boolean
     latency?: number
     attempts?: number
-    answered_on: number
+    answeredOn: number
 }
 class UserStickerDAO extends EntityDAO<AnswerRow> {
 }
@@ -41,12 +41,12 @@ router.post('/userAnswer', [
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_answer')
   const value = {
-    album_id: req.body.albumId,
-    question_id: req.body.questionId,
+    albumId: req.body.albumId,
+    questionId: req.body.questionId,
     success: req.body.success !== undefined ? req.body.success : null,
     latency: req.body.latency || null,
     attempts: req.body.attempts || null,
-    answered_on: req.body.answeredOn
+    answeredOn: req.body.answeredOn
   }
   dao.post(value).catch((err) => {
     console.log('failed userAnswer post answer:', err)
