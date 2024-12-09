@@ -9,6 +9,7 @@ import { AppDispatch } from './app/store'
 import { fetchAlbum } from './features/game/gameMiddleware';
 
 import { useDispatch } from 'react-redux';
+import PlayerView from './components/PlayerView';
 
 function App() {
     // Load initial state
@@ -22,6 +23,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<AlbumView />} />
                     <Route path="/reto" element={<QuestionView />} />
+                    <Route path="/players" element={<PlayerView />} />
                 </Routes>
             </div>
         </BrowserRouter>

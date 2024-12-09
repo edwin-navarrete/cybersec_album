@@ -29,16 +29,18 @@ class PlayerDAO extends EntityDAO<PlayerRow> {
 }
 
 router.get('/players',[
+    check('groupId', 'groupId is numeric').optional().isNumeric(),
     check('playerId', 'playerId is numeric').optional().isNumeric(),
     check('playerName', 'playerId is alphanumeric').optional().isAlphanumeric(),
     validateInput
   ], async (req: Request, res: Response) => {
+    const groupId = req.query.groupId as string
     const playerId = req.query.playerId as string
     const playerName = req.query.playerName as string
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
     try {
       const players = await dao.get({
-        filter:{playerId,playerName}
+        filter:{groupId,playerId,playerName}
       })
       res.status(200).json({ data: players })
     } catch (error) {
