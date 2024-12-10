@@ -3,6 +3,7 @@ import { check, validationResult } from 'express-validator'
 
 import EntityDAO from '../controllers/entityDao'
 import mysqlDriver from '../controllers/mysqlDriver'
+import validateInput from './validateInput'
 
 const router = Router()
 
@@ -17,22 +18,13 @@ CREATE TABLE `ssolucio_cyberalbum`.`user_sticker` (
     INDEX `album_id_idx` (`album_id`) ) ENGINE = InnoDB;
 */
 interface UserStickerRow {
-    album_id: string,
-    sticker_id: number,
-    in_album: boolean,
-    added_on: number
+    albumId: string,
+    stickerId: number,
+    inAlbum: boolean,
+    addedOn: number
 }
 
 class UserStickerDAO extends EntityDAO<UserStickerRow> {
-}
-
-const validateInput = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    console.log('Failed validation for: ', req.body)
-    return res.status(400).json(errors)
-  }
-  next()
 }
 
 router.post('/userSticker', [
@@ -43,15 +35,33 @@ router.post('/userSticker', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
-  let value: UserStickerRow = req.body as UserStickerRow
-  value = {
-    album_id: req.body.albumId,
-    sticker_id: req.body.stickerId,
-    in_album: req.body.inAlbum !== undefined ? req.body.inAlbum : null,
-    added_on: req.body.addedOn
+  // FIXME how to ignore unknown fields?
+  const {albumId, stickerId, inAlbum, addedOn} = req.body
+  const value: UserStickerRow = {albumId, stickerId, inAlbum, addedOn}
+  dao.post(value).then((val)=>{
+    console.log('userSticker updated', val.affectedRows)
+    res.status(200).json(value)
+  })
+  .catch((err) => {
+    console.log('failed userSticker post answer:', err)
+    res.status(400).json({ errorMessage: err })
+  })
+  
+})
+
+router.get('/userSticker',[ 
+  check('albumId', 'albumId is required').isUUID(4),
+  validateInput
+], async (req: Request, res: Response) => {
+  const albumId = req.query.albumId as string
+  const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
+  try {
+    const userStickers = await dao.get({filter: {album_id: albumId}})
+    res.status(200).json({ results: userStickers })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ errorMessage: error })
   }
-  dao.post(value)
-  res.status(200).json(value)
 })
 
 module.exports = router

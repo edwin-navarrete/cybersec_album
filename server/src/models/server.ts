@@ -30,6 +30,7 @@ export class Server {
     this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userAnswer'))
     this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/album'))
     this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/questionRouter'))
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/player'))
   }
 
   listen () {
