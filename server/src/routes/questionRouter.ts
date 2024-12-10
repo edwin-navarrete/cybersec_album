@@ -41,7 +41,7 @@ questionsRouterinfo.get('/questions',[
     const albumIdsQuest = await dao.get({
       filter:{lang:lang}
     })
-    res.status(200).json({ data: albumIdsQuest })
+    res.status(200).json({ results: albumIdsQuest })
   } catch (error) {
     console.log(error)
     return res.status(500).json({ errorMessage: error })

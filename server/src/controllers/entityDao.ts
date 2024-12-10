@@ -60,7 +60,7 @@ export default class EntityDAO<T extends Object> {
     return results?.map(row => this.snakeToCamel(row) as T);
   }
 
-  public async post (row: T, upsert = true): Promise<void> {
+  public async post (row: T, upsert = true): Promise<any> {
     const snakeCaseRow = this.camelToSnake(row);
     const fields = Object.keys(snakeCaseRow)
     const updateFields = fields.filter(field => !field.endsWith('_id'));
@@ -71,7 +71,7 @@ export default class EntityDAO<T extends Object> {
     return this.insert(stm, Object.values(row))
   }
 
-  public async upsert (row: T): Promise<void> {
+  public async upsert (row: T): Promise<any> {
     const fields = Object.keys(row)
     const stm = `REPLACE INTO ${this.entityName}(${fields}) VALUES (${fields.map(_f => '?')})`
     return this.insert(stm, Object.values(row))

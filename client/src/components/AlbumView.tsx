@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
-import { nextQuestion, stickerSample, glueSticker, registerPlayer } from '../features/game/gameMiddleware';
+import { nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
@@ -36,7 +36,6 @@ const AlbumView = () => {
     const handleCaptcha = useCallback(async (token : string) => {
         // console.log(token.slice(-5));
         dispatch(updateToken(token));
-        if(stickers.length === 1 && !stickers[0].inAlbum) dispatch(glueSticker(await stickerSample))
         // eslint-disable-next-line
     }, [dispatch, stickers]);
 
