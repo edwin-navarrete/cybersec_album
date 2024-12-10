@@ -108,8 +108,9 @@ export module Sticker {
         // FIXME The sticker details mapped by spot is not serializable! simplify to plain array
         async getStickers(): Promise<Map<string, AlbumStiker>> {
             let self = this
-            return this.userStickerDAO.findAll({ filter: { albumId: this.albumId }, order: "+inAlbum" })
-                .then(userStickers => 
+            // TODO: Should filter by albumId in the future
+            return this.userStickerDAO.findAll({ order: "+inAlbum" })
+                .then(userStickers =>
                     self.stickerDAO.findAll({
                         include: userStickers.map(s => s.stickerId)
                     }).then(stickers => {
@@ -132,17 +133,12 @@ export module Sticker {
 
         }
 
-        async ownStickers(stickers: StickerDef[]): Promise<AlbumStiker[]> {
+        async ownStickers(stickers: StickerDef[]): Promise<UserSticker[]> {
             let upserts = stickers.map(stickerDef => {
                 if (!stickerDef.id) throw new Error("Invalid sticker in userSticker")
                 return this.userStickerDAO.upsert({
                     albumId: this.albumId,
                     stickerId: stickerDef.id
-                }).then(userSticker => {
-                    return {
-                        ...userSticker,
-                        ...stickerDef
-                    }
                 })
             })
             return Promise.all(upserts)
@@ -174,7 +170,7 @@ export module Sticker {
                     // to trigger the start of the album
                     return this.userStickerDAO.upsert(albumStiker as UserSticker);
                 }
-                return albumStiker
+                return new Promise((resolve) => resolve(albumStiker))
             }
             finally {
                 await this.getAchievement();
@@ -221,22 +217,23 @@ export module Sticker {
             super("userSticker",initialDB)
         }
         async upsert(sticker: UserSticker): Promise<UserSticker> {
-            if (!sticker.id) {
-                sticker.id = this.db.length + 1
-                sticker.addedOn = Date.now();
-                sticker.inAlbum = sticker.inAlbum || false;
-                super.push(sticker)
-            }
-            else {
-                // just update some fields
-                let found = this.db.find(us => us.id === sticker.id)
-                if (!found) throw new Error("Invalid DB at UserStickerDAO")
-                found.inAlbum = sticker.inAlbum || false
-                found.addedOn = Date.now()
-                super.push(found)
-                sticker = found
-            }
-            return sticker;
+            return new Promise(resolve => {
+                if (!sticker.id) {
+                    sticker.id = this.db.length + 1
+                    sticker.addedOn = Date.now();
+                    sticker.inAlbum = sticker.inAlbum || false;
+                    super.push(sticker)
+                }
+                else {
+                    // just update some fields
+                    let found = this.db.find(us => us.id === sticker.id)
+                    if (!found) throw new Error("Invalid DB at UserStickerDAO")
+                    found.inAlbum = sticker.inAlbum || false
+                    found.addedOn = Date.now()
+                    sticker = found
+                }
+                resolve(sticker)
+            })
         }
     }
 

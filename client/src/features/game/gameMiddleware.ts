@@ -27,6 +27,12 @@ export const userStickerDAO = new Sticker.UserStickerDAO([])
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, ALBUM_ID)
 const gameConfig = config as Question.GameConfig
 
+// give the first sticker as a sample
+export const stickerSample = stickerDAO.findAll({ include: [1] }).then( async stickerSample => {
+    let firstSticker = stickerSample[0]
+    let userSticker = await theAlbum.ownStickers(stickerSample);
+    return { ...firstSticker, ...userSticker[0] };
+ });
 
 const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 const userAnswerDAO = new Question.UserAnswerDAO()
@@ -35,14 +41,6 @@ const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, ALB
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {
         let stickers = await theAlbum.getStickers()
-        if(!stickers.size){
-            // if first time, give the first sticker as a sample
-            console.log("Adding Sample")
-            let stickerSample = await stickerDAO.findAll({ include: [1] })
-            let newStickers = await theAlbum.ownStickers(stickerSample);
-            await theAlbum.glueSticker(newStickers[0]);
-            stickers = await theAlbum.getStickers()
-        }
         return Array.from(stickers.values())
     })
 

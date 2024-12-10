@@ -52,7 +52,6 @@ export module Question {
     }
 
     interface QueryOptions {
-        filter?: Record<string,string>
         include?: any[]
         exclude?: any[]
         order?: string | string[] // "[-|+]field"
@@ -135,7 +134,6 @@ export module Question {
 
     export class DAO<Type extends Identifiable>{
         db: Type[]
-        loaded: boolean = false 
         static token: string = ""
         entrypoint: string
 
@@ -147,53 +145,37 @@ export module Question {
             this.entrypoint = entrypoint
         }
 
-        async inMemFindAll(options: QueryOptions = {}): Promise<Type[]> {
+        findAll(options?: QueryOptions): Promise<Type[]> {
             let db = this.db
-            const { exclude = [], include = [], order, limit } = options;
-            let results = this.db.filter(q =>
-                (!include.length || include.includes(q.id)) && !exclude.includes(q.id)
-            );
-            if (order) {
-                const orders = (Array.isArray(order) ? order : [order]).map(o => ({
-                    desc: o.startsWith('-'),
-                    fld: o.replace(/^[-+]/, '')
-                }));
-    
-                results.sort((x, y) =>
-                    orders.reduce((cmp, { fld, desc }) => cmp || compare(x, y, fld, desc), 0)
-                );
-            }
-            if (limit && limit > 0) {
-                results = results.slice(0, limit);
-            }
-            // return copies of data so no changes will modify our memory db
-            return results.map(o => { return { ...o } })
-        }
-
-        async findAll(options: QueryOptions = {}): Promise<Type[]> {
-            // NOTE reads from remote only once, then it works offline
-            let self = this
-            if(this.entrypoint && !self.loaded){
-                let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
-                return axios.get(uri,{
-                    params: options.filter,
-                    headers:{"g-recaptcha-response":DAO.token
-                }})
-                .then(response => {
-                    self.loaded = true;
-                    self.db = response.data.results;
-                    return self.db;
-                })
-                .catch(error => {
-                    return this.inMemFindAll();
-                });
-            }
-            return this.inMemFindAll(options);
+            return new Promise(function(resolve) {
+                options = options || {}
+                let exclude = options.exclude || [];
+                let include = options.include || [];
+                let results = db.filter(q =>
+                    (!include.length || include.includes(q.id)) && !exclude.includes(q.id));
+                if (options.order) {
+                    if (typeof options.order === "string") {
+                        options.order = [options.order]
+                    }
+                    let ordering = options.order.reverse().map(o => {
+                        return { desc: o.startsWith('-'), fld: o.substring(1) }
+                    })
+                    results.sort((x, y) => {
+                        return ordering.reduce((cmp, o) => {
+                            return compare(x, y, o.fld, o.desc) || cmp
+                        }, 0)
+                    })
+                }
+                if (options.limit && options.limit > 0)
+                    results = results.slice(0, options.limit)
+                // return copies of data so no changes will modify our memory db
+                resolve(results.map(o => { return { ...o } }))
+            });
         }
 
         async push(record: Type){
             this.db.push(record);
-            if(this.entrypoint){
+            if(DAO.token && this.entrypoint){
                 try {
                     let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
                     await axios.post(uri,record,{
@@ -228,10 +210,9 @@ export module Question {
                     found.success = answer.success
                     if (answer.latency) {
                         found.latency = found.latency
-                            ? (found.latency * 3. + answer.latency) / 4. // Moving average for latency
+                            ? (found.latency * 3. + answer.latency) / 4.
                             : answer.latency
                     }
-                    super.push(found)
                     resolve(found)
                 }
             })

@@ -7,8 +7,8 @@ import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
-import { nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
-import { AppDispatch, RootState } from '../app/store'
+import { nextQuestion, stickerSample, glueSticker, registerPlayer } from '../features/game/gameMiddleware';
+import { AppDispatch } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
 
@@ -16,7 +16,6 @@ const AlbumView = () => {
     const dispatch = useDispatch() as AppDispatch;
     const spots = useSelector(selectStickerSpots);
     const stickers = useSelector(selectStickers);
-    const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
 
     const navigate = useNavigate();
@@ -37,6 +36,7 @@ const AlbumView = () => {
     const handleCaptcha = useCallback(async (token : string) => {
         // console.log(token.slice(-5));
         dispatch(updateToken(token));
+        if(stickers.length === 1 && !stickers[0].inAlbum) dispatch(glueSticker(await stickerSample))
         // eslint-disable-next-line
     }, [dispatch, stickers]);
 
@@ -102,7 +102,7 @@ const AlbumView = () => {
             {isFull && success()}
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
-                {!isComplete && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+                {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
             </div>
         </section>
 

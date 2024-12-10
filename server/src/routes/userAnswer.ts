@@ -1,9 +1,8 @@
-import { Router, Request, Response } from 'express'
-import { check } from 'express-validator'
+import { Router, Request, Response, NextFunction } from 'express'
+import { check, validationResult } from 'express-validator'
 
 import EntityDAO from '../controllers/entityDao'
 import mysqlDriver from '../controllers/mysqlDriver'
-import validateInput from './validateInput'
 
 const router = Router()
 
@@ -20,14 +19,23 @@ CREATE TABLE `ssolucio_cyberalbum`.`user_answer` (
     INDEX `album_id_idx` (`album_id`) ) ENGINE = InnoDB;
 */
 interface AnswerRow {
-    albumId: string
-    questionId: number
+    album_id: string
+    question_id: number
     success?: boolean
     latency?: number
     attempts?: number
-    answeredOn: number
+    answered_on: number
 }
 class UserStickerDAO extends EntityDAO<AnswerRow> {
+}
+
+const validateInput = (req: Request, res: Response, next: NextFunction) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    console.log('Failed validation for: ', req.body)
+    return res.status(400).json(errors)
+  }
+  next()
 }
 
 router.post('/userAnswer', [
@@ -40,18 +48,18 @@ router.post('/userAnswer', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_answer')
-  const value: AnswerRow = {
-    ...req.body,
-    success: req.body.success ?? null,
-    latency: req.body.latency ?? null,
-    attempts: req.body.attempts ?? null
-  };
-
+  const value = {
+    album_id: req.body.albumId,
+    question_id: req.body.questionId,
+    success: req.body.success !== undefined ? req.body.success : null,
+    latency: req.body.latency || null,
+    attempts: req.body.attempts || null,
+    answered_on: req.body.answeredOn
+  }
   dao.post(value).catch((err) => {
-    console.log('failed userAnswer post answer:', err)
+    console.log('failed post answer:', err)
   })
   res.status(200).json(value)
 })
-
 
 module.exports = router
