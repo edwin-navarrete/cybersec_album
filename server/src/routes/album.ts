@@ -57,10 +57,13 @@ router.post('/album', [
     version: req.useragent?.version ?? null,
     isMobile: req.useragent?.isMobile ?? false
   };
-  dao.post(value).catch(err => {
-    console.log('Failed post album:', err)
-  })
-  res.status(200).json(value)
+  try {
+    await dao.post(value)
+    res.status(200).json(value)
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({ errorMessage: error })
+  }
 })
 
 module.exports = router

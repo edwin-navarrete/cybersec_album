@@ -35,7 +35,6 @@ router.post('/userSticker', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
-  // FIXME how to ignore unknown fields?
   const {albumId, stickerId, inAlbum, addedOn} = req.body
   const value: UserStickerRow = {albumId, stickerId, inAlbum, addedOn}
   dao.post(value).then((val)=>{

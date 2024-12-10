@@ -79,10 +79,12 @@ export module Question {
             // then the oldest failed questions
             // and then the oldest succeeded
             let self = this
-            return this.userAnswerDAO.findAll({ order: ["+success", "+answeredOn"] })
+            let curLanguage = localStorage.getItem("lang");
+            return this.userAnswerDAO.findAll({ filter:{ albumId: this.albumId }, order: ["+success", "+answeredOn"] })
                 .then(answers => answers.map(answer => answer.questionId))
                 .then(seen =>
                     self.questionDefDAO.findAll({
+                        filter:{ lang: curLanguage || 'es' },
                         exclude: seen,
                         order: (this.config.quizStrategy === "randomUnseen" ? "__random" : "+difficulty"),
                         limit: count
@@ -154,14 +156,22 @@ export module Question {
                 (!include.length || include.includes(q.id)) && !exclude.includes(q.id)
             );
             if (order) {
-                const orders = (Array.isArray(order) ? order : [order]).map(o => ({
-                    desc: o.startsWith('-'),
-                    fld: o.replace(/^[-+]/, '')
-                }));
-    
-                results.sort((x, y) =>
-                    orders.reduce((cmp, { fld, desc }) => cmp || compare(x, y, fld, desc), 0)
-                );
+                if (order == '__random'){
+                    for (let i = results.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));  
+                        [results[i], results[j]] = [results[j], results[i]];
+                      }
+                }
+                else {
+                    const orders = (Array.isArray(order) ? order : [order]).map(o => ({
+                        desc: o.startsWith('-'),
+                        fld: o.replace(/^[-+]/, '')
+                    }));
+        
+                    results.sort((x, y) =>
+                        orders.reduce((cmp, { fld, desc }) => cmp || compare(x, y, fld, desc), 0)
+                    );
+                }
             }
             if (limit && limit > 0) {
                 results = results.slice(0, limit);
@@ -181,10 +191,11 @@ export module Question {
                 }})
                 .then(response => {
                     self.loaded = true;
-                    self.db = response.data.results;
-                    return self.db;
+                    self.db = response.data.results.map((item: Record<string, any>)=>{ return {...item, id: item[self.entrypoint+'Id']}});
+                    return this.inMemFindAll(options);
                 })
                 .catch(error => {
+                    console.error('findAll failed', error)
                     return this.inMemFindAll();
                 });
             }
@@ -240,7 +251,14 @@ export module Question {
 
     export class QuestionDefDAO extends DAO<QuestionDef> {
         constructor(initialDB:QuestionDef[]){
-            super("", initialDB)
+            super("question", initialDB)
+        }
+
+        async findAll(options: QueryOptions = {}): Promise<QuestionDef[]> {
+            if(options.filter) {
+                this.loaded = false
+            }
+            return super.findAll(options)
         }
     }
 }
