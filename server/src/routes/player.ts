@@ -42,7 +42,7 @@ router.get('/players',[
       const players = await dao.get({
         filter:{groupId,playerId,playerName}
       })
-      res.status(200).json({ data: players })
+      res.status(200).json({ results: players })
     } catch (error) {
       console.log(error)
       return res.status(500).json({ errorMessage: error })
