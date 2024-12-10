@@ -22,7 +22,6 @@ interface PlayerRow {
     playerId: number
     playerName: string
     isGroup: boolean
-    size : number
 }
 
 class PlayerDAO extends EntityDAO<PlayerRow> {
@@ -55,9 +54,8 @@ router.put('/players', [
     validateInput
     ], async (req: Request, res: Response) => {
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
-    const value: PlayerRow = {
-        ...req.body
-    };
+    const {playerId, playerName, isGroup} = req.body
+    const value: PlayerRow = { playerId, playerName, isGroup };
     try {
         await dao.post(value, false)
         let result = await dao.get({filter:{playerName:value.playerName}})

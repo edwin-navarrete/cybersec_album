@@ -48,8 +48,8 @@ export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
 
 export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>
     ('album/lang', async (newLanguage) => {
-        let newQuestions = await import(`./data/${newLanguage}/questionDB.json`);
-        questionDefDAO.db = Array.from(newQuestions as Question.QuestionDef[]);
+        localStorage.setItem("lang", newLanguage);
+        await questionDefDAO.findAll({ filter:{ lang:newLanguage } });
         let newStickers = await import(`./data/${newLanguage}/stickerDB.json`);
         stickerDAO.db = Array.from(newStickers as Sticker.StickerDef[]);
         let stickers = await theAlbum.getStickers()

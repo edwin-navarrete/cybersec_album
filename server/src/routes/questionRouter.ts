@@ -31,7 +31,7 @@ interface QuestionRow {
 class QuestionDAO extends EntityDAO<QuestionRow> {
 }
 
-questionsRouterinfo.get('/questions',[
+questionsRouterinfo.get('/question',[
   check('lang', 'lang is required and must be a valid language code').matches(/^[a-z]{2}(-[A-Z]{2})?$/),
   validateInput
 ], async (req: Request, res: Response) => {
