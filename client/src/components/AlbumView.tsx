@@ -8,7 +8,7 @@ import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
 import { nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
-import { AppDispatch } from '../app/store'
+import { AppDispatch, RootState } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
 
@@ -16,6 +16,7 @@ const AlbumView = () => {
     const dispatch = useDispatch() as AppDispatch;
     const spots = useSelector(selectStickerSpots);
     const stickers = useSelector(selectStickers);
+    const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
 
     const navigate = useNavigate();
@@ -101,7 +102,7 @@ const AlbumView = () => {
             {isFull && success()}
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
-                {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+                {!isComplete && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
             </div>
         </section>
 
