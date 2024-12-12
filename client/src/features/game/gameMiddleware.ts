@@ -10,13 +10,6 @@ import config from './gameConfig.json';
 import { RootState } from '../../app/store';
 import { QuestionState, Attempt, QuestionsAndStickers, FeedbackAndStickers } from './gameSlice'
 
-var ALBUM_ID = localStorage.getItem("albumId");
-if(!ALBUM_ID){
-    ALBUM_ID = uuidv4();
-    localStorage.setItem("albumId", ALBUM_ID)
-    localStorage.setItem("startedOn", Date.now().toString())
-}
-
 // backward compatibility
 if(!localStorage.getItem("startedOn")){
     localStorage.setItem("startedOn", Date.now().toString())
@@ -24,13 +17,13 @@ if(!localStorage.getItem("startedOn")){
 
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 export const userStickerDAO = new Sticker.UserStickerDAO([])
-const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, ALBUM_ID)
+const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO)
 const gameConfig = config as Question.GameConfig
 
 
-const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
-const userAnswerDAO = new Question.UserAnswerDAO()
-const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, ALBUM_ID)
+export const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
+export const userAnswerDAO = new Question.UserAnswerDAO()
+const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, theAlbum)
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {

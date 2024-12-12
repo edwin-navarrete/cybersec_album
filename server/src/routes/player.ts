@@ -52,21 +52,21 @@ router.get('/player',[
     }
   })
 
-router.put('/player', [
+router.post('/player', [
     check('mode', "mode must be 'coop' or 'solo'").default('solo').optional().matches('(coop|solo)'),
     check('lang', "lang must be 'es' or 'en'").default('es').optional().matches('(en|es)'),
+    check('playerId', 'playerId must be numeric').optional({ nullable: true }).isNumeric(),
     check('playerName', 'playerName is required and is chars and spaces').isAlpha('es-ES', { ignore: ' ' }),
-    check('isGroup', 'isGroup must be boolean').optional().isBoolean(),
     validateInput
     ], async (req: Request, res: Response) => {
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
-    const {playerName, isGroup = false} = req.body
+    const {playerId, playerName} = req.body
     const mode = req.body.mode
-    const newPlayer: PlayerRow = { playerName, isGroup };
+    const newPlayer: PlayerRow = { playerId, playerName, isGroup: false };
     try {
-        const postResult = await dao.post(newPlayer, false)
-        newPlayer.playerId = postResult.insertId
-        if( req.body.mode == 'coop' && !newPlayer.isGroup){
+        const postResult = await ( newPlayer.playerId?  dao.update(newPlayer) :  dao.post(newPlayer, false))
+        if( !newPlayer.playerId && req.body.mode == 'coop'){
+            // only when creating a new player it can be assigned to a group
             const assignedGrp = await assignGroup( req.body.lang )
             if(!assignedGrp){
                 return res.status(500).json({ errorMessage: "Unable to assign a group" })
@@ -79,6 +79,7 @@ router.put('/player', [
             await dao.update(newPlayer)
             newPlayer.groupName = assignedGrp.playerName
         }
+        newPlayer.playerId = newPlayer.playerId || postResult.insertId
         res.status(200).json( newPlayer )
     } catch (error) {
         console.log(error)
@@ -88,21 +89,6 @@ router.put('/player', [
         return res.status(500).json({ errorMessage: error })
     }
 })
-
-router.get('/player/name',[
-    check('lang', "lang must be 'es' or 'en'").default('es').optional().matches('(en|es)'),
-    validateInput
-  ], async (req: Request, res: Response) => {
-    const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
-    const lang = req.query.lang as string
-
-    const uniqGroup = await assignGroup(lang)
-    if(uniqGroup){
-        return res.status(200).json(uniqGroup);
-    }
-    return res.status(404).json({ error: "None available" })
-})
-
 
 async function assignGroup( lang: string){
     // Get the oldest group_id
