@@ -1,6 +1,12 @@
 
 import { Question } from "./question";
+import { Sticker } from "./sticker";
 import questionDB from './test/sampleQuestions.json';
+import axios from 'axios'
+
+// Mock de Axios
+jest.mock('axios')
+const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('QuestionDefDAO', () => {
 
@@ -8,6 +14,8 @@ describe('QuestionDefDAO', () => {
 
     beforeEach(() => {
         questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
+        questionDefDAO.entrypoint = ""
+        mockedAxios.post.mockClear()
     })
 
     it('should return all',  async () => {
@@ -57,6 +65,7 @@ describe('UserAnswerDAO', () => {
 
     beforeEach(function() {
         userAnswerDAO = new Question.UserAnswerDAO()
+        userAnswerDAO.entrypoint = ""
         userAnswerDAO.put({ albumId: "juan", questionId: 1, success: true })
         userAnswerDAO.put({ albumId: "juan", questionId: 2, success: false })
         userAnswerDAO.put({ albumId: "juan", questionId: 5, success: true })
@@ -142,13 +151,42 @@ describe('Quiz', () => {
 
     beforeEach(() => {
         questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
+        questionDefDAO.entrypoint = ""
         userAnswerDAO = new Question.UserAnswerDAO()
+        userAnswerDAO.entrypoint = ""
         let config: Question.GameConfig = {
             quizStrategy: Question.QuizStrategy.easiestUnseen,
             rewardSchema: Question.RewardSchema.latency,
             rewardStrategy: Question.RewardStrategy.sequential
         }
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        const album: Sticker.Album = {
+            stickerDAO: {
+                db: [],
+                loaded: false,
+                entrypoint: "",
+                inMemFindAll: jest.fn(),
+                findAll: jest.fn(),
+                push: jest.fn()
+            },
+            getAlbumId: jest.fn().mockReturnValue("123abc"),
+            getStickers: jest.fn(),
+            ownStickers: jest.fn(),
+            registerPlayer: jest.fn(),
+            glueSticker: jest.fn(),
+            getAchievement: jest.fn(),
+            userStickerDAO: {
+                upsert: function (sticker: Sticker.UserSticker): Promise<Sticker.UserSticker> {
+                    throw new Error("Function not implemented.");
+                },
+                db: [],
+                loaded: false,
+                entrypoint: "",
+                inMemFindAll: jest.fn(),
+                findAll: jest.fn(),
+                push: jest.fn(),
+            }
+        }
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
     })
 
 

@@ -20,7 +20,9 @@ const resources = {
             "quiz.reward": "Now you have $t(stickers, {\"count\": {{number}} }) to claim.",
             "stickers_one": "{{count}} sticker",
             "stickers_other": "{{count}} stickers",
-            "introMsg": "Hi! would you help me to fill the album? start down here!"
+            "introMsg": "Hi! would you help me to fill the album? start down here!",
+            "dupName.err": "Name is already taken. Please choose a different one.",
+            "registration.err": "Ocurrió un error al registrar el jugador. Inténtalo más tarde.",
         }
     },
     es: {
@@ -38,7 +40,9 @@ const resources = {
             "quiz.reward": "Ahora tienes $t(stickers, {\"count\": {{number}} }) por reclamar.",
             "stickers_one": "{{count}} lámina",
             "stickers_other": "{{count}} láminas",
-            "introMsg": "Hola! me ayudarías a llenar el album? empieza aquí abajo!"
+            "introMsg": "Hola! me ayudarías a llenar el album? empieza aquí abajo!",
+            "dupName.err": "El nombre ya está en uso. Por favor, elige otro.",
+            "registration.err": "Ocurrió un error al registrar el jugador. Inténtalo más tarde.",
         }
     }
 };

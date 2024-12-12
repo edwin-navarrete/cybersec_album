@@ -23,7 +23,7 @@ CREATE TABLE `ssolucio_cyberalbum`.`album` (
 
 interface AlbumRow {
     albumId: string
-    playerName: string
+    playerId: number
     startedOn: number
     endedOn?: number
     language: number
@@ -47,7 +47,7 @@ router.post('/album', [
   const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
   const value: AlbumRow = {
     albumId: req.body.albumId,
-    playerName: req.body.playerName ?? null,
+    playerId: req.body.playerId ?? null,
     startedOn: req.body.startedOn,
     endedOn: req.body.endedOn ?? null,
     language: req.body.language,
@@ -59,6 +59,10 @@ router.post('/album', [
   };
   try {
     await dao.post(value)
+    // owner player is set only once
+    if(value.playerId){
+      await mysqlDriver.insert('UPDATE album SET player_id = COALESCE(player_id,?) WHERE album_id=?', [value.playerId, value.albumId])
+    }
     res.status(200).json(value)
   } catch (error) {
     console.log(error)

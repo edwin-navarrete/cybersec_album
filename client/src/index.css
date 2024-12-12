@@ -299,10 +299,15 @@ code {
     margin: 10px 10px;
     text-align: center;
 }
-.successForm button {
-    color: cyan;
+
+.errorMessage {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  text-align: left; /* Alineación opcional */
 }
 
+successSplash
 .rewardMsg {
     font-family: 'Itim', cursive;
     font-size: 20px;
