@@ -1,4 +1,5 @@
 import axios from "axios"
+import { Sticker } from "./sticker"
 
 export module Question {
 
@@ -60,14 +61,14 @@ export module Question {
     }
 
     export class Quiz {
-        albumId: string
+        album: Sticker.Album
         userAnswerDAO: UserAnswerDAO
         questionDefDAO: QuestionDefDAO
         answers: Answer[]
         config: GameConfig
 
-        constructor(config: GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: string) {
-            this.albumId = albumId
+        constructor(config: GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: Sticker.Album) {
+            this.album = albumId
             this.userAnswerDAO = userAnswerDAO
             this.questionDefDAO = questionDefDAO
             this.answers = []
@@ -80,7 +81,7 @@ export module Question {
             // and then the oldest succeeded
             let self = this
             let curLanguage = localStorage.getItem("lang");
-            return this.userAnswerDAO.findAll({ filter:{ albumId: this.albumId }, order: ["+success", "+answeredOn"] })
+            return this.userAnswerDAO.findAll({ filter:{ albumId: await this.album.getAlbumId() }, order: ["+success", "+answeredOn"] })
                 .then(answers => answers.map(answer => answer.questionId))
                 .then(seen =>
                     self.questionDefDAO.findAll({
@@ -106,7 +107,7 @@ export module Question {
         async putAnswer(question: QuestionDef, response: number[], latency?: number): Promise<Answer> {
             if (!question.id) throw new Error("question id is required")
             let answer: Answer = {
-                albumId: this.albumId,
+                albumId: await this.album.getAlbumId(),
                 questionId: question.id,
                 success: response.length === question.solution.length
                     && response.reduce((a, b) => a && question.solution.includes(b), true),

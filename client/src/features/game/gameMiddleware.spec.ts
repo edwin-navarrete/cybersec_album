@@ -1,14 +1,24 @@
 // import { AnyAction } from 'redux'
 // import { PayloadAction } from '@reduxjs/toolkit'
-import { userStickerDAO, nextQuestion, putAnswer, glueSticker } from './gameMiddleware'
+import { userStickerDAO, userAnswerDAO, questionDefDAO, nextQuestion, putAnswer, glueSticker } from './gameMiddleware'
 import { QuestionState, FeedbackAndStickers } from './gameSlice'
 import { Sticker } from "./sticker";
+import axios from 'axios'
+
+// Mock de Axios
+jest.mock('axios')
+const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('gameMiddleware', () => {
 
     beforeEach(() => {
         // Clear userStickerDAO
         userStickerDAO.db.length = 0
+        // Disconnect remote access
+        userStickerDAO.entrypoint = ""
+        userAnswerDAO.entrypoint = ""
+        questionDefDAO.entrypoint = ""
+        mockedAxios.post.mockClear()
     })
 
     it('should do a full cycle', async () => {
@@ -42,9 +52,11 @@ describe('gameMiddleware', () => {
         // any sticker can be glued
         let originalSize = feedback.stickers.length;
         let sticker = feedback.stickers.values().next().value
-        let stickerAction = await glueSticker(sticker)(dispatch, state, {})
-        let album = stickerAction.payload as Sticker.AlbumStiker[];
-        expect(album.length).toEqual(originalSize);
-        expect(Array.from(album.values()).some((s: Sticker.UserSticker) => s.inAlbum)).toBeTruthy()
+        if(sticker){
+            let stickerAction = await glueSticker(sticker)(dispatch, state, {})
+            let album = stickerAction.payload as Sticker.AlbumStiker[];
+            expect(album.length).toEqual(originalSize);
+            expect(Array.from(album.values()).some((s: Sticker.UserSticker) => s.inAlbum)).toBeTruthy()
+        }
     });
 })

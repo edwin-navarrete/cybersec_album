@@ -3,6 +3,11 @@ import { Question } from "./question";
 import { Sticker } from "./sticker";
 import questionDB from './test/sampleQuestions.json';
 import stickersDB from './test/sampleStickers.json';
+import axios from 'axios'
+
+// Mock de Axios
+jest.mock('axios')
+const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('UserStickerDAO', () => {
 
@@ -10,6 +15,7 @@ describe('UserStickerDAO', () => {
 
     beforeEach(() => {
         userStickerDAO = new Sticker.UserStickerDAO([])
+        mockedAxios.post.mockClear()
     })
 
 
@@ -36,10 +42,13 @@ describe('Album', () => {
     var userStickerDAO: Sticker.UserStickerDAO
     var album: Sticker.Album
 
-    beforeEach(() => {
+    beforeEach(() => {  
         let stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
         userStickerDAO = new Sticker.UserStickerDAO([])
-        album = new Sticker.Album(stickerDAO, userStickerDAO, "juan")
+        // Disable remote access
+        userStickerDAO.entrypoint = ""
+        album = new Sticker.Album(stickerDAO, userStickerDAO)
+        jest.spyOn(album, 'getAlbumId').mockResolvedValue('juan')
     })
 
 
@@ -130,22 +139,26 @@ describe('Reward', () => {
 
     beforeEach(() => {
         questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
+        questionDefDAO.entrypoint=""
         stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
+        stickerDAO.entrypoint = ""
         userStickerDAO = new Sticker.UserStickerDAO([])
-        album = new Sticker.Album(stickerDAO, userStickerDAO, "juan")
+        userStickerDAO.entrypoint = ""
+        album = new Sticker.Album(stickerDAO, userStickerDAO)
         reward = new Sticker.Reward(config, album, stickerDAO)
         userAnswerDAO = new Question.UserAnswerDAO()
+        userAnswerDAO.entrypoint = ""
     })
 
     it('no rewards when no answers', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let rewards = await reward.produceStickers([])
         // "Waiting no rewards"
         expect(rewards.length).toEqual(0)
     });
 
     it('no rewards when all is wrong', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let questions = await quiz.generate(3);
         for (const q of questions) {
             let wrong = q.options
@@ -160,7 +173,7 @@ describe('Reward', () => {
 
 
     it('reward by latency', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let questions = await quiz.generate(3);
         let latencies = [1_000, 4_500, 5_500, 10_000].values()
         for (const q of questions) {
@@ -176,7 +189,7 @@ describe('Reward', () => {
 
 
     it('reward by difficulty', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let questions = await quiz.generate(6);
         let expected = []
         for (const q of questions) {
@@ -201,7 +214,7 @@ describe('Reward', () => {
 
 
     it('max rewards on perfect quiz', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let questions = await quiz.generate(3);
         for (const q of questions) {
             await quiz.putAnswer(q, q.solution, 1_000)
@@ -221,7 +234,7 @@ describe('Reward', () => {
         let maxIter = 100
         let filledPerc = 0
         while (filledPerc < 1 && maxIter--) {
-            quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+            quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
             let questions = await quiz.generate(3);
             for (const q of questions) {
                 const rndInt = Math.floor(Math.random() * q.options.length)
