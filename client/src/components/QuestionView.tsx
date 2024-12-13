@@ -137,9 +137,9 @@ const QuestionView = () => {
                 {renderQuestion(questionState)}
             </section>
             <div className='buttonContainer'>
-                {hasGroupId && ( <Button className="glowingBtn" variant="contained"  onClick={handleTeamRedirect}  sx={{ mr: 2, pl:3, minWidth: "60px", height: "35px", }} startIcon={<i className="fas fa-users" style={{ fontSize: "20px", color: "white" }} />} ></Button>)}
                 <Button variant="contained" onClick={() => navigate("/")}>{t("button.back")}</Button>
                 {questionState?.success !== undefined && <Button variant="contained" onClick={handleNewQuestion}>{t("button.earn")}</Button>}
+                {hasGroupId && ( <Button className="glowingBtn" variant="contained"  onClick={handleTeamRedirect}  sx={{ ml: 2, pl:3, minWidth: "60px", height: "35px", }} startIcon={<i className="fas fa-users" style={{ fontSize: "20px", color: "white" }} />} ></Button>)}
             </div>
         </section>
     );
