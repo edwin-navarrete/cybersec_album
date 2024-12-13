@@ -24,7 +24,7 @@ const AlbumView = () => {
     // Load initial album state
     useEffect(() => {
         dispatch(fetchAlbum());
-      }, [dispatch]);
+    }, [dispatch]);
 
     const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
     const handleTeamRedirect = () => {
@@ -133,13 +133,8 @@ const AlbumView = () => {
             {isFull && success()}
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
-<<<<<<< HEAD
-                {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
-            
-                {hasGroupId && ( <Button className="glowingBtn" variant="contained"  onClick={handleTeamRedirect}  sx={{ ml: 2, pl:3, minWidth: "60px", height: "35px", }} startIcon={<i className="fas fa-users" style={{ fontSize: "20px", color: "white" }} />} ></Button>)}
-=======
-                {!isComplete && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
->>>>>>> 02234d05db54295f8ef30c5195a260cd564f5764
+                {hasGroupId && ( <Button className="glowingBtn" variant="contained"  onClick={handleTeamRedirect}  sx={{ mr: 2, pl:3, minWidth: "60px", height: "35px", }} startIcon={<i className="fas fa-users" style={{ fontSize: "20px", color: "white" }} />} ></Button>)}
+                {!isComplete && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}    
             </div>
         </section>
 
