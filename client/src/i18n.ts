@@ -9,6 +9,7 @@ const resources = {
         translation: {
             "album.title": "4S CyberAlbum",
             "button.earn": "Earn Stickers",
+            "button.team": "Team Game",
             "button.back": "Go back",
             "button.register": "Submit",
             "hint.register": "Enter your name",
@@ -27,6 +28,7 @@ const resources = {
         translation: {
             "album.title": "CiberAlbum 4S",
             "button.earn": "Ganar Láminas",
+            "button.team": "Juego en Equipo",
             "button.back": "Volver",
             "button.register": "Enviar",
             "hint.register": "Ingresa tu nombre",

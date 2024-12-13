@@ -3,9 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
-
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
 import { nextQuestion, stickerSample, glueSticker, registerPlayer } from '../features/game/gameMiddleware';
 import { AppDispatch } from '../app/store'
@@ -17,6 +18,12 @@ const AlbumView = () => {
     const spots = useSelector(selectStickerSpots);
     const stickers = useSelector(selectStickers);
     const isFull = useSelector(selectAchievement);
+
+    const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
+    const handleTeamRedirect = () => {
+        navigate('/players');
+    };
+
 
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -103,6 +110,8 @@ const AlbumView = () => {
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
                 {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+            
+                {hasGroupId && ( <Button className="glowingBtn" variant="contained"  onClick={handleTeamRedirect}  sx={{ ml: 2, pl:3, minWidth: "60px", height: "35px", }} startIcon={<i className="fas fa-users" style={{ fontSize: "20px", color: "white" }} />} ></Button>)}
             </div>
         </section>
 
