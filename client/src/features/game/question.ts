@@ -1,4 +1,5 @@
 import axios from "axios"
+import { Sticker } from "./sticker"
 
 export module Question {
 
@@ -52,6 +53,7 @@ export module Question {
     }
 
     interface QueryOptions {
+        filter?: Record<string,string>
         include?: any[]
         exclude?: any[]
         order?: string | string[] // "[-|+]field"
@@ -59,14 +61,14 @@ export module Question {
     }
 
     export class Quiz {
-        albumId: string
+        album: Sticker.Album
         userAnswerDAO: UserAnswerDAO
         questionDefDAO: QuestionDefDAO
         answers: Answer[]
         config: GameConfig
 
-        constructor(config: GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: string) {
-            this.albumId = albumId
+        constructor(config: GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: Sticker.Album) {
+            this.album = albumId
             this.userAnswerDAO = userAnswerDAO
             this.questionDefDAO = questionDefDAO
             this.answers = []
@@ -78,10 +80,12 @@ export module Question {
             // then the oldest failed questions
             // and then the oldest succeeded
             let self = this
-            return this.userAnswerDAO.findAll({ order: ["+success", "+answeredOn"] })
+            let curLanguage = localStorage.getItem("lang");
+            return this.userAnswerDAO.findAll({ filter:{ albumId: await this.album.getAlbumId() }, order: ["+success", "+answeredOn"] })
                 .then(answers => answers.map(answer => answer.questionId))
                 .then(seen =>
                     self.questionDefDAO.findAll({
+                        filter:{ lang: curLanguage || 'es' },
                         exclude: seen,
                         order: (this.config.quizStrategy === "randomUnseen" ? "__random" : "+difficulty"),
                         limit: count
@@ -103,7 +107,7 @@ export module Question {
         async putAnswer(question: QuestionDef, response: number[], latency?: number): Promise<Answer> {
             if (!question.id) throw new Error("question id is required")
             let answer: Answer = {
-                albumId: this.albumId,
+                albumId: await this.album.getAlbumId(),
                 questionId: question.id,
                 success: response.length === question.solution.length
                     && response.reduce((a, b) => a && question.solution.includes(b), true),
@@ -134,6 +138,7 @@ export module Question {
 
     export class DAO<Type extends Identifiable>{
         db: Type[]
+        loaded: boolean = false 
         static token: string = ""
         entrypoint: string
 
@@ -145,37 +150,62 @@ export module Question {
             this.entrypoint = entrypoint
         }
 
-        findAll(options?: QueryOptions): Promise<Type[]> {
+        async inMemFindAll(options: QueryOptions = {}): Promise<Type[]> {
             let db = this.db
-            return new Promise(function(resolve) {
-                options = options || {}
-                let exclude = options.exclude || [];
-                let include = options.include || [];
-                let results = db.filter(q =>
-                    (!include.length || include.includes(q.id)) && !exclude.includes(q.id));
-                if (options.order) {
-                    if (typeof options.order === "string") {
-                        options.order = [options.order]
-                    }
-                    let ordering = options.order.reverse().map(o => {
-                        return { desc: o.startsWith('-'), fld: o.substring(1) }
-                    })
-                    results.sort((x, y) => {
-                        return ordering.reduce((cmp, o) => {
-                            return compare(x, y, o.fld, o.desc) || cmp
-                        }, 0)
-                    })
+            const { exclude = [], include = [], order, limit } = options;
+            let results = this.db.filter(q =>
+                (!include.length || include.includes(q.id)) && !exclude.includes(q.id)
+            );
+            if (order) {
+                if (order == '__random'){
+                    for (let i = results.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));  
+                        [results[i], results[j]] = [results[j], results[i]];
+                      }
                 }
-                if (options.limit && options.limit > 0)
-                    results = results.slice(0, options.limit)
-                // return copies of data so no changes will modify our memory db
-                resolve(results.map(o => { return { ...o } }))
-            });
+                else {
+                    const orders = (Array.isArray(order) ? order : [order]).map(o => ({
+                        desc: o.startsWith('-'),
+                        fld: o.replace(/^[-+]/, '')
+                    }));
+        
+                    results.sort((x, y) =>
+                        orders.reduce((cmp, { fld, desc }) => cmp || compare(x, y, fld, desc), 0)
+                    );
+                }
+            }
+            if (limit && limit > 0) {
+                results = results.slice(0, limit);
+            }
+            // return copies of data so no changes will modify our memory db
+            return results.map(o => { return { ...o } })
+        }
+
+        async findAll(options: QueryOptions = {}): Promise<Type[]> {
+            // NOTE reads from remote only once, then it works offline
+            let self = this
+            if(this.entrypoint && !self.loaded){
+                let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
+                return axios.get(uri,{
+                    params: options.filter,
+                    headers:{"g-recaptcha-response":DAO.token
+                }})
+                .then(response => {
+                    self.loaded = true;
+                    self.db = response.data.results.map((item: Record<string, any>)=>{ return {...item, id: item[self.entrypoint+'Id']}});
+                    return this.inMemFindAll(options);
+                })
+                .catch(error => {
+                    console.error('findAll failed', error)
+                    return this.inMemFindAll();
+                });
+            }
+            return this.inMemFindAll(options);
         }
 
         async push(record: Type){
             this.db.push(record);
-            if(DAO.token && this.entrypoint){
+            if(this.entrypoint){
                 try {
                     let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
                     await axios.post(uri,record,{
@@ -222,7 +252,14 @@ export module Question {
 
     export class QuestionDefDAO extends DAO<QuestionDef> {
         constructor(initialDB:QuestionDef[]){
-            super("", initialDB)
+            super("question", initialDB)
+        }
+
+        async findAll(options: QueryOptions = {}): Promise<QuestionDef[]> {
+            if(options.filter) {
+                this.loaded = false
+            }
+            return super.findAll(options)
         }
     }
 }

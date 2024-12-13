@@ -31,7 +31,7 @@ interface QuestionRow {
 class QuestionDAO extends EntityDAO<QuestionRow> {
 }
 
-questionsRouterinfo.get('/questions',[
+questionsRouterinfo.get('/question',[
   check('lang', 'lang is required and must be a valid language code').matches(/^[a-z]{2}(-[A-Z]{2})?$/),
   validateInput
 ], async (req: Request, res: Response) => {
@@ -41,7 +41,7 @@ questionsRouterinfo.get('/questions',[
     const albumIdsQuest = await dao.get({
       filter:{lang:lang}
     })
-    res.status(200).json({ data: albumIdsQuest })
+    res.status(200).json({ results: albumIdsQuest })
   } catch (error) {
     console.log(error)
     return res.status(500).json({ errorMessage: error })

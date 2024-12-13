@@ -1,5 +1,6 @@
 import axios from "axios"
 import { Question } from "./question";
+import {v4 as uuidv4 } from "uuid"
 
 export module Sticker {
 
@@ -97,20 +98,41 @@ export module Sticker {
     export class Album {
         stickerDAO: StickerDAO
         userStickerDAO: UserStickerDAO
-        albumId: string
 
-        constructor(stickerDAO: StickerDAO, userStickerDAO: UserStickerDAO, albumId: string) {
+        constructor(stickerDAO: StickerDAO, userStickerDAO: UserStickerDAO) {
             this.stickerDAO = stickerDAO
             this.userStickerDAO = userStickerDAO
-            this.albumId = albumId
+        }
+
+        async getAlbumId(): Promise<string> {
+            let albumId = localStorage.getItem("albumId");
+            if(!albumId){
+                albumId = uuidv4()
+                const startedOn = Date.now().toString()
+                try {
+                    let uri = process.env.REACT_APP_API+`/album`;
+                    await axios.post(uri,{
+                        albumId: albumId,
+                        startedOn: startedOn,
+                        language: navigator.language
+                    },{
+                        headers:{"g-recaptcha-response": Question.DAO.token
+                    }});
+                    localStorage.setItem("albumId", albumId)
+                    localStorage.setItem("startedOn", startedOn)
+                } catch (error){
+                    localStorage.setItem("albumId", 'undefined')
+                    console.error("API error", error);
+                }
+            }
+            return albumId
         }
 
         // FIXME The sticker details mapped by spot is not serializable! simplify to plain array
         async getStickers(): Promise<Map<string, AlbumStiker>> {
             let self = this
-            // TODO: Should filter by albumId in the future
-            return this.userStickerDAO.findAll({ order: "+inAlbum" })
-                .then(userStickers =>
+            return this.userStickerDAO.findAll({ filter: { albumId: await this.getAlbumId() }, order: "+inAlbum" })
+                .then(userStickers => 
                     self.stickerDAO.findAll({
                         include: userStickers.map(s => s.stickerId)
                     }).then(stickers => {
@@ -129,38 +151,58 @@ export module Sticker {
                         }))
                         return stickerMap
                     }
-                    ))
+                ))
 
         }
 
-        async ownStickers(stickers: StickerDef[]): Promise<UserSticker[]> {
+        async ownStickers(stickers: StickerDef[]): Promise<AlbumStiker[]> {
+            const albumId = await this.getAlbumId()
             let upserts = stickers.map(stickerDef => {
                 if (!stickerDef.id) throw new Error("Invalid sticker in userSticker")
                 return this.userStickerDAO.upsert({
-                    albumId: this.albumId,
+                    albumId: albumId,
                     stickerId: stickerDef.id
+                }).then(userSticker => {
+                    return {
+                        ...userSticker,
+                        ...stickerDef
+                    }
                 })
             })
             return Promise.all(upserts)
         }
 
         async registerPlayer(playerName: string): Promise<string> {
-           localStorage.setItem("playerName", playerName);
            try {
-                let uri = process.env.REACT_APP_API+`/album`;
-                await axios.post(uri,{
-                    albumId: localStorage.getItem("albumId"),
-                    playerName: localStorage.getItem("playerName"),
+                const playerId = localStorage.getItem("playerId");
+                const apiResponse = await axios.post(process.env.REACT_APP_API+'/player',{
+                    playerId: playerId,
+                    playerName: playerName,
+                },{
+                    headers:{"g-recaptcha-response": Question.DAO.token
+                }});
+                const newPlayer = apiResponse.data
+                await axios.post(process.env.REACT_APP_API+'/album',{
+                    albumId: await this.getAlbumId(),
+                    playerId: newPlayer.playerId,
                     startedOn: localStorage.getItem("startedOn"),
                     endedOn: localStorage.getItem("endedOn"),
                     language: navigator.language
                 },{
                     headers:{"g-recaptcha-response": Question.DAO.token
                 }});
-            } catch (error){
-                console.error("API error", error);
+                localStorage.setItem("playerId", newPlayer.playerId);
+                localStorage.setItem("playerName", playerName);
+                return playerName;
+            }  
+            catch (error: any) {
+                if (axios.isAxiosError(error) && error.response?.status === 409) {
+                    throw new Error("DUPLICATE_NAME");
+                } else {
+                    console.error("API error", error);
+                    throw new Error("GENERAL_ERROR");
+                }
             }
-            return playerName;
         }
 
         async glueSticker(albumStiker: AlbumStiker): Promise<UserSticker> {
@@ -170,7 +212,7 @@ export module Sticker {
                     // to trigger the start of the album
                     return this.userStickerDAO.upsert(albumStiker as UserSticker);
                 }
-                return new Promise((resolve) => resolve(albumStiker))
+                return albumStiker
             }
             finally {
                 await this.getAchievement();
@@ -217,24 +259,22 @@ export module Sticker {
             super("userSticker",initialDB)
         }
         async upsert(sticker: UserSticker): Promise<UserSticker> {
-            return new Promise(resolve => {
-                if (!sticker.id) {
-                    sticker.id = this.db.length + 1
-                    sticker.addedOn = Date.now();
-                    sticker.inAlbum = sticker.inAlbum || false;
-                    super.push(sticker)
-                }
-                else {
-                    // just update some fields
-                    let found = this.db.find(us => us.id === sticker.id)
-                    if (!found) throw new Error("Invalid DB at UserStickerDAO")
-                    found.inAlbum = sticker.inAlbum || false
-                    found.addedOn = Date.now()
-                    super.push(found)
-                    sticker = found
-                }
-                resolve(sticker)
-            })
+            if (!sticker.id) {
+                sticker.id = this.db.length + 1
+                sticker.addedOn = Date.now();
+                sticker.inAlbum = sticker.inAlbum || false;
+                super.push(sticker)
+            }
+            else {
+                // just update some fields
+                let found = this.db.find(us => us.id === sticker.id)
+                if (!found) throw new Error("Invalid DB at UserStickerDAO")
+                found.inAlbum = sticker.inAlbum || false
+                found.addedOn = Date.now()
+                super.push(found)
+                sticker = found
+            }
+            return sticker;
         }
     }
 
@@ -244,3 +284,4 @@ export module Sticker {
         }
     }
 }
+

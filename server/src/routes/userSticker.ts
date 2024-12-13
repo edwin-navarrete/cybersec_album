@@ -35,11 +35,17 @@ router.post('/userSticker', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
-  const value: UserStickerRow = req.body as UserStickerRow
-  dao.post(value).catch((err) => {
-    console.log('failed userSticker post answer:', err)
+  const {albumId, stickerId, inAlbum, addedOn} = req.body
+  const value: UserStickerRow = {albumId, stickerId, inAlbum, addedOn}
+  dao.post(value).then((val)=>{
+    console.log('userSticker updated', val.affectedRows)
+    res.status(200).json(value)
   })
-  res.status(200).json(value)
+  .catch((err) => {
+    console.log('failed userSticker post answer:', err)
+    res.status(400).json({ errorMessage: err })
+  })
+  
 })
 
 router.get('/userSticker',[ 
@@ -50,7 +56,7 @@ router.get('/userSticker',[
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
   try {
     const userStickers = await dao.get({filter: {album_id: albumId}})
-    res.status(200).json({ data: userStickers })
+    res.status(200).json({ results: userStickers })
   } catch (error) {
     console.log(error)
     return res.status(500).json({ errorMessage: error })

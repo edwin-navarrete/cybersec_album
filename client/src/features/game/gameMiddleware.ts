@@ -10,13 +10,6 @@ import config from './gameConfig.json';
 import { RootState } from '../../app/store';
 import { QuestionState, Attempt, QuestionsAndStickers, FeedbackAndStickers } from './gameSlice'
 
-var ALBUM_ID = localStorage.getItem("albumId");
-if(!ALBUM_ID){
-    ALBUM_ID = uuidv4();
-    localStorage.setItem("albumId", ALBUM_ID)
-    localStorage.setItem("startedOn", Date.now().toString())
-}
-
 // backward compatibility
 if(!localStorage.getItem("startedOn")){
     localStorage.setItem("startedOn", Date.now().toString())
@@ -24,30 +17,32 @@ if(!localStorage.getItem("startedOn")){
 
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 export const userStickerDAO = new Sticker.UserStickerDAO([])
-const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO, ALBUM_ID)
+const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO)
 const gameConfig = config as Question.GameConfig
 
-// give the first sticker as a sample
-export const stickerSample = stickerDAO.findAll({ include: [1] }).then( async stickerSample => {
-    let firstSticker = stickerSample[0]
-    let userSticker = await theAlbum.ownStickers(stickerSample);
-    return { ...firstSticker, ...userSticker[0] };
- });
 
-const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
-const userAnswerDAO = new Question.UserAnswerDAO()
-const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, ALBUM_ID)
+export const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
+export const userAnswerDAO = new Question.UserAnswerDAO()
+const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, theAlbum)
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {
         let stickers = await theAlbum.getStickers()
+        if(!stickers.size){
+            // if first time, give the first sticker as a sample
+            console.log("Adding Sample")
+            let stickerSample = await stickerDAO.findAll({ include: [1] })
+            let newStickers = await theAlbum.ownStickers(stickerSample);
+            await theAlbum.glueSticker(newStickers[0]);
+            stickers = await theAlbum.getStickers()
+        }
         return Array.from(stickers.values())
     })
 
 export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>
     ('album/lang', async (newLanguage) => {
-        let newQuestions = await import(`./data/${newLanguage}/questionDB.json`);
-        questionDefDAO.db = Array.from(newQuestions as Question.QuestionDef[]);
+        localStorage.setItem("lang", newLanguage);
+        await questionDefDAO.findAll({ filter:{ lang:newLanguage } });
         let newStickers = await import(`./data/${newLanguage}/stickerDB.json`);
         stickerDAO.db = Array.from(newStickers as Sticker.StickerDef[]);
         let stickers = await theAlbum.getStickers()

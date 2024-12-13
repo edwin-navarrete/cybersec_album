@@ -1,7 +1,7 @@
 import { Fetch, Insert } from './DBDriver'
 
 export interface GetOptions {
-    filter: Record<string,string>
+    filter: Record<string,any>
     limit?: number
     sort?: string
     order?: string | string[] // "[-|+]field"
@@ -41,7 +41,7 @@ export default class EntityDAO<T extends Object> {
     if (options.filter) {
       const conditions = Object.entries(options.filter)
         .filter( ([key, value]) => value !== undefined )
-        .map( ([key, value]) =>`${toSnake(key)}='${value}'` );
+        .map( ([key, value]) => value instanceof Array ?  `${toSnake(key)} IN(${value.map(v=>`'${v}'`).join(",")})` : `${toSnake(key)}='${value}'` );
       qry += conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     }
     options.include && (qry += ` AND ${this.entityName}_id IN (${options.include})`)
@@ -60,7 +60,7 @@ export default class EntityDAO<T extends Object> {
     return results?.map(row => this.snakeToCamel(row) as T);
   }
 
-  public async post (row: T, upsert = true): Promise<void> {
+  public async post (row: T, upsert = true): Promise<any> {
     const snakeCaseRow = this.camelToSnake(row);
     const fields = Object.keys(snakeCaseRow)
     const updateFields = fields.filter(field => !field.endsWith('_id'));
@@ -71,7 +71,16 @@ export default class EntityDAO<T extends Object> {
     return this.insert(stm, Object.values(row))
   }
 
-  public async upsert (row: T): Promise<void> {
+  public async update (row: T): Promise<any> {
+    const snakeCaseRow = this.camelToSnake(row);
+    const fields = Object.keys(snakeCaseRow)
+    const keyField = this.entityName + '_id'
+    const updateFields = fields.filter(field => field != keyField);
+    const stm = `UPDATE ${this.entityName} SET ${updateFields.map(f=>f+'=?').join(', ')} WHERE ${keyField} = ${snakeCaseRow[keyField]}`
+    return this.insert(stm,  updateFields.map(updFld=>snakeCaseRow[updFld]))
+  }
+
+  public async replace (row: T): Promise<any> {
     const fields = Object.keys(row)
     const stm = `REPLACE INTO ${this.entityName}(${fields}) VALUES (${fields.map(_f => '?')})`
     return this.insert(stm, Object.values(row))

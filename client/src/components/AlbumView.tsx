@@ -8,8 +8,8 @@ import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
-import { nextQuestion, stickerSample, glueSticker, registerPlayer } from '../features/game/gameMiddleware';
-import { AppDispatch } from '../app/store'
+import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
+import { AppDispatch, RootState } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
 
@@ -17,7 +17,14 @@ const AlbumView = () => {
     const dispatch = useDispatch() as AppDispatch;
     const spots = useSelector(selectStickerSpots);
     const stickers = useSelector(selectStickers);
+    const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
+    
+
+    // Load initial album state
+    useEffect(() => {
+        dispatch(fetchAlbum());
+      }, [dispatch]);
 
     const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
     const handleTeamRedirect = () => {
@@ -31,6 +38,7 @@ const AlbumView = () => {
     const [splash, setSplash] = useState(true);
     const [intro, setIntro] = useState(true);
     const [playerName, setPlayerName] = useState('');
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         var player = localStorage.getItem('playerName')
@@ -43,7 +51,6 @@ const AlbumView = () => {
     const handleCaptcha = useCallback(async (token : string) => {
         // console.log(token.slice(-5));
         dispatch(updateToken(token));
-        if(stickers.length === 1 && !stickers[0].inAlbum) dispatch(glueSticker(await stickerSample))
         // eslint-disable-next-line
     }, [dispatch, stickers]);
 
@@ -70,14 +77,29 @@ const AlbumView = () => {
 
     const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPlayerName(event.target.value);
+        setErrorMessage(null); 
     };
 
 
-    function handleSubmit() {
-        if (playerName.trim() !== '') {
-            dispatch(registerPlayer(playerName));
-            setSplash(false);
+    function handleSubmit(event: React.FormEvent) {
+        event.preventDefault();
+        if (playerName.trim() === '') {
+            setErrorMessage("El nombre no puede estar vacío.");
+            return;
         }
+        dispatch(registerPlayer(playerName))
+        .unwrap()
+        .then(() => {
+            setErrorMessage(null); 
+            setSplash(false);
+        })
+        .catch((error) => {
+            if (error.message === "DUPLICATE_NAME") {
+                setErrorMessage(t("dupName.err"));
+            } else {
+                setErrorMessage(t("registration.err"));
+            }
+        });
     }
 
     function success() {
@@ -92,7 +114,9 @@ const AlbumView = () => {
                         value={playerName}
                         onChange={handleNameChange}
                         placeholder={t("hint.register")}
+                        error={!!errorMessage}
                         required />
+                    {errorMessage && <p className="errorMessage">{errorMessage}</p>}
                     <Button type="submit" className="glowingBtn">{t("button.register")}</Button>
                 </div>
             </form>);
@@ -109,9 +133,13 @@ const AlbumView = () => {
             {isFull && success()}
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
+<<<<<<< HEAD
                 {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
             
                 {hasGroupId && ( <Button className="glowingBtn" variant="contained"  onClick={handleTeamRedirect}  sx={{ ml: 2, pl:3, minWidth: "60px", height: "35px", }} startIcon={<i className="fas fa-users" style={{ fontSize: "20px", color: "white" }} />} ></Button>)}
+=======
+                {!isComplete && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+>>>>>>> 02234d05db54295f8ef30c5195a260cd564f5764
             </div>
         </section>
 
