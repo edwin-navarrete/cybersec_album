@@ -26,6 +26,11 @@ const QuestionView = () => {
         // eslint-disable-next-line
     }, [dispatch, questionState]);
 
+    const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
+    const handleTeamRedirect = () => {
+        navigate('/players');
+    };
+
     let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6)
     let optCount = questionState?.options.length || 4;
 
@@ -132,8 +137,13 @@ const QuestionView = () => {
                 {renderQuestion(questionState)}
             </section>
             <div className='buttonContainer'>
+                <div className='buttonGrp'>
                 <Button variant="contained" onClick={() => navigate("/")}>{t("button.back")}</Button>
                 {questionState?.success !== undefined && <Button variant="contained" onClick={handleNewQuestion}>{t("button.earn")}</Button>}
+                {hasGroupId && ( <Button variant="contained"  onClick={handleTeamRedirect}>
+                        <i className="fas fa-users" />
+                    </Button>)}
+                </div>
             </div>
         </section>
     );

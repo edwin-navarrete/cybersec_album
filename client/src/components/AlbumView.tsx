@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
-
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
 import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
 import { AppDispatch, RootState } from '../app/store'
@@ -23,7 +22,13 @@ const AlbumView = () => {
     // Load initial album state
     useEffect(() => {
         dispatch(fetchAlbum());
-      }, [dispatch]);
+    }, [dispatch]);
+
+    const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
+    const handleTeamRedirect = () => {
+        navigate('/players');
+    };
+
 
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -126,7 +131,11 @@ const AlbumView = () => {
             {isFull && success()}
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
-                {!isComplete && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+                <div className='buttonGrp'>
+                {!isComplete && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}    
+                {hasGroupId && (<Button variant="contained" onClick={handleTeamRedirect}>
+                    <i className="fas fa-users"/></Button>)}
+                </div>
             </div>
         </section>
 
