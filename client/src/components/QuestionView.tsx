@@ -38,7 +38,7 @@ const QuestionView = () => {
     const [timestamp, setTimestamp] = useState(-1)
 
     // go to album if answered enough to fill the album
-    useEffect(() => { achievement && navigate("/") })
+    useEffect(() => { achievement && navigate("/album") })
     useEffect(() => {
         let interval: NodeJS.Timer;
         if (questionState?.success === undefined) {
