@@ -5,6 +5,7 @@ import AlbumView from './components/AlbumView';
 import QuestionView from './components/QuestionView';
 import Header from './components/Header';
 import PlayerView from './components/PlayerView';
+import AlbumIntroView from './components/AlbumIntroView';
 
 function App() {
     return (
@@ -12,7 +13,8 @@ function App() {
             <div className="Initial" data-testid="app-1">
                 {Header()}
                 <Routes>
-                    <Route path="/" element={<AlbumView />} />
+                    <Route path="/" element={<AlbumIntroView />} />
+                    <Route path="/album" element={<AlbumView />} />
                     <Route path="/reto" element={<QuestionView />} />
                     <Route path="/players" element={<PlayerView />} />
                 </Routes>

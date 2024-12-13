@@ -66,6 +66,7 @@ router.post('/player', [
     try {
         const postResult = await ( newPlayer.playerId?  dao.update(newPlayer) :  dao.post(newPlayer, false))
         if( !newPlayer.playerId && req.body.mode == 'coop'){
+            newPlayer.playerId = postResult.insertId
             // only when creating a new player it can be assigned to a group
             const assignedGrp = await assignGroup( req.body.lang )
             if(!assignedGrp){
@@ -78,6 +79,14 @@ router.post('/player', [
             }
             await dao.update(newPlayer)
             newPlayer.groupName = assignedGrp.playerName
+        }
+        else {
+            const players = await dao.get({
+                filter:{playerId}
+              })
+            if(players){
+                newPlayer.isLeader = players[0].isLeader;
+            }
         }
         newPlayer.playerId = newPlayer.playerId || postResult.insertId
         res.status(200).json( newPlayer )
@@ -101,7 +110,7 @@ async function assignGroup( lang: string){
                 "WHERE p.is_group = 1 " +
                 "AND a.player_id IS NULL " +
                 "GROUP BY p.player_name " +
-                "HAVING COUNT(DISTINCT t.player_id) < " + GROUP_LIMIT
+                "HAVING COUNT(DISTINCT t.player_id) < " + GROUP_LIMIT +
                 " ORDER BY p.modified_on ASC " +
                 "LIMIT 2";
 

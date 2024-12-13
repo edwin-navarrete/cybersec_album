@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 36 36"
+   aria-hidden="true"
+   role="img"
+   class="iconify iconify--twemoji"
+   preserveAspectRatio="xMidYMid meet"
+   version="1.1"
+   id="svg7"
+   sodipodi:docname="flag-for-flag-spain.svg"
+   inkscape:version="1.3 (0e150ed, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs7" />
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.295"
+     inkscape:cx="401.69492"
+     inkscape:cy="401.69492"
+     inkscape:window-width="1536"
+     inkscape:window-height="722"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg7" />
+  <ellipse
+     style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#c60a1d;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1"
+     id="path8"
+     cx="17.847458"
+     cy="18"
+     rx="15.711865"
+     ry="15.864407" />
+  <path
+     id="path9"
+     d="M 3.3373828 11.999971 A 15.711865 15.864407 0 0 0 2.1355664 18 A 15.711865 15.864407 0 0 0 3.3373828 24.000029 L 32.357549 24.000029 A 15.711865 15.864407 0 0 0 33.559365 18 A 15.711865 15.864407 0 0 0 32.390508 11.999971 L 3.3373828 11.999971 z "
+     style="font-variation-settings:normal;opacity:1;vector-effect:none;fill:#ffc400;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;-inkscape-stroke:none;stop-color:#000000;stop-opacity:1" />
+  <path
+     fill="#EA596E"
+     d="M9 17v3a3 3 0 1 0 6 0v-3H9z"
+     id="path3" />
+  <path
+     fill="#F4A2B2"
+     d="M12 16h3v3h-3z"
+     id="path4" />
+  <path
+     fill="#DD2E44"
+     d="M9 16h3v3H9z"
+     id="path5" />
+  <ellipse
+     fill="#EA596E"
+     cx="12"
+     cy="14.5"
+     rx="3"
+     ry="1.5"
+     id="ellipse5" />
+  <ellipse
+     fill="#FFAC33"
+     cx="12"
+     cy="13.75"
+     rx="3"
+     ry=".75"
+     id="ellipse6" />
+  <path
+     fill="#99AAB5"
+     d="M7 16h1v7H7zm9 0h1v7h-1z"
+     id="path6" />
+  <path
+     fill="#66757F"
+     d="M6 22h3v1H6zm9 0h3v1h-3zm-8-7h1v1H7zm9 0h1v1h-1z"
+     id="path7" />
+</svg>
