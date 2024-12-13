@@ -71,27 +71,6 @@ const AlbumIntroView = () => {
                     {t("welcome.hdr")}  
                     </h2>
                     <p>{t("welcome.txt")}</p>
-                    <p>{t("gameMode.label")}</p>
-                </div>
-                <div className="gameModeSelector">
-                    <ToggleButtonGroup
-                        value={gameMode}
-                        exclusive
-                        onChange={handleGameMode}
-                        aria-label="gameMode"
-                        size="medium" // Ajusta el tamaño a 'medium' para más visibilidad
-                    >
-                        <ToggleButton value="solo" aria-label="solo">
-                            <div className="languageToggle">
-                                <i className="fas fa-user"></i>Individual
-                            </div>
-                        </ToggleButton>
-                        <ToggleButton value="coop" aria-label="cooperative">
-                            <div className="languageToggle">
-                                <i className="fas fa-users"></i>Colaborativo
-                            </div>
-                        </ToggleButton>
-                    </ToggleButtonGroup>
                 </div>
                 <div className="playerNameField">
                     <TextField
@@ -105,6 +84,27 @@ const AlbumIntroView = () => {
                         fullWidth // Ocupa todo el ancho disponible
                     />
                     {errorMessage && <p className="errorMessage">{t(errorMessage)}</p>}
+                </div>
+                <div className="gameModeSelector">
+                    <p>{t("gameMode.label")}</p>
+                    <ToggleButtonGroup
+                        value={gameMode}
+                        exclusive
+                        onChange={handleGameMode}
+                        aria-label="gameMode"
+                        size="medium" // Ajusta el tamaño a 'medium' para más visibilidad
+                    >
+                        <ToggleButton value="solo" aria-label="solo">
+                            <div className="languageToggle">
+                                <i className="fas fa-user"></i>{t("gameMode.solo")}
+                            </div>
+                        </ToggleButton>
+                        <ToggleButton value="coop" aria-label="cooperative">
+                            <div className="languageToggle">
+                                <i className="fas fa-users"></i>{t("gameMode.coop")}
+                            </div>
+                        </ToggleButton>
+                    </ToggleButtonGroup>
                 </div>
                 <div className="formActions">
                     <Button type="submit" className="glowingBtn" variant="contained" color="primary" size="large">

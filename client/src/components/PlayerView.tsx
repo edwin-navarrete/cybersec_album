@@ -79,7 +79,7 @@ const PlayerView = () => {
                 </div>
             </section>           
             <div className='buttonContainer'>
-                <Button variant="contained" onClick={() => navigate("/")}>{t("button.back")}</Button>
+                <Button variant="contained" onClick={() => navigate("/album")}>{t("button.back")}</Button>
             </div>
         </section>
     );
