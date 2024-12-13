@@ -68,7 +68,18 @@ code {
   position: fixed;
   bottom: 0;
   padding: 5px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  /* justify-content: center; */
   background: linear-gradient(to bottom,  var(--navbar-1), var(--navbar-0), var(--navbar-0));
+}
+
+.buttonGrp {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
 }
 
 .albumContainer {
