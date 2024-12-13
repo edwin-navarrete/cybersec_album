@@ -3,9 +3,10 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
-
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
 import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
 import { AppDispatch, RootState } from '../app/store'
@@ -18,7 +19,7 @@ const AlbumView = () => {
     const stickers = useSelector(selectStickers);
     const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
-    
+
 
     // Load initial album state
     useEffect(() => {
@@ -70,7 +71,7 @@ const AlbumView = () => {
 
     const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPlayerName(event.target.value);
-        setErrorMessage(null); 
+        setErrorMessage(null);
     };
 
 
@@ -83,7 +84,7 @@ const AlbumView = () => {
         dispatch(registerPlayer(playerName))
         .unwrap()
         .then(() => {
-            setErrorMessage(null); 
+            setErrorMessage(null);
             setSplash(false);
         })
         .catch((error) => {
@@ -127,6 +128,7 @@ const AlbumView = () => {
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
                 {!isComplete && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+                {hasGroupId && ( <Button className="glowingBtn" variant="contained"  onClick={handleTeamRedirect}  sx={{ ml: 2, pl:3, minWidth: "60px", height: "35px", }} startIcon={<i className="fas fa-users" style={{ fontSize: "20px", color: "white" }} />} ></Button>)}
             </div>
         </section>
 
