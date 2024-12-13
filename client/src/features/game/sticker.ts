@@ -172,19 +172,21 @@ export module Sticker {
             return Promise.all(upserts)
         }
 
-        async registerPlayer(playerName: string): Promise<string> {
+        async registerPlayer(playerName: string, gameMode: string): Promise<string> {
            try {
                 const playerId = localStorage.getItem("playerId");
                 const apiResponse = await axios.post(process.env.REACT_APP_API+'/player',{
                     playerId: playerId,
                     playerName: playerName,
+                    mode:gameMode,
                 },{
                     headers:{"g-recaptcha-response": Question.DAO.token
                 }});
                 const newPlayer = apiResponse.data
+                const ownerId = newPlayer.isLeader && newPlayer.groupId? newPlayer.groupId : newPlayer.playerId;
                 await axios.post(process.env.REACT_APP_API+'/album',{
                     albumId: await this.getAlbumId(),
-                    playerId: newPlayer.playerId,
+                    playerId: ownerId,
                     startedOn: localStorage.getItem("startedOn"),
                     endedOn: localStorage.getItem("endedOn"),
                     language: navigator.language
@@ -193,6 +195,9 @@ export module Sticker {
                 }});
                 localStorage.setItem("playerId", newPlayer.playerId);
                 localStorage.setItem("playerName", playerName);
+                localStorage.setItem("groupId", newPlayer.groupId);
+                localStorage.setItem("isLeader", newPlayer.isLeader);
+                localStorage.setItem("modifiedOn", newPlayer.modifiedOn);
                 return playerName;
             }  
             catch (error: any) {

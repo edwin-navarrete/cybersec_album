@@ -62,7 +62,7 @@ router.post('/player', [
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
     const {playerId, playerName} = req.body
     const mode = req.body.mode
-    const newPlayer: PlayerRow = { playerId, playerName, isGroup: false };
+    let newPlayer: PlayerRow = { playerId, playerName, isGroup: false };
     try {
         const postResult = await ( newPlayer.playerId?  dao.update(newPlayer) :  dao.post(newPlayer, false))
         if( !newPlayer.playerId && req.body.mode == 'coop'){
@@ -80,13 +80,11 @@ router.post('/player', [
             await dao.update(newPlayer)
             newPlayer.groupName = assignedGrp.playerName
         }
-        else {
-            const players = await dao.get({
-                filter:{playerId}
-              })
-            if(players){
-                newPlayer.isLeader = players[0].isLeader;
-            }
+        const players = await dao.get({
+            filter:{playerId: newPlayer.playerId}
+            })
+        if(players){
+            newPlayer = players[0];
         }
         newPlayer.playerId = newPlayer.playerId || postResult.insertId
         res.status(200).json( newPlayer )
@@ -110,7 +108,7 @@ async function assignGroup( lang: string){
                 "WHERE p.is_group = 1 " +
                 "AND a.player_id IS NULL " +
                 "GROUP BY p.player_name " +
-                "HAVING COUNT(DISTINCT t.player_id) < " + GROUP_LIMIT +
+                "HAVING COUNT(DISTINCT t.player_id) < " + GROUP_LIMIT
                 " ORDER BY p.modified_on ASC " +
                 "LIMIT 2";
 

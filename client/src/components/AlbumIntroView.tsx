@@ -45,7 +45,7 @@ const AlbumIntroView = () => {
             setErrorMessage("emptyName.err");
             return;
         }
-        dispatch(registerPlayer(playerName))
+        dispatch(registerPlayer({ playerName, gameMode }))
         .unwrap()
         .then(() => {
             setErrorMessage(null);

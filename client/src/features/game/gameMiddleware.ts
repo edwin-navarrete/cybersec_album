@@ -65,11 +65,16 @@ export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state:
             stickers: Array.from((await theAlbum.getStickers()).values())
         } as FeedbackAndStickers;
     })
+// Define el tipo para los parámetros del thunk
+interface RegisterPlayerPayload {
+    playerName: string;
+    gameMode: string;
+}
 
-export const registerPlayer = createAsyncThunk<string, string>
-    ('album/registerPlayer', async (playerName: string) => {
-        await theAlbum.registerPlayer(playerName)
-        return playerName
+export const registerPlayer = createAsyncThunk<string, RegisterPlayerPayload>
+    ('album/registerPlayer', async ({ playerName, gameMode }) => {
+        await theAlbum.registerPlayer(playerName, gameMode);
+        return playerName;
     })
 
 export const glueSticker = createAsyncThunk<Sticker.AlbumStiker[], Sticker.AlbumStiker>

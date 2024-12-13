@@ -85,7 +85,7 @@ const AlbumView = () => {
             setErrorMessage("El nombre no puede estar vacío.");
             return;
         }
-        dispatch(registerPlayer(playerName))
+        dispatch(registerPlayer({ playerName, gameMode: 'solo'}))
         .unwrap()
         .then(() => {
             setErrorMessage(null); 
