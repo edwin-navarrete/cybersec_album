@@ -187,3 +187,19 @@ DROP TEMPORARY TABLE unique_user_sticker;
 
 -- Crear el índice único
 ALTER TABLE user_sticker ADD UNIQUE KEY (album_id, sticker_id);
+
+-- Adding player table
+ALTER TABLE album ADD COLUMN player_id MEDIUMINT UNSIGNED;
+
+CREATE TABLE `player` (
+  `player_id` mediumint unsigned NOT NULL AUTO_INCREMENT,
+  `player_name` varchar(80) NOT NULL,
+  `is_group` tinyint(1) DEFAULT '0',
+  `group_id` mediumint unsigned DEFAULT NULL,
+  `is_leader` tinyint(1) DEFAULT NULL,
+  `added_on` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `modified_on` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`player_id`),
+  UNIQUE KEY `player_name` (`player_name`),
+  UNIQUE KEY `group_id` (`group_id`,`is_leader`)
+) ENGINE=InnoDB AUTO_INCREMENT=653 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
