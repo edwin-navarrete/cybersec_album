@@ -99,23 +99,36 @@ const AlbumView = () => {
             }
         });
     }
-
+    const playerId = localStorage.getItem("playerId");
+    useEffect(() => {
+        if (playerId) {
+            const timer = setTimeout(() => setSplash(false), 5000); // Oculta en 5 segundos
+            return () => clearTimeout(timer); // Limpieza
+        }
+    }, [playerId]);
     function success() {
         return splash && (
             <form className='successSplash' onSubmit={handleSubmit}>
                 <div className="successForm">
                     <p className="completed" >{t("quiz.completed")}</p>
-                    <TextField
-                        id="playerName"
-                        type="text"
-                        variant="standard"
-                        value={playerName}
-                        onChange={handleNameChange}
-                        placeholder={t("hint.register")}
-                        error={!!errorMessage}
-                        required />
-                    {errorMessage && <p className="errorMessage">{errorMessage}</p>}
-                    <Button type="submit" className="glowingBtn">{t("button.register")}</Button>
+                    {!playerId && (
+                        <>
+                            <TextField
+                                id="playerName"
+                                type="text"
+                                variant="standard"
+                                value={playerName}
+                                onChange={handleNameChange}
+                                placeholder={t("hint.register")}
+                                error={!!errorMessage}
+                                required
+                            />
+                            {errorMessage && <p className="errorMessage">{errorMessage}</p>}
+                            <Button type="submit" className="glowingBtn">
+                                {t("button.register")}
+                            </Button>
+                        </>
+                    )}
                 </div>
             </form>);
     }

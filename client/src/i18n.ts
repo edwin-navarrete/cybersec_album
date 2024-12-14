@@ -8,7 +8,7 @@ const resources = {
     en: {
         translation: {
             "album.title": "4S CyberAlbum",
-            "welcome.hdr":"Welcome!",
+            "welcome.hdr":"Hey, get ready for action!",
             "welcome.txt":"Please register before starting.",
             "gameMode.solo":"Solo",
             "gameMode.coop":"Cooperative",
@@ -17,6 +17,7 @@ const resources = {
             "button.team": "Team Game",
             "button.back": "Go back",
             "button.register": "Register",
+            "button.continue": "Continue",
             "hint.register": "Enter your name",
             "timer.secs": "Seconds",
             "quiz.multipleWrn": "(Select more than one answer)",
@@ -35,7 +36,7 @@ const resources = {
     es: {
         translation: {
             "album.title": "CiberAlbum 4S",
-            "welcome.hdr":"Bienvenido!",
+            "welcome.hdr":"¡Oye, prepárate para la acción!",
             "welcome.txt":"Por favor, regístrate antes de comenzar.",
             "gameMode.solo":"Invidivual",
             "gameMode.coop":"Cooperativo",
@@ -44,6 +45,7 @@ const resources = {
             "button.team": "Juego en Equipo",
             "button.back": "Volver",
             "button.register": "Registrarse",
+            "button.continue": "Continuar",
             "hint.register": "Ingresa tu nombre",
             "timer.secs": "Segundos",
             "quiz.multipleWrn": "(Escoge más de una respuesta)",
