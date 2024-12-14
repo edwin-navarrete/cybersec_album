@@ -38,7 +38,7 @@ const QuestionView = () => {
     const [timestamp, setTimestamp] = useState(-1)
 
     // go to album if answered enough to fill the album
-    useEffect(() => { achievement && navigate("/") })
+    useEffect(() => { achievement && navigate("/album") })
     useEffect(() => {
         let interval: NodeJS.Timer;
         if (questionState?.success === undefined) {
@@ -138,7 +138,7 @@ const QuestionView = () => {
             </section>
             <div className='buttonContainer'>
                 <div className='buttonGrp'>
-                <Button variant="contained" onClick={() => navigate("/")}>{t("button.back")}</Button>
+                <Button variant="contained" onClick={() => navigate("/album")}>{t("button.back")}</Button>
                 {questionState?.success !== undefined && <Button variant="contained" onClick={handleNewQuestion}>{t("button.earn")}</Button>}
                 {hasGroupId && ( <Button variant="contained"  onClick={handleTeamRedirect}>
                         <i className="fas fa-users" />

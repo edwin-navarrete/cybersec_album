@@ -62,24 +62,32 @@ router.post('/player', [
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
     const {playerId, playerName} = req.body
     const mode = req.body.mode
-    const newPlayer: PlayerRow = { playerId, playerName, isGroup: false };
+    let newPlayer: PlayerRow = { playerId, playerName, isGroup: false };
     try {
         const postResult = await ( newPlayer.playerId?  dao.update(newPlayer) :  dao.post(newPlayer, false))
-        if( !newPlayer.playerId && req.body.mode == 'coop'){
-            // only when creating a new player it can be assigned to a group
-            const assignedGrp = await assignGroup( req.body.lang )
-            if(!assignedGrp){
-                return res.status(500).json({ errorMessage: "Unable to assign a group" })
+        if( !newPlayer.playerId ){
+            newPlayer.playerId = postResult.insertId
+            if(req.body.mode == 'coop'){
+                // only when creating a new player it can be assigned to a group
+                const assignedGrp = await assignGroup( req.body.lang ?? 'es')
+                if(!assignedGrp){
+                    return res.status(500).json({ errorMessage: "Unable to assign a group" })
+                }
+                newPlayer.groupId = assignedGrp.playerId
+                if(!assignedGrp.groupSize){
+                    // First player become leader
+                    newPlayer.isLeader = true
+                }
+                await dao.update(newPlayer)
+                newPlayer.groupName = assignedGrp.playerName
             }
-            newPlayer.groupId = assignedGrp.playerId
-            if(!assignedGrp.groupSize){
-                // First player become leader
-                newPlayer.isLeader = true
-            }
-            await dao.update(newPlayer)
-            newPlayer.groupName = assignedGrp.playerName
         }
-        newPlayer.playerId = newPlayer.playerId || postResult.insertId
+        const players = await dao.get({
+            filter:{playerId: newPlayer.playerId}
+            })
+        if(players){
+            newPlayer = players[0];
+        }
         res.status(200).json( newPlayer )
     } catch (error) {
         console.log(error)
@@ -109,7 +117,7 @@ async function assignGroup( lang: string){
         const groups = await mysqlDriver.fetch(grpQry)
         // Make sure there are at least 2 groups available
         if(groups.length < 2){
-            for( let i = 0; i < groups.length; i++){
+            for( let i = 0; i < 2; i++){
                 const group_name = await generateUniqGroupName(lang)
                 if(!group_name){
                     return null

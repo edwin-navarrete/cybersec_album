@@ -41,7 +41,19 @@ export default class EntityDAO<T extends Object> {
     if (options.filter) {
       const conditions = Object.entries(options.filter)
         .filter( ([key, value]) => value !== undefined )
-        .map( ([key, value]) => value instanceof Array ?  `${toSnake(key)} IN(${value.map(v=>`'${v}'`).join(",")})` : `${toSnake(key)}='${value}'` );
+        .map(([key, value]) => {
+          const snakeKey = toSnake(key);
+          if (value instanceof Array) {
+            // use "IN"
+            const formattedValues = value.map(v => `'${v}'`).join(", ");
+            return `${snakeKey} IN(${formattedValues})`;
+          } else {
+            // equals OR IS NULL
+            return value 
+              ? `${snakeKey} = '${value}'`
+              : `${snakeKey} IS NULL`;  
+          }
+        });
       qry += conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     }
     options.include && (qry += ` AND ${this.entityName}_id IN (${options.include})`)
@@ -51,7 +63,7 @@ export default class EntityDAO<T extends Object> {
       const order = []
       for (const o of options.order) {
         const fld = o.substring(1)
-        order.push(`${fld === '_random' ? 'RAND()' : fld} ${o.startsWith('-') ? 'DESC' : 'ASC'}`)
+        order.push(`${fld === '_random' ? 'RAND()' : toSnake(fld)} ${o.startsWith('-') ? 'DESC' : 'ASC'}`)
       }
       order && (qry += ` ORDER BY ${order}`)
     }

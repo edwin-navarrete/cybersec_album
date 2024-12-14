@@ -50,7 +50,7 @@ code {
 
 .navTitle {
   margin: auto;
-  padding: 15px;
+  padding: 1px;
   text-align: center;
   color: var(--navbar-txt);
   background: linear-gradient(to bottom, var(--navbar-0), var(--navbar-0), var(--navbar-1));
@@ -290,6 +290,20 @@ code {
   bottom: -24px;
 }
 
+.languageToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre la bandera y el texto */
+}
+
+.flagIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; /* Hace que la imagen sea redonda */
+  object-fit: cover; /* Ajusta la imagen al contenedor */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para un mejor efecto */
+}
+
 .successSplash {
     place-items: end;
     display: grid;
@@ -303,6 +317,47 @@ code {
     background-size:     cover;
     background-repeat:   no-repeat;
     background-position: center center;
+}
+
+.registrationForm
+{
+  max-width: 400px; /* Ajusta al tamaño deseado */
+  margin: 0 auto; /* Centra el formulario */
+  padding: 20px;
+  background-color: #f9f9f9; /* Fondo suave */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  font-family: Arial, sans-serif;
+}
+
+.formHeader {
+  text-align: center;
+}
+
+.formHeader h2 {
+  margin: 10px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.formHeader h3 {
+  margin: 10px 0;
+  font-size: 1.0  rem;
+  color: #555;
+}
+
+.gameModeSelector {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.playerNameField {
+  margin: 20px 0;
+}
+
+.formActions {
+  margin-top: 20px;
+  text-align: center;
 }
 
 .successForm

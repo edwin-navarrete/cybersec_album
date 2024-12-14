@@ -107,25 +107,38 @@ export module Sticker {
         async getAlbumId(): Promise<string> {
             let albumId = localStorage.getItem("albumId");
             if(!albumId){
-                albumId = uuidv4()
-                const startedOn = Date.now().toString()
                 try {
-                    let uri = process.env.REACT_APP_API+`/album`;
-                    await axios.post(uri,{
-                        albumId: albumId,
-                        startedOn: startedOn,
-                        language: navigator.language
-                    },{
-                        headers:{"g-recaptcha-response": Question.DAO.token
-                    }});
-                    localStorage.setItem("albumId", albumId)
-                    localStorage.setItem("startedOn", startedOn)
+                    const playerId = localStorage.getItem("playerId");
+                    const groupId = localStorage.getItem("groupId");
+                    const isLeader = localStorage.getItem("isLeader");
+                    const uri = process.env.REACT_APP_API+`/album`;
+                    const headers = {"g-recaptcha-response": Question.DAO.token}
+                    if( groupId && !isLeader ){
+                        const getResp = await axios.get(uri,{
+                            params: {playerId:groupId},
+                            headers
+                        });
+                        albumId = getResp.data.results?.[0]?.albumId as string ?? 'undefined';
+                    }
+                    else {
+                        albumId = uuidv4();
+                        const ownerId = groupId ?? playerId;
+                        const startedOn = Date.now().toString()
+                        await axios.post(uri,{
+                            albumId: albumId,
+                            playerId: ownerId,
+                            startedOn: startedOn,
+                            language: navigator.language
+                        }, { headers });
+                        localStorage.setItem("startedOn", startedOn);
+                    }
                 } catch (error){
-                    localStorage.setItem("albumId", 'undefined')
+                    albumId = 'undefined';
                     console.error("API error", error);
                 }
+                localStorage.setItem("albumId", albumId);
             }
-            return albumId
+            return albumId;
         }
 
         // FIXME The sticker details mapped by spot is not serializable! simplify to plain array
@@ -172,27 +185,26 @@ export module Sticker {
             return Promise.all(upserts)
         }
 
-        async registerPlayer(playerName: string): Promise<string> {
+        async registerPlayer(playerName: string, gameMode: string): Promise<string> {
            try {
                 const playerId = localStorage.getItem("playerId");
                 const apiResponse = await axios.post(process.env.REACT_APP_API+'/player',{
                     playerId: playerId,
                     playerName: playerName,
+                    mode: gameMode,
+                    lang: localStorage.getItem("lang") ?? 'es'
                 },{
                     headers:{"g-recaptcha-response": Question.DAO.token
                 }});
                 const newPlayer = apiResponse.data
-                await axios.post(process.env.REACT_APP_API+'/album',{
-                    albumId: await this.getAlbumId(),
-                    playerId: newPlayer.playerId,
-                    startedOn: localStorage.getItem("startedOn"),
-                    endedOn: localStorage.getItem("endedOn"),
-                    language: navigator.language
-                },{
-                    headers:{"g-recaptcha-response": Question.DAO.token
-                }});
                 localStorage.setItem("playerId", newPlayer.playerId);
                 localStorage.setItem("playerName", playerName);
+                newPlayer.groupId && localStorage.setItem("groupId", newPlayer.groupId);
+                newPlayer.isLeader && localStorage.setItem("isLeader", newPlayer.isLeader);
+                localStorage.setItem("modifiedOn", newPlayer.modifiedOn);
+                
+                // Register the album immediately
+                await this.getAlbumId()
                 return playerName;
             }  
             catch (error: any) {

@@ -70,4 +70,27 @@ router.post('/album', [
   }
 })
 
+router.get('/album',[
+  check('albumId', 'album_id is UUID').optional().isUUID(4),
+  check('playerId', 'playerId must be numeric').optional({ nullable: true }).isNumeric(),
+  validateInput
+], async (req: Request, res: Response) => {
+  const albumId = req.query.albumId as string
+  const playerId = req.query.playerId as string
+  if(!albumId && !playerId){
+    return res.status(400).json({ errorMessage: "requires albumId or playerId" })
+  }
+  const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
+  try {
+    const albums = await dao.get({
+      filter:{albumId, playerId, endedOn: null},
+      order: "-startedOn"
+    })
+    res.status(200).json({ results: albums })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ errorMessage: error })
+  }
+})
+
 module.exports = router

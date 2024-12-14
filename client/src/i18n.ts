@@ -8,10 +8,16 @@ const resources = {
     en: {
         translation: {
             "album.title": "4S CyberAlbum",
+            "welcome.hdr":"Hey, get ready for action!",
+            "welcome.txt":"Please register before starting.",
+            "gameMode.solo":"Solo",
+            "gameMode.coop":"Cooperative",
+            "gameMode.label":"Choose the game mode:",
             "button.earn": "Earn Stickers",
             "button.team": "Team Game",
             "button.back": "Go back",
-            "button.register": "Submit",
+            "button.register": "Register",
+            "button.continue": "Continue",
             "hint.register": "Enter your name",
             "timer.secs": "Seconds",
             "quiz.multipleWrn": "(Select more than one answer)",
@@ -23,16 +29,23 @@ const resources = {
             "stickers_other": "{{count}} stickers",
             "introMsg": "Hi! would you help me to fill the album? start down here!",
             "dupName.err": "Name is already taken. Please choose a different one.",
+            "emptyName.err":"The name cannot be empty.",
             "registration.err": "Ocurrió un error al registrar el jugador. Inténtalo más tarde.",
         }
     },
     es: {
         translation: {
             "album.title": "CiberAlbum 4S",
+            "welcome.hdr":"¡Oye, prepárate para la acción!",
+            "welcome.txt":"Por favor, regístrate antes de comenzar.",
+            "gameMode.solo":"Invidivual",
+            "gameMode.coop":"Cooperativo",
+            "gameMode.label":"Elige el modo de juego:",
             "button.earn": "Ganar Láminas",
             "button.team": "Juego en Equipo",
             "button.back": "Volver",
-            "button.register": "Enviar",
+            "button.register": "Registrarse",
+            "button.continue": "Continuar",
             "hint.register": "Ingresa tu nombre",
             "timer.secs": "Segundos",
             "quiz.multipleWrn": "(Escoge más de una respuesta)",
@@ -44,6 +57,7 @@ const resources = {
             "stickers_other": "{{count}} láminas",
             "introMsg": "Hola! me ayudarías a llenar el album? empieza aquí abajo!",
             "dupName.err": "El nombre ya está en uso. Por favor, elige otro.",
+            "emptyName.err":"El nombre no puede estar vacío.",
             "registration.err": "Ocurrió un error al registrar el jugador. Inténtalo más tarde.",
         }
     }
