@@ -1,6 +1,7 @@
 import axios from "axios"
 import { Question } from "./question";
 import {v4 as uuidv4 } from "uuid"
+import { QueryOptions } from "@testing-library/react";
 
 export module Sticker {
 
@@ -10,6 +11,12 @@ export module Sticker {
         image: string
     }
 
+    export interface Player extends Question.Identifiable {
+        playerName: string
+        isGroup: boolean
+        isLeader: boolean
+        modifiedOn: string
+    }
 
     export interface UserSticker extends Question.Identifiable {
         albumId: string
@@ -293,6 +300,17 @@ export module Sticker {
     export class StickerDAO extends Question.DAO<StickerDef> {
         constructor(initialDB:StickerDef[]) {
             super("",initialDB)
+        }
+    }
+
+    export class PlayerDAO extends Question.DAO<Player> {
+        constructor(initialDB:Player[]){
+            super("player", initialDB)
+        }
+
+        async findAll(options: QueryOptions = {}): Promise<Player[]> {
+            this.loaded = false
+            return super.findAll(options)
         }
     }
 }

@@ -1,16 +1,12 @@
-import { useState, useEffect, useCallback, ChangeEvent } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useState, useEffect, ChangeEvent } from 'react';
+import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
-import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
-import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
-import { AppDispatch, RootState } from '../app/store'
-import Gauge from './Gauge';
-import StickerView from './StickerView';
+import { registerPlayer } from '../features/game/gameMiddleware';
+import { AppDispatch } from '../app/store'
 import ToggleLang from './ToggleLang';
 import { ToggleButtonGroup, ToggleButton } from '@mui/material';
 

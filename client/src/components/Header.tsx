@@ -1,4 +1,3 @@
-import ToggleLang from './ToggleLang';
 import { useTranslation } from 'react-i18next';
 
 export default function Header() {

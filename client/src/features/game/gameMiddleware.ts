@@ -1,5 +1,4 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {v4 as uuidv4 } from "uuid"
 
 import { Question } from "./question";
 import { Sticker } from "./sticker";
@@ -17,6 +16,8 @@ if(!localStorage.getItem("startedOn")){
 
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 export const userStickerDAO = new Sticker.UserStickerDAO([])
+export const playerDefDAO = new Sticker.PlayerDAO([])
+
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO)
 const gameConfig = config as Question.GameConfig
 
@@ -24,6 +25,7 @@ const gameConfig = config as Question.GameConfig
 export const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 export const userAnswerDAO = new Question.UserAnswerDAO()
 const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, theAlbum)
+
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {
