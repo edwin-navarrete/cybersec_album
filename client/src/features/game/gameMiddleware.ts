@@ -93,3 +93,22 @@ export const nextQuestion = createAsyncThunk<QuestionState>
         if (!questions[0] || !questions[0].id) throw new Error('Illegal question in Middleware')
         return questions[0] as QuestionState
     })
+
+export const loadTeam = createAsyncThunk<Sticker.Team>
+    ('album/loadTeam', async () => {
+        const groupId = localStorage.getItem("groupId");
+        const theTeam = {} as Sticker.Team;
+        if(groupId){
+            const grpArr = await playerDefDAO.findAll({ filter:{  playerId:groupId } });
+            theTeam.teamName = grpArr?.[0]?.playerName ?? 'Unknown'
+            theTeam.players =  await playerDefDAO.findAll({ filter:{  groupId } });
+            theTeam.players.sort((a,b)=>{
+                if( a.isLeader )
+                    return -1;
+                if( b.isLeader )
+                    return 1;
+                return a.playerName.localeCompare(b.playerName);
+            })
+        }
+        return theTeam;
+    })

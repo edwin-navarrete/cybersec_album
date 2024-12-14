@@ -1,7 +1,6 @@
 import axios from "axios"
 import { Question } from "./question";
 import {v4 as uuidv4 } from "uuid"
-import { QueryOptions } from "@testing-library/react";
 
 export module Sticker {
 
@@ -16,6 +15,11 @@ export module Sticker {
         isGroup: boolean
         isLeader: boolean
         modifiedOn: string
+    }
+
+    export interface Team {
+        teamName: string
+        players: Player[]
     }
 
     export interface UserSticker extends Question.Identifiable {

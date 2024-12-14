@@ -52,7 +52,7 @@ export module Question {
         difficulty?: number
     }
 
-    interface QueryOptions {
+    export interface QueryOptions {
         filter?: Record<string,string>
         include?: any[]
         exclude?: any[]
