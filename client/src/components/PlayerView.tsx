@@ -22,7 +22,14 @@ const PlayerView = () => {
 
     function getLeaderTime(player: Sticker.Player) {
         const date =Date.parse(player.modifiedOn);
-        return <>{date}</>
+        const curDate = new Date();
+        const diff = Math.abs(curDate.getTime() - date);  // Diferencia en milisegundos
+    
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+        return ` ${days}d ${hours}h ${minutes}m`;
     }
 
     function getPlayerView(player: Sticker.Player) {

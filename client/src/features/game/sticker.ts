@@ -312,7 +312,7 @@ export module Sticker {
             super("player", initialDB)
         }
 
-        async findAll(options: QueryOptions = {}): Promise<Player[]> {
+        async findAll(options: Question.QueryOptions = {}): Promise<Player[]> {
             this.loaded = false
             return super.findAll(options)
         }
