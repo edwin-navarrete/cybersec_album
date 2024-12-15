@@ -32,6 +32,7 @@ const resources = {
             "emptyName.err":"The name cannot be empty.",
             "registration.err": "Ocurrió un error al registrar el jugador. Inténtalo más tarde.",
             "nextLeader.hdr": "Choose a successor:",
+            "dueLeader.hdr": "Choose a successor within {{dueLeader}}...",
         }
     },
     es: {
@@ -61,6 +62,7 @@ const resources = {
             "emptyName.err":"El nombre no puede estar vacío.",
             "registration.err": "Ocurrió un error al registrar el jugador. Inténtalo más tarde.",
             "nextLeader.hdr": "Elije a un sucesor:",
+            "dueLeader.hdr": "Elije a successor dentro de {{dueLeader}}...",
         }
     }
 };
