@@ -2,7 +2,7 @@ import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import { Sticker } from "./sticker";
 import { Question } from "./question";
 import { RootState } from '../../app/store';
-import { changeLanguage, putAnswer, glueSticker, nextQuestion, fetchAlbum } from "./gameMiddleware";
+import { changeLanguage, putAnswer, glueSticker, nextQuestion, fetchAlbum, loadTeam } from "./gameMiddleware";
 
 import stickersDB from './data/es/stickerDB.json';
 
@@ -31,13 +31,14 @@ export interface AlbumState {
     token: string
     stickerCount: number
     stickers: Sticker.AlbumStiker[]
+    team?: Sticker.Team
     question?: QuestionState
 }
 
 const initialState: AlbumState = {
     token: "",
     stickerCount: stickersDB.length,
-    stickers: []
+    stickers: [],
 };
 
 // Selector for the question
@@ -45,6 +46,11 @@ export const selectQuestion = (state: RootState) => state.game.question;
 
 // Selector for album stickers
 export const selectStickers = (state: RootState) => state.game.stickers;
+
+// Selector for team members
+export const selectTeam = (state: RootState) => state.game.team?.players ?? [];
+// Selector for team members
+export const selectTeamName = (state: RootState) => state.game.team?.teamName ?? "";
 
 // Selector for sticker spots
 export const selectStickerSpots = createSelector((state: RootState) => state.game.stickerCount, (stickerCount) => {
@@ -88,6 +94,9 @@ export const abumSlice = createSlice({
         });
         builder.addCase(fetchAlbum.fulfilled, (state, action) => {
             state.stickers = action.payload
+        });
+        builder.addCase(loadTeam.fulfilled, (state, action) => {
+            state.team = action.payload
         });
         builder.addCase(glueSticker.fulfilled, (state, action) => {
             state.stickers = action.payload

@@ -1,5 +1,4 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {v4 as uuidv4 } from "uuid"
 
 import { Question } from "./question";
 import { Sticker } from "./sticker";
@@ -17,6 +16,8 @@ if(!localStorage.getItem("startedOn")){
 
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 export const userStickerDAO = new Sticker.UserStickerDAO([])
+export const playerDefDAO = new Sticker.PlayerDAO([])
+
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO)
 const gameConfig = config as Question.GameConfig
 
@@ -24,6 +25,7 @@ const gameConfig = config as Question.GameConfig
 export const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 export const userAnswerDAO = new Question.UserAnswerDAO()
 const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, theAlbum)
+
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {
@@ -90,4 +92,23 @@ export const nextQuestion = createAsyncThunk<QuestionState>
         let questions = await theQuiz.generate(1)
         if (!questions[0] || !questions[0].id) throw new Error('Illegal question in Middleware')
         return questions[0] as QuestionState
+    })
+
+export const loadTeam = createAsyncThunk<Sticker.Team>
+    ('album/loadTeam', async () => {
+        const groupId = localStorage.getItem("groupId");
+        const theTeam = {} as Sticker.Team;
+        if(groupId){
+            const grpArr = await playerDefDAO.findAll({ filter:{  playerId:groupId } });
+            theTeam.teamName = grpArr?.[0]?.playerName ?? 'Unknown'
+            theTeam.players =  await playerDefDAO.findAll({ filter:{  groupId } });
+            theTeam.players.sort((a,b)=>{
+                if( a.isLeader )
+                    return -1;
+                if( b.isLeader )
+                    return 1;
+                return a.playerName.localeCompare(b.playerName);
+            })
+        }
+        return theTeam;
     })

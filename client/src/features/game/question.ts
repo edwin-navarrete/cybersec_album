@@ -52,7 +52,7 @@ export module Question {
         difficulty?: number
     }
 
-    interface QueryOptions {
+    export interface QueryOptions {
         filter?: Record<string,string>
         include?: any[]
         exclude?: any[]
@@ -151,13 +151,12 @@ export module Question {
         }
 
         async inMemFindAll(options: QueryOptions = {}): Promise<Type[]> {
-            let db = this.db
             const { exclude = [], include = [], order, limit } = options;
             let results = this.db.filter(q =>
                 (!include.length || include.includes(q.id)) && !exclude.includes(q.id)
             );
             if (order) {
-                if (order == '__random'){
+                if (order === '__random'){
                     for (let i = results.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));  
                         [results[i], results[j]] = [results[j], results[i]];

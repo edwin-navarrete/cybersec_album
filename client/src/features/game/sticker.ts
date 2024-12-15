@@ -10,6 +10,17 @@ export module Sticker {
         image: string
     }
 
+    export interface Player extends Question.Identifiable {
+        playerName: string
+        isGroup: boolean
+        isLeader: boolean
+        modifiedOn: string
+    }
+
+    export interface Team {
+        teamName: string
+        players: Player[]
+    }
 
     export interface UserSticker extends Question.Identifiable {
         albumId: string
@@ -293,6 +304,17 @@ export module Sticker {
     export class StickerDAO extends Question.DAO<StickerDef> {
         constructor(initialDB:StickerDef[]) {
             super("",initialDB)
+        }
+    }
+
+    export class PlayerDAO extends Question.DAO<Player> {
+        constructor(initialDB:Player[]){
+            super("player", initialDB)
+        }
+
+        async findAll(options: Question.QueryOptions = {}): Promise<Player[]> {
+            this.loaded = false
+            return super.findAll(options)
         }
     }
 }
