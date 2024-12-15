@@ -95,8 +95,8 @@ export const nextQuestion = createAsyncThunk<QuestionState>
         return questions[0] as QuestionState
     })
 
-export const loadTeam = createAsyncThunk<Sticker.Team>
-    ('album/loadTeam', async () => {
+async function reloadTeam() {
+    try {
         const groupId = localStorage.getItem("groupId");
         const theTeam = {} as Sticker.Team;
         if(groupId){
@@ -112,4 +112,26 @@ export const loadTeam = createAsyncThunk<Sticker.Team>
             })
         }
         return theTeam;
+    } catch (error) {
+        console.error("Error loading team:", error);
+        throw error;
+    }
+}
+
+export const loadTeam = createAsyncThunk<Sticker.Team>
+    ('album/loadTeam', reloadTeam)
+
+export const changeLeader = createAsyncThunk<Sticker.Team, Sticker.Player>
+    ('album/changeLeader', async (leader : Sticker.Player) => {
+        try {
+            const groupId = localStorage.getItem("groupId");
+            if(groupId){
+                await playerDefDAO.push({ ...leader, isLeader: true } as Sticker.Player);       
+            }
+            return await reloadTeam()
+        }
+        catch(e){
+            console.error(e);
+            throw e;
+        }
     })

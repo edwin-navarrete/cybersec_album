@@ -2,7 +2,7 @@ import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import { Sticker } from "./sticker";
 import { Question } from "./question";
 import { RootState } from '../../app/store';
-import { changeLanguage, putAnswer, glueSticker, nextQuestion, fetchAlbum, loadTeam } from "./gameMiddleware";
+import { changeLanguage, putAnswer, glueSticker, nextQuestion, fetchAlbum, loadTeam, changeLeader } from "./gameMiddleware";
 
 import stickersDB from './data/es/stickerDB.json';
 
@@ -96,6 +96,9 @@ export const abumSlice = createSlice({
             state.stickers = action.payload
         });
         builder.addCase(loadTeam.fulfilled, (state, action) => {
+            state.team = action.payload
+        });
+        builder.addCase(changeLeader.fulfilled, (state, action) => {
             state.team = action.payload
         });
         builder.addCase(glueSticker.fulfilled, (state, action) => {

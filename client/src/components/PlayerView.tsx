@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { AppDispatch } from "../app/store";
 import { useDispatch, useSelector } from 'react-redux';
-import { loadTeam } from "../features/game/gameMiddleware";
+import { loadTeam, changeLeader } from "../features/game/gameMiddleware";
 import { selectTeam, selectTeamName } from "../features/game/gameSlice";
 import { Sticker } from "../features/game/sticker";
 
@@ -35,7 +35,7 @@ const PlayerView = () => {
         if (hours > 0) parts.push(`${hours}h`);
         if (minutes > 0) parts.push(`${minutes}m`);
     
-        return parts.length > 0 ? parts.join(' ') : '0m';
+        return parts.length > 0 ? parts.join(' ') : '';
     }
 
     function getLeaderTime(player: Sticker.Player) {
@@ -46,6 +46,11 @@ const PlayerView = () => {
         return getTimeDiff(date, now)
     }
 
+    function handleSwitchLeader(player: Sticker.Player){
+        dispatch( changeLeader(player) );
+    }
+
+
     function getPlayerView(player: Sticker.Player) {
         return  <div className="playerRowContainer" key={player.id}>
                     <div className="playerNameContainer"><p>{player.isLeader && <i className="fas fa-crown"/>}{player.isLeader && getLeaderTime(player)} {player.playerName}</p></div>
@@ -53,7 +58,10 @@ const PlayerView = () => {
                         {/* <i className="fas fa-star"></i> */}
                     </div>
                     <div className="playerButtonContainer">
-                        <Button variant="contained" disabled={ !!player.isLeader || (!isLeader && !!dueLeader) } >
+                        <Button 
+                            variant="contained" 
+                            disabled={ !!player.isLeader || (!isLeader && !!dueLeader) } 
+                            onClick={() => player.id && handleSwitchLeader(player)} >
                             <i className="fa-solid fa-share"/><i className="fas fa-crown"/>
                         </Button>
                     </div>  
