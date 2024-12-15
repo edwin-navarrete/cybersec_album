@@ -33,15 +33,14 @@ class MySQLDriver {
     return connection;
   }
 
-  fetch: Fetch = async (query: string) => {
+  fetch: Fetch = async (query: string, values?: any[]) => {
     const connection = await this.getConnection(1000);
     if (!connection) {
       throw new Error('Unable to acquire database connection');
     }
     try {
         console.log('FETCH', query)
-        const connection = await this.getConnection(1000)
-        const [rows] = await connection.execute(query)
+        const [rows] = await connection.execute(query, values)
         connection.release();
         return rows as any[]
     } catch (error) {
