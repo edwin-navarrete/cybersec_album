@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { Question } from "./question";
-import { Sticker } from "./sticker";
+import { Game, Sticker } from "./sticker";
 import stickersDB from './data/es/stickerDB.json';
 import questionDB from './data/es/questionDB.json';
 import config from './gameConfig.json';
@@ -14,9 +14,10 @@ if(!localStorage.getItem("startedOn")){
     localStorage.setItem("startedOn", Date.now().toString())
 }
 
+
 const stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
 export const userStickerDAO = new Sticker.UserStickerDAO([])
-export const playerDefDAO = new Sticker.PlayerDAO([])
+export const playerDefDAO = new Game.PlayerDAO([])
 
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO)
 const gameConfig = config as Question.GameConfig
@@ -104,7 +105,7 @@ async function reloadTeam() {
             const grpArr = await playerDefDAO.findAll({ filter:{  playerId:groupId } });
             theTeam.teamName = grpArr?.[0]?.playerName ?? 'Unknown'
             theTeam.players =  await playerDefDAO.findAll({ filter:{  groupId } });
-            const updateIsLeader = (player: Sticker.Player) => {
+            const updateIsLeader = (player: Game.Player) => {
                 if (player.id === +playerId) {
                     localStorage.setItem("isLeader", String(player.isLeader));
                     // FIXME generate playing token
@@ -135,12 +136,12 @@ async function reloadTeam() {
 export const loadTeam = createAsyncThunk<Sticker.Team>
     ('album/loadTeam', reloadTeam)
 
-export const changeLeader = createAsyncThunk<Sticker.Team, Sticker.Player>
-    ('album/changeLeader', async (leader : Sticker.Player) => {
+export const changeLeader = createAsyncThunk<Sticker.Team, Game.Player>
+    ('album/changeLeader', async (leader : Game.Player) => {
         try {
             const groupId = localStorage.getItem("groupId");
             if(groupId){
-                await playerDefDAO.push({ ...leader, isLeader: 1 } as Sticker.Player);       
+                await playerDefDAO.push({ ...leader, isLeader: 1 } as Game.Player);       
             }
             return await reloadTeam()
         }
@@ -153,7 +154,7 @@ export const changeLeader = createAsyncThunk<Sticker.Team, Sticker.Player>
 /*
     Returns  now, player.modifiedOn, leaderDue 
 */
-export const  getLeaderDeadline = (player: Sticker.Player):[number, number, number] => {
+export const  getLeaderDeadline = (player: Game.Player):[number, number, number] => {
     const date =Date.parse(player.modifiedOn);
     const now = Date.now()
     if(!player.isLeader) return [now, date, 0];

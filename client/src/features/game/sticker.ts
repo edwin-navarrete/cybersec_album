@@ -2,7 +2,75 @@ import axios from "axios"
 import { Question } from "./question";
 import {v4 as uuidv4 } from "uuid"
 
-export module Sticker {
+const MAX_DATE_VALUE = 864000000000000;
+
+export namespace Game {
+    export interface PlayToken {
+        description: string // Describe the period of time when the player can play
+        startDate: number
+        endDate: number
+    }
+    
+    export interface PlayTokenFactory {
+        produceToken(leaderOrdinal:number): PlayToken
+    }
+
+    export class UnlimitedPlayTokenFactory implements PlayTokenFactory {
+        produceToken(_leaderOrdinal:number): PlayToken{
+            return {
+                description:'',
+                startDate: Date.now(),
+                endDate: MAX_DATE_VALUE
+            }
+        }
+    }
+
+    export class WorkingDaysPlayTokenFactory implements PlayTokenFactory {
+        produceToken(leaderOrdinal:number): PlayToken {
+            // Returns a token so the player can play according to the following sequence:
+            // the first leader (ordinal 1) can play on next monday, the second can play on next Tuesday.. the sixth on next Monday 
+            const laborDay = ((leaderOrdinal - 1) % 5) + 1;
+            const now = new Date(Date.now());
+            let diff = laborDay - now.getDay()
+            if(diff < 0){
+                diff += 7;
+            }
+            const startDate = new Date(now);
+            startDate.setDate(now.getDate() + diff);
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 1);
+            const formattedDate = startDate.toISOString().split('T')[0];
+
+            return {
+                description:`${formattedDate}`,
+                startDate:startDate.getTime(),
+                endDate:endDate.getTime(),
+            }
+        }
+    }
+
+
+    export interface Player extends Question.Identifiable {
+        playerName: string
+        isGroup: boolean
+        isLeader: number
+        modifiedOn: string
+    }
+
+    export class PlayerDAO extends Question.DAO<Player> {
+        constructor(initialDB:Player[]){
+            super("player", initialDB)
+        }
+
+        async findAll(options: Question.QueryOptions = {}): Promise<Player[]> {
+            this.loaded = false
+            return super.findAll(options)
+        }
+    }
+}
+
+export namespace Sticker {
 
     export interface StickerDef extends Question.Identifiable {
         spot: string
@@ -307,15 +375,6 @@ export module Sticker {
         }
     }
 
-    export class PlayerDAO extends Question.DAO<Player> {
-        constructor(initialDB:Player[]){
-            super("player", initialDB)
-        }
 
-        async findAll(options: Question.QueryOptions = {}): Promise<Player[]> {
-            this.loaded = false
-            return super.findAll(options)
-        }
-    }
 }
 

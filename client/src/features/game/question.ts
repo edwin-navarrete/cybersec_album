@@ -1,7 +1,7 @@
 import axios from "axios"
 import { Sticker } from "./sticker"
 
-export module Question {
+export namespace Question {
 
     export enum RewardStrategy {
         sequential = "sequential",
