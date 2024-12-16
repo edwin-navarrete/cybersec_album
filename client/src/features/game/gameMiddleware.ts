@@ -104,15 +104,24 @@ async function reloadTeam() {
             const grpArr = await playerDefDAO.findAll({ filter:{  playerId:groupId } });
             theTeam.teamName = grpArr?.[0]?.playerName ?? 'Unknown'
             theTeam.players =  await playerDefDAO.findAll({ filter:{  groupId } });
+            const updateIsLeader = (player: Sticker.Player) => {
+                if (player.id === +playerId) {
+                    localStorage.setItem("isLeader", String(player.isLeader));
+                    // FIXME generate playing token
+                } else {
+                    localStorage.removeItem("isLeader");
+                    // FIXME clear playing token
+                }
+            };
             theTeam.players.sort((a,b)=>{
                 if( a.isLeader ){
-                    if (a.isLeader && a?.id != playerId) {
-                        localStorage.removeItem("isLeader");
-                    }
+                    updateIsLeader(a);
                     return -1;
                 }
-                if( b.isLeader )
+                if( b.isLeader ){
+                    updateIsLeader(b);
                     return 1;
+                }
                 return a.playerName.localeCompare(b.playerName);
             })
         }
@@ -131,7 +140,7 @@ export const changeLeader = createAsyncThunk<Sticker.Team, Sticker.Player>
         try {
             const groupId = localStorage.getItem("groupId");
             if(groupId){
-                await playerDefDAO.push({ ...leader, isLeader: true } as Sticker.Player);       
+                await playerDefDAO.push({ ...leader, isLeader: 1 } as Sticker.Player);       
             }
             return await reloadTeam()
         }

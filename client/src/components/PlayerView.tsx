@@ -14,7 +14,7 @@ const PlayerView = () => {
     const dispatch = useDispatch() as AppDispatch;
     const team = useSelector(selectTeam)
     const teamName = useSelector(selectTeamName)
-    const isLeader = localStorage.getItem('isLeader') ? true : false;
+    const isLeader = localStorage.getItem('isLeader') ?? 0;
     const LEADER_TIMEOUT = 2 * 24 * 60 * 60 * 1000; // 2d
     const [dueLeader, setDueLeader] = useState('');
 
@@ -42,7 +42,7 @@ const PlayerView = () => {
         const date =Date.parse(player.modifiedOn);
         const now = Date.now()
         const due = LEADER_TIMEOUT + date;
-        if (due > now && dueLeader == '') setDueLeader(getTimeDiff(due , Date.now()))
+        if (due > now && dueLeader === '') setDueLeader(getTimeDiff(due , Date.now()))
         return getTimeDiff(date, now)
     }
 

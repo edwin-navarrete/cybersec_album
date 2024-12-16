@@ -13,7 +13,7 @@ export module Sticker {
     export interface Player extends Question.Identifiable {
         playerName: string
         isGroup: boolean
-        isLeader: boolean
+        isLeader: number
         modifiedOn: string
     }
 
