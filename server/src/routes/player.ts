@@ -93,9 +93,11 @@ router.post('/player', [
                 }
                 newPlayer.groupId = assignedGrp.playerId
                 if(!assignedGrp.groupSize){
-                    // First player become leader
-                    newPlayer.isLeader = 1
+                    // First player become leader, the ordinal can be set
+                    newPlayer.isLeader = Math.max(1, newPlayer.isLeader)
                 }
+                else delete newPlayer.isLeader;
+
                 await dao.update(newPlayer)
                 newPlayer.groupName = assignedGrp.playerName
             }

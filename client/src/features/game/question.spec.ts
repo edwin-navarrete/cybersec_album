@@ -157,7 +157,9 @@ describe('Quiz', () => {
         let config: Question.GameConfig = {
             quizStrategy: Question.QuizStrategy.easiestUnseen,
             rewardSchema: Question.RewardSchema.latency,
-            rewardStrategy: Question.RewardStrategy.sequential
+            rewardStrategy: Question.RewardStrategy.sequential,
+            playTokenStrategy: Question.PlayTokenStrategy.unlimited,
+            leaderTimeout: 100
         }
         const album: Sticker.Album = {
             stickerDAO: {

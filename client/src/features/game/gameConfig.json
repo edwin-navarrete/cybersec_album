@@ -1,5 +1,7 @@
 {
     "rewardStrategy" : "sequential",
     "rewardSchema": "difficulty",
-    "quizStrategy": "randomUnseen"
+    "quizStrategy": "randomUnseen",
+    "playTokenStrategy": "workingDays",
+    "leaderTimeout": 86400000
 }

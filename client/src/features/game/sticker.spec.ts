@@ -134,7 +134,9 @@ describe('Reward', () => {
     let config: Question.GameConfig = {
         quizStrategy: Question.QuizStrategy.randomUnseen,
         rewardSchema: Question.RewardSchema.latency,
-        rewardStrategy: Question.RewardStrategy.sequential
+        rewardStrategy: Question.RewardStrategy.sequential,
+        playTokenStrategy: Question.PlayTokenStrategy.unlimited,
+        leaderTimeout: 100
     }
 
     beforeEach(() => {

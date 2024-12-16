@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { AppDispatch } from "../app/store";
 import { useDispatch, useSelector } from 'react-redux';
-import { loadTeam, changeLeader } from "../features/game/gameMiddleware";
+import { loadTeam, changeLeader, getLeaderDeadline } from "../features/game/gameMiddleware";
 import { selectTeam, selectTeamName } from "../features/game/gameSlice";
 import { Sticker } from "../features/game/sticker";
 
@@ -15,7 +15,7 @@ const PlayerView = () => {
     const team = useSelector(selectTeam)
     const teamName = useSelector(selectTeamName)
     const isLeader = localStorage.getItem('isLeader') ?? 0;
-    const LEADER_TIMEOUT = 2 * 24 * 60 * 60 * 1000; // 2d
+    const LEADER_TIMEOUT = 1 * 24 * 60 * 60 * 1000; // 2d
     const [dueLeader, setDueLeader] = useState('');
 
     // Load team members
@@ -39,10 +39,8 @@ const PlayerView = () => {
     }
 
     function getLeaderTime(player: Sticker.Player) {
-        const date =Date.parse(player.modifiedOn);
-        const now = Date.now()
-        const due = LEADER_TIMEOUT + date;
-        if (due > now && dueLeader === '') setDueLeader(getTimeDiff(due , Date.now()))
+        const [now, date, due] = getLeaderDeadline(player)
+        if (due > 0 && dueLeader === '') setDueLeader(getTimeDiff(due ,now))
         return getTimeDiff(date, now)
     }
 

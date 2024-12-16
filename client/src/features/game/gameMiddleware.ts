@@ -149,3 +149,14 @@ export const changeLeader = createAsyncThunk<Sticker.Team, Sticker.Player>
             throw e;
         }
     })
+
+/*
+    Returns  now, player.modifiedOn, leaderDue 
+*/
+export const  getLeaderDeadline = (player: Sticker.Player):[number, number, number] => {
+    const date =Date.parse(player.modifiedOn);
+    const now = Date.now()
+    if(!player.isLeader) return [now, date, 0];
+    const due = gameConfig.leaderTimeout + date;
+    return [now, date, (due > now )? due : 0]; 
+}

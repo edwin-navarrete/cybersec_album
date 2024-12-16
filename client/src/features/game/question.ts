@@ -18,10 +18,17 @@ export module Question {
         easiestUnseen = "easiestUnseen"
     }
 
+    export enum PlayTokenStrategy {
+        workingDays = "workingDays",
+        unlimited = "unlimited"
+    }
+
     export interface GameConfig {
         rewardStrategy: RewardStrategy,
         rewardSchema: RewardSchema,
-        quizStrategy: QuizStrategy
+        quizStrategy: QuizStrategy,
+        playTokenStrategy: PlayTokenStrategy,
+        leaderTimeout: number
     }
 
     enum QuestionType {
