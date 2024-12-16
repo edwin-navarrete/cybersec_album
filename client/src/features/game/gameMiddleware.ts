@@ -43,6 +43,7 @@ export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
 
 export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>
     ('album/lang', async (newLanguage) => {
+        console.log('New language:', newLanguage)
         localStorage.setItem("lang", newLanguage);
         await questionDefDAO.findAll({ filter:{ lang:newLanguage } });
         let newStickers = await import(`./data/${newLanguage}/stickerDB.json`);
@@ -94,21 +95,48 @@ export const nextQuestion = createAsyncThunk<QuestionState>
         return questions[0] as QuestionState
     })
 
-export const loadTeam = createAsyncThunk<Sticker.Team>
-    ('album/loadTeam', async () => {
+async function reloadTeam() {
+    try {
         const groupId = localStorage.getItem("groupId");
+        const playerId = localStorage.getItem("playerId") ?? -1;
         const theTeam = {} as Sticker.Team;
         if(groupId){
             const grpArr = await playerDefDAO.findAll({ filter:{  playerId:groupId } });
             theTeam.teamName = grpArr?.[0]?.playerName ?? 'Unknown'
             theTeam.players =  await playerDefDAO.findAll({ filter:{  groupId } });
             theTeam.players.sort((a,b)=>{
-                if( a.isLeader )
+                if( a.isLeader ){
+                    if (a.isLeader && a?.id != playerId) {
+                        localStorage.removeItem("isLeader");
+                    }
                     return -1;
+                }
                 if( b.isLeader )
                     return 1;
                 return a.playerName.localeCompare(b.playerName);
             })
         }
         return theTeam;
+    } catch (error) {
+        console.error("Error loading team:", error);
+        throw error;
+    }
+}
+
+export const loadTeam = createAsyncThunk<Sticker.Team>
+    ('album/loadTeam', reloadTeam)
+
+export const changeLeader = createAsyncThunk<Sticker.Team, Sticker.Player>
+    ('album/changeLeader', async (leader : Sticker.Player) => {
+        try {
+            const groupId = localStorage.getItem("groupId");
+            if(groupId){
+                await playerDefDAO.push({ ...leader, isLeader: true } as Sticker.Player);       
+            }
+            return await reloadTeam()
+        }
+        catch(e){
+            console.error(e);
+            throw e;
+        }
     })

@@ -203,7 +203,6 @@ export module Question {
         }
 
         async push(record: Type){
-            this.db.push(record);
             if(this.entrypoint){
                 try {
                     let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
@@ -214,6 +213,11 @@ export module Question {
                     console.error("API error", error);
                 }
             }
+            const index = this.db.findIndex(item => item.id === record.id);
+            if (index !== -1) {
+                this.db.splice(index, 1);
+            }
+            this.db.push(record);
         }
     }
 

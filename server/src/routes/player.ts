@@ -56,14 +56,29 @@ router.post('/player', [
     check('mode', "mode must be 'coop' or 'solo'").default('solo').optional().matches('(coop|solo)'),
     check('lang', "lang must be 'es' or 'en'").default('es').optional().matches('(en|es)'),
     check('playerId', 'playerId must be numeric').optional({ nullable: true }).isNumeric(),
+    check('isLeader', "isLeader must be boolean").optional().isBoolean(),
     check('playerName', 'playerName is required and is chars and spaces').isAlpha('es-ES', { ignore: ' ' }),
     validateInput
     ], async (req: Request, res: Response) => {
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
-    const {playerId, playerName} = req.body
+    const {playerId, playerName, isLeader} = req.body
     const mode = req.body.mode
-    let newPlayer: PlayerRow = { playerId, playerName, isGroup: false };
+    let newPlayer: PlayerRow = { playerId, playerName, isLeader, isGroup: false };
     try {
+        if(newPlayer.playerId){
+            if(newPlayer.isLeader){
+                //Switch leader
+                const upd = await mysqlDriver.fetch(
+                    'SELECT group_id FROM player WHERE player_id = ? AND is_leader IS NULL',[playerId]);
+                const groupId = upd?.[0]?.group_id
+                if(groupId){
+                    // Clear leader
+                    await mysqlDriver.insert('UPDATE player SET is_leader = NULL WHERE group_id = ?', [groupId])
+                }
+                else delete newPlayer.isLeader; // player doesn't belong to a group
+            }
+            else delete newPlayer.isLeader; // Never reset the leader
+        }
         const postResult = await ( newPlayer.playerId?  dao.update(newPlayer) :  dao.post(newPlayer, false))
         if( !newPlayer.playerId ){
             newPlayer.playerId = postResult.insertId
