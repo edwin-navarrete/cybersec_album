@@ -98,14 +98,19 @@ export const nextQuestion = createAsyncThunk<QuestionState>
 async function reloadTeam() {
     try {
         const groupId = localStorage.getItem("groupId");
+        const playerId = localStorage.getItem("playerId") ?? -1;
         const theTeam = {} as Sticker.Team;
         if(groupId){
             const grpArr = await playerDefDAO.findAll({ filter:{  playerId:groupId } });
             theTeam.teamName = grpArr?.[0]?.playerName ?? 'Unknown'
             theTeam.players =  await playerDefDAO.findAll({ filter:{  groupId } });
             theTeam.players.sort((a,b)=>{
-                if( a.isLeader )
+                if( a.isLeader ){
+                    if (a.isLeader && a?.id != playerId) {
+                        localStorage.removeItem("isLeader");
+                    }
                     return -1;
+                }
                 if( b.isLeader )
                     return 1;
                 return a.playerName.localeCompare(b.playerName);
