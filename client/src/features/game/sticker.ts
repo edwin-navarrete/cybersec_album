@@ -5,6 +5,36 @@ import {v4 as uuidv4 } from "uuid"
 const MAX_DATE_VALUE = 864000000000000;
 
 export namespace Game {
+
+    export interface GameConfig {
+        rewardStrategy: RewardStrategy,
+        rewardSchema: RewardSchema,
+        quizStrategy: QuizStrategy,
+        playTokenStrategy: PlayTokenStrategy,
+        leaderTimeout: number
+    }
+
+    export enum RewardStrategy {
+        sequential = "sequential",
+        randomWeigthed = "randomWeigthed"
+    }
+
+    export enum RewardSchema {
+        latency = "latency",
+        difficulty = "difficulty"
+    }
+
+    export enum QuizStrategy {
+        randomUnseen = "randomUnseen",
+        easiestUnseen = "easiestUnseen"
+    }
+
+    export enum PlayTokenStrategy {
+        workingDays = "workingDays",
+        unlimited = "unlimited"
+    }
+
+
     export interface PlayToken {
         description: string // Describe the period of time when the player can play
         startDate: number
@@ -104,9 +134,9 @@ export namespace Sticker {
         stickerDAO: StickerDAO
         latencySchema: Map<number, number> // maxLatency-> stickerCount
         difficultySchema: Map<number, number> // maxDifficulty-> stickerCount
-        config: Question.GameConfig
+        config: Game.GameConfig
 
-        constructor(config: Question.GameConfig, album: Album, stickerDAO: StickerDAO) {
+        constructor(config: Game.GameConfig, album: Album, stickerDAO: StickerDAO) {
             this.album = album
             this.stickerDAO = stickerDAO
             // fibbonaccy reward
@@ -130,7 +160,7 @@ export namespace Sticker {
                     stickers = stickers.filter(s => !owned.includes(s.spot)) || stickers;
                     let result: StickerDef[] = [];
 
-                    if (self.config.rewardStrategy === Question.RewardStrategy.randomWeigthed) {
+                    if (self.config.rewardStrategy === Game.RewardStrategy.randomWeigthed) {
                         // select random count of stickers based on weight
                         stickers.sort((a, b) => b.weight - a.weight);
                         let top = stickers.reduce((sum, s) => sum + s.weight, 0);
@@ -160,7 +190,7 @@ export namespace Sticker {
             if (!answer.success) return 0
             let schema = this.difficultySchema
             let marker = answer.difficulty || 0.5
-            if (answer.latency && this.config.rewardSchema === Question.RewardSchema.latency) {
+            if (answer.latency && this.config.rewardSchema === Game.RewardSchema.latency) {
                 schema = this.latencySchema
                 marker = answer.latency
             }

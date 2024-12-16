@@ -20,9 +20,14 @@ export const userStickerDAO = new Sticker.UserStickerDAO([])
 export const playerDefDAO = new Game.PlayerDAO([])
 
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO)
-const gameConfig = config as Question.GameConfig
+const gameConfig = config as Game.GameConfig
 
-
+// Available play token factories
+const playTokenFactories: Record<Game.PlayTokenStrategy, () => Game.PlayTokenFactory> = {
+    [Game.PlayTokenStrategy.workingDays]: () => new Game.WorkingDaysPlayTokenFactory(),
+    [Game.PlayTokenStrategy.unlimited]: () => new Game.UnlimitedPlayTokenFactory(),
+};
+export const playTokenFactory: Game.PlayTokenFactory = playTokenFactories[gameConfig.playTokenStrategy]();
 export const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 export const userAnswerDAO = new Question.UserAnswerDAO()
 const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, theAlbum)

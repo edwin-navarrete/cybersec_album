@@ -1,6 +1,6 @@
 
 import { Question } from "./question";
-import { Sticker } from "./sticker";
+import { Game, Sticker } from "./sticker";
 import questionDB from './test/sampleQuestions.json';
 import stickersDB from './test/sampleStickers.json';
 import axios from 'axios'
@@ -131,11 +131,11 @@ describe('Reward', () => {
     let quiz: Question.Quiz
     let userAnswerDAO: Question.UserAnswerDAO
 
-    let config: Question.GameConfig = {
-        quizStrategy: Question.QuizStrategy.randomUnseen,
-        rewardSchema: Question.RewardSchema.latency,
-        rewardStrategy: Question.RewardStrategy.sequential,
-        playTokenStrategy: Question.PlayTokenStrategy.unlimited,
+    let config: Game.GameConfig = {
+        quizStrategy: Game.QuizStrategy.randomUnseen,
+        rewardSchema: Game.RewardSchema.latency,
+        rewardStrategy: Game.RewardStrategy.sequential,
+        playTokenStrategy: Game.PlayTokenStrategy.unlimited,
         leaderTimeout: 100
     }
 

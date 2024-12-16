@@ -1,41 +1,14 @@
 import axios from "axios"
-import { Sticker } from "./sticker"
+import { Game, Sticker } from "./sticker"
 
 export namespace Question {
-
-    export enum RewardStrategy {
-        sequential = "sequential",
-        randomWeigthed = "randomWeigthed"
-    }
-
-    export enum RewardSchema {
-        latency = "latency",
-        difficulty = "difficulty"
-    }
-
-    export enum QuizStrategy {
-        randomUnseen = "randomUnseen",
-        easiestUnseen = "easiestUnseen"
-    }
-
-    export enum PlayTokenStrategy {
-        workingDays = "workingDays",
-        unlimited = "unlimited"
-    }
-
-    export interface GameConfig {
-        rewardStrategy: RewardStrategy,
-        rewardSchema: RewardSchema,
-        quizStrategy: QuizStrategy,
-        playTokenStrategy: PlayTokenStrategy,
-        leaderTimeout: number
-    }
 
     enum QuestionType {
         single = "single",
         multiple = "multiple"
     }
 
+    // FIXME this one doesn't belong to Question namespace
     export interface Identifiable {
         id?: number
     }
@@ -59,6 +32,7 @@ export namespace Question {
         difficulty?: number
     }
 
+    // FIXME this one doesn't belong to Question namespace
     export interface QueryOptions {
         filter?: Record<string,string>
         include?: any[]
@@ -72,9 +46,9 @@ export namespace Question {
         userAnswerDAO: UserAnswerDAO
         questionDefDAO: QuestionDefDAO
         answers: Answer[]
-        config: GameConfig
+        config: Game.GameConfig
 
-        constructor(config: GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: Sticker.Album) {
+        constructor(config: Game.GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: Sticker.Album) {
             this.album = albumId
             this.userAnswerDAO = userAnswerDAO
             this.questionDefDAO = questionDefDAO
