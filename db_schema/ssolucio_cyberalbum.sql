@@ -196,7 +196,7 @@ CREATE TABLE `player` (
   `player_name` varchar(80) NOT NULL,
   `is_group` tinyint(1) DEFAULT '0',
   `group_id` mediumint unsigned DEFAULT NULL,
-  `is_leader` tinyint(1) DEFAULT NULL,
+  `is_leader` tinyint unsigned DEFAULT NULL,
   `added_on` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_on` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`player_id`),
