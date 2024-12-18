@@ -53,7 +53,6 @@ export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
 
 export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>
     ('album/lang', async (newLanguage) => {
-        console.log('New language:', newLanguage)
         localStorage.setItem("lang", newLanguage);
         await questionDefDAO.findAll({ filter:{ lang:newLanguage } });
         let newStickers = await import(`./data/${newLanguage}/stickerDB.json`);
@@ -70,8 +69,8 @@ export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state:
         Question.DAO.token = thunkApi.getState().game.token;
         let answer = await theQuiz.putAnswer(question, attempt.response, attempt.latency)
         let reward = new Sticker.Reward(gameConfig, theAlbum, stickerDAO);
-        let stickerDefs = await reward.produceStickers([answer])
-        theAlbum.ownStickers(stickerDefs)
+        const stickerDefs = await reward.produceStickers([answer])
+        await theAlbum.ownStickers(stickerDefs);
         let wrong = attempt.response.filter(r => !question.solution.includes(r))
         return {
             wrong: wrong,
@@ -110,7 +109,6 @@ export const nextQuestion = createAsyncThunk<QuestionState>
         }
         else {
             // Spend the existing token
-            console.log('Spending token')
             token = tokenFactory.loadToken(playToken);
             token.spend()
         }

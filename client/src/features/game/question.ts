@@ -196,9 +196,11 @@ export namespace Question {
             }
             const index = this.db.findIndex(item => item.id === record.id);
             if (index !== -1) {
-                this.db.splice(index, 1);
+                Object.assign(this.db[index],record);
             }
-            this.db.push(record);
+            else {
+                this.db.push(record);
+            }
         }
     }
 

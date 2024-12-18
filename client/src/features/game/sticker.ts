@@ -370,25 +370,26 @@ export namespace Sticker {
             let self = this
             return this.userStickerDAO.findAll({ filter: { albumId: await this.getAlbumId() }, order: "+inAlbum" })
                 .then(userStickers => 
-                    self.stickerDAO.findAll({
-                        include: userStickers.map(s => s.stickerId)
-                    }).then(stickers => {
-                        let stickerMap = new Map(userStickers.map(us => {
-                            let s = stickers.find(s => s.id === us.stickerId)
-                            if (!s) throw new Error('Inconsistent stickers DB')
-                            let as = {
-                                ...s,
-                                id: us.id,
-                                inAlbum: us.inAlbum,
-                                albumId: us.albumId,
-                                addedOn: us.addedOn,
-                                stickerId: us.stickerId
-                            } as AlbumStiker
-                            return [s.spot, as]
-                        }))
-                        return stickerMap
-                    }
-                ))
+                     self.stickerDAO.findAll({
+                            include: userStickers.map(s => s.stickerId)
+                        }).then(stickers => {
+                            let stickerMap = new Map(userStickers.map(us => {
+                                let s = stickers.find(s => s.id === us.stickerId)
+                                if (!s) throw new Error('Inconsistent stickers DB')
+                                let as = {
+                                    ...s,
+                                    id: us.id,
+                                    inAlbum: us.inAlbum,
+                                    albumId: us.albumId,
+                                    addedOn: us.addedOn,
+                                    stickerId: us.stickerId
+                                } as AlbumStiker
+                                return [s.spot, as]
+                            }))
+                            return stickerMap
+                        }
+                    )
+                )
 
         }
 
@@ -498,7 +499,7 @@ export namespace Sticker {
                 sticker.id = this.db.length + 1
                 sticker.addedOn = Date.now();
                 sticker.inAlbum = sticker.inAlbum || false;
-                super.push(sticker)
+                await super.push(sticker)
             }
             else {
                 // just update some fields
@@ -506,7 +507,7 @@ export namespace Sticker {
                 if (!found) throw new Error("Invalid DB at UserStickerDAO")
                 found.inAlbum = sticker.inAlbum || false
                 found.addedOn = Date.now()
-                super.push(found)
+                await super.push(found)
                 sticker = found
             }
             return sticker;
