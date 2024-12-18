@@ -20,14 +20,18 @@ export const userStickerDAO = new Sticker.UserStickerDAO([])
 export const playerDefDAO = new Game.PlayerDAO([])
 
 const theAlbum = new Sticker.Album(stickerDAO, userStickerDAO)
-const gameConfig = config as Game.GameConfig
+const gameConfig = config as Game.GameConfig;
 
 // Available play token factories
 const playTokenFactories: Record<Game.PlayTokenStrategy, () => Game.PlayTokenFactory> = {
-    [Game.PlayTokenStrategy.workingDays]: () => new Game.WorkingDaysPlayTokenFactory(),
+    [Game.PlayTokenStrategy.bussinessDays]: () => new Game.BussinessDaysPlayTokenFactory(),
     [Game.PlayTokenStrategy.unlimited]: () => new Game.UnlimitedPlayTokenFactory(),
 };
-export const playTokenFactory: Game.PlayTokenFactory = playTokenFactories[gameConfig.playTokenStrategy]();
+
+export const getPlayTokenFactory = (coopMode:boolean) : Game.PlayTokenFactory => {
+    return coopMode? playTokenFactories[gameConfig.coopTokenStrategy]() : playTokenFactories[gameConfig.soloTokenStrategy]()
+};
+
 export const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
 export const userAnswerDAO = new Question.UserAnswerDAO()
 const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, theAlbum)
@@ -60,6 +64,7 @@ export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>
 
 export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state: RootState }>
     ('question/putAnswer', async (attempt, thunkApi) => {
+        // Store the answer
         const question = thunkApi.getState().game.question
         if (!question) throw new Error("Illegal answer without question")
         Question.DAO.token = thunkApi.getState().game.token;
@@ -96,6 +101,20 @@ export const glueSticker = createAsyncThunk<Sticker.AlbumStiker[], Sticker.Album
 
 export const nextQuestion = createAsyncThunk<QuestionState>
     ('question/nextQuestion', async () => {
+        const tokenFactory = getPlayTokenFactory(!!localStorage.getItem("groupId"));
+        const playToken = localStorage.getItem("playToken");
+        // Create the token 
+        if(!playToken) {
+            const token = tokenFactory.produceToken();
+            localStorage.setItem("playToken", tokenFactory.storeToken(token));
+        }
+        else{
+            // Spend the existing token
+            console.log('Spending token')
+            const token = tokenFactory.loadToken(playToken);
+            token.spend()
+            localStorage.setItem("playToken",tokenFactory.storeToken(token));
+        }
         let questions = await theQuiz.generate(1)
         if (!questions[0] || !questions[0].id) throw new Error('Illegal question in Middleware')
         return questions[0] as QuestionState

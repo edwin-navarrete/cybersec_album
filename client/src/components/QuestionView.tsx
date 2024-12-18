@@ -7,7 +7,7 @@ import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import '../index.css';
 import { selectQuestion, selectUnclaimed, selectAchievement, updateToken, QuestionState } from '../features/game/gameSlice';
-import { putAnswer, nextQuestion } from '../features/game/gameMiddleware';
+import { putAnswer, nextQuestion, getPlayTokenFactory } from '../features/game/gameMiddleware';
 
 import { AppDispatch, RootState } from '../app/store'
 import Button from '@mui/material/Button';
@@ -85,6 +85,11 @@ const QuestionView = () => {
     }
 
     function renderFeedback(success?: boolean | null) {
+        // if isLeader, decrement to avoid immediate turn 
+        const isLeader : number = +(localStorage.getItem("isLeader") ?? 0);
+        if(isLeader){
+            localStorage.setItem("isLeader", String(isLeader - 1));
+        }
         if (success === true) {
             return (<div className="feedbackFrame">
                 <label className="feedbackMsg">{t("quiz.success")}</label>
@@ -108,6 +113,27 @@ const QuestionView = () => {
     }
 
     function renderQuestion(questionState?: QuestionState) {
+        const isCoop = !!localStorage.getItem("groupId")
+        const isLeader = +(localStorage.getItem("isLeader") ?? 0);
+        let message = ''
+        if(isCoop && !isLeader){
+            message += t("quiz.notLeader");
+        }
+        else {
+            const tokenFactory = getPlayTokenFactory(isCoop);
+            const playToken = localStorage.getItem("playToken") ?? '';
+            const token = tokenFactory.loadToken(playToken);
+            if(token.isInvalid()){
+                message += t("quiz.playDisabled",{timeDesc: token.validPeriod()}) ;
+            }
+        }
+
+        if(message){
+            return (<div className='questionFrame'>
+                <p>{message}</p>{isCoop && (<><p>{t("quiz.leaderHint")}<i className="fas fa-users"></i></p></>) }
+            </div>);
+        }
+    
         if (!questionState) return (<div className='questionFrame' />);
 
         const { question, options, success, solution, wrong } = questionState

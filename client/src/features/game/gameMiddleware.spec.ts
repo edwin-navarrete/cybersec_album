@@ -10,10 +10,10 @@ jest.mock('axios')
 const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('WorkingDaysPlayTokenFactory', () => {
-    let factory: Game.WorkingDaysPlayTokenFactory;
+    let factory: Game.BussinessDaysPlayTokenFactory;
 
     beforeEach(() => {
-        factory = new Game.WorkingDaysPlayTokenFactory();
+        factory = new Game.BussinessDaysPlayTokenFactory();
     });
 
     afterEach(() => {
@@ -23,6 +23,31 @@ describe('WorkingDaysPlayTokenFactory', () => {
     const mockDate = (isoDate: string) => {
         jest.spyOn(global.Date, 'now').mockImplementation(() => new Date(isoDate).getTime());
     };
+
+    it('should produce correct play token for Solo', async () => {
+        localStorage.removeItem("groupId");
+        localStorage.removeItem("isLeader");
+        const token = factory.produceToken();
+        expect(token.constructor.name).toBe('BusinessDayToken');
+        const bizDayTok : Game.BusinessDayToken = token as Game.BusinessDayToken;
+        expect(bizDayTok.increment).toBe(1);
+    })
+
+    it('should produce correct play token for Coop/Leader', async () => {
+        localStorage.removeItem("groupId");
+        localStorage.removeItem("isLeader");
+        const token = factory.produceToken();
+        expect(token.constructor.name).toBe('BusinessDayToken');
+        const bizDayTok : Game.BusinessDayToken = token as Game.BusinessDayToken;
+        expect(bizDayTok.increment).toBe(5);
+    })
+
+    it('should produce correct play token for Coop/NoLeader', async () => {
+        localStorage.removeItem("groupId");
+        localStorage.removeItem("isLeader");
+        const token = factory.produceToken();
+        expect(token.constructor.name).toBe('DisabledToken');
+    })
 
     test.each([
         [1, new Date(2024, 11, 16)], // Monday
@@ -36,16 +61,13 @@ describe('WorkingDaysPlayTokenFactory', () => {
         'should produce correct play token for leaderOrdinal %i starting on %s',
         (leaderOrdinal, expectedStartDate) => {
             mockDate('2024-12-13T12:00:00Z'); // A Friday
+            localStorage.setItem("isLeader", String(leaderOrdinal));
+            const token = factory.produceToken();
 
-            const token = factory.produceToken(leaderOrdinal);
-
-            const expectedStart = expectedStartDate.setHours(0, 0, 0, 0);
             const expectedEnd = new Date(expectedStartDate);
             expectedEnd.setDate(expectedEnd.getDate() + 1);
 
-            expect(token.description).toBe(expectedStartDate.toISOString().split('T')[0]);
-            expect(token.startDate).toBe(expectedStart);
-            expect(token.endDate).toBe(expectedEnd.getTime());
+            expect(token.validPeriod()).toBe(expectedStartDate.toISOString().split('T')[0]);
         }
     );
 });

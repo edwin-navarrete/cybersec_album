@@ -1,8 +1,14 @@
 import axios from "axios"
 import { Question } from "./question";
 import {v4 as uuidv4 } from "uuid"
+import { getPlayTokenFactory } from "./gameMiddleware";
 
-const MAX_DATE_VALUE = 864000000000000;
+function getNextBusinessDay(date:Date) {
+    const dayOfWeek = date.getDay();
+    const nextDay = new Date(date);
+    nextDay.setDate(date.getDate() + (dayOfWeek > 4 ? 8 - dayOfWeek : 1));
+    return nextDay;
+}
 
 export namespace Game {
 
@@ -10,7 +16,8 @@ export namespace Game {
         rewardStrategy: RewardStrategy,
         rewardSchema: RewardSchema,
         quizStrategy: QuizStrategy,
-        playTokenStrategy: PlayTokenStrategy,
+        soloTokenStrategy: PlayTokenStrategy,
+        coopTokenStrategy: PlayTokenStrategy,
         leaderTimeout: number
     }
 
@@ -30,52 +37,163 @@ export namespace Game {
     }
 
     export enum PlayTokenStrategy {
-        workingDays = "workingDays",
+        bussinessDays = "bussinessDays",
         unlimited = "unlimited"
     }
 
+    /*
+        A play token determines when is allowed to play. Currently based on Date.now().
+        validPeriod returns an independent from language representing the period of time where it become valid.
+        toString returns a string representation
 
+        NOTE:
+        New token iplementations must be in AbstractPlayTokenFactory.register
+    */
     export interface PlayToken {
-        description: string // Describe the period of time when the player can play
-        startDate: number
-        endDate: number
-    }
-    
-    export interface PlayTokenFactory {
-        produceToken(leaderOrdinal:number): PlayToken
+        isInvalid: () => number; // 0 means valid, -1 means is still pending, 1 means it has expired
+        validPeriod:  () => string;
+        spend: () => void;
     }
 
-    export class UnlimitedPlayTokenFactory implements PlayTokenFactory {
-        produceToken(_leaderOrdinal:number): PlayToken{
-            return {
-                description:'',
-                startDate: Date.now(),
-                endDate: MAX_DATE_VALUE
-            }
+    export class UnlimitedToken implements PlayToken {
+        isInvalid ():number {
+            return 0
+        }
+        validPeriod(): string{
+            return '∞';
+        }
+        spend() {
         }
     }
 
-    export class WorkingDaysPlayTokenFactory implements PlayTokenFactory {
-        produceToken(leaderOrdinal:number): PlayToken {
-            // Returns a token so the player can play according to the following sequence:
-            // the first leader (ordinal 1) can play on next monday, the second can play on next Tuesday.. the sixth on next Monday 
-            const laborDay = ((leaderOrdinal - 1) % 5) + 1;
-            const now = new Date(Date.now());
-            let diff = laborDay - now.getDay()
-            if(diff < 0){
-                diff += 7;
-            }
-            const startDate = new Date(now);
-            startDate.setDate(now.getDate() + diff);
-            startDate.setHours(0, 0, 0, 0);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 1);
-            const formattedDate = startDate.toISOString().split('T')[0];
+    export class DisabledToken implements PlayToken {
+        isInvalid ():number {
+            return 1
+        }
+        validPeriod(): string{
+            return '??';
+        }
+        spend() {
+        }
+    }
 
-            return {
-                description:`${formattedDate}`,
-                startDate:startDate.getTime(),
-                endDate:endDate.getTime(),
+    /*
+        Represents a Token that is valid on a specific business day only. (From the very first hour of the day to the end of the day)
+        If is expired or being spent, it is automatically moved to the next n-th 
+        where n is given by increment .
+     */
+    export class BusinessDayToken implements PlayToken {
+        increment: number;
+        startDate: number;
+
+        // Set the startDate to the first businessDay given by businessDay (transformed to 1..5). If zero then next biz day
+        constructor(businessDay: number = 1, increment: number = 1){
+            businessDay = Math.round(Math.max(( (businessDay + 4) % 5 ) + 1, 1));
+            this.increment = Math.round(Math.max(increment, 1));
+            this.startDate = this.moveStart((i, bizDay) => bizDay.getDay() === businessDay);
+        }
+
+
+        isInvalid():number {
+            const now =Date.now();
+            const expirationTime = this.startDate + 24 * 60 * 60 * 1000;
+            return now < this.startDate ? -1 : now >= expirationTime ? 1 : 0;
+        }
+
+        validPeriod(): string{
+            const startDate = new Date(this.startDate);
+            return startDate.toISOString().split('T')[0];;
+        };
+
+        spend() {
+            const status = this.isInvalid()
+            console.log(`Token ${this.validPeriod()} Status`,status)
+            if(status == 0){
+                // If valid then increment
+                this.moveStart((i) => i >= this.increment);
+            }
+            else if(status > 0){
+                // If expired, allow to play as soon as posible
+                this.moveStart(() => true);
+                console.log(`ASAP Token ${this.validPeriod()}`, this.isInvalid())
+            }
+        }
+
+        // Move to next n business day after now where n is given by this.increment
+        moveStart(until: (i:number, bizDay:Date)=>boolean): number {
+            let n = 0;
+            let nextBizDay = new Date();
+            while (!until(n, nextBizDay)) {
+                nextBizDay = getNextBusinessDay(nextBizDay);
+                n++;
+            }
+            nextBizDay.setHours(0, 0, 0, 0);
+            this.startDate = nextBizDay.getTime();
+            return this.startDate;
+        }
+    }
+    
+    export interface PlayTokenFactory {
+        produceToken(): PlayToken
+        storeToken(token:PlayToken):string
+        loadToken(stored:string):PlayToken
+    }
+
+    abstract class AbstractPlayTokenFactory implements PlayTokenFactory {
+        static register: Record<string,()=>PlayToken> = {
+            'BusinessDayToken': () => new BusinessDayToken(),
+            'UnlimitedToken': () => new UnlimitedToken(),
+            'DisabledToken': () => new DisabledToken(),
+        };
+
+        abstract produceToken(): PlayToken;
+        storeToken(token:PlayToken):string {
+            if(!AbstractPlayTokenFactory.register[token.constructor.name] ){
+                throw new Error(`Unssupported play token ${token.constructor.name}`);
+            }
+            const toStore = {
+                className : token.constructor.name,
+                data: token
+            }
+            return JSON.stringify(toStore);
+        } 
+        loadToken(stored:string):PlayToken{
+            if(!stored) return new DisabledToken();
+            const loaded = JSON.parse(stored);
+            if(!AbstractPlayTokenFactory.register[loaded.className] || !loaded.data ){
+                throw new Error(`Invalid stored token`);
+            }
+            const newToken:PlayToken = AbstractPlayTokenFactory.register[loaded.className]()
+            Object.assign(newToken, loaded.data)
+            return newToken;
+        }
+    }
+
+    export class UnlimitedPlayTokenFactory extends AbstractPlayTokenFactory {
+        produceToken(): PlayToken{
+            return new UnlimitedToken();
+        }
+    }
+
+    export class BussinessDaysPlayTokenFactory extends AbstractPlayTokenFactory{
+        produceToken(): PlayToken {
+            const groupId = localStorage.getItem("groupId")
+            const leaderOrdinal = +(localStorage.getItem("isLeader") ?? 0)
+
+            // for Solo next bizDay after yesterday, increment 1
+            if(!groupId){
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const nxtBizDay = getNextBusinessDay(yesterday).getDay();
+                return new BusinessDayToken(nxtBizDay, 1);
+            }
+            // for Coop, if is the leader choose a bizDay according to its ordinal and enable once every week
+            if( leaderOrdinal > 0 ){
+                return new BusinessDayToken(leaderOrdinal, 5);
+            }
+            else {
+                // Disabled for others
+                return new DisabledToken()
             }
         }
     }
@@ -311,7 +429,6 @@ export namespace Sticker {
                 newPlayer.groupId && localStorage.setItem("groupId", newPlayer.groupId);
                 newPlayer.isLeader && localStorage.setItem("isLeader", newPlayer.isLeader);
                 localStorage.setItem("modifiedOn", newPlayer.modifiedOn);
-                
                 // Register the album immediately
                 await this.getAlbumId()
                 return playerName;

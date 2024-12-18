@@ -135,7 +135,8 @@ describe('Reward', () => {
         quizStrategy: Game.QuizStrategy.randomUnseen,
         rewardSchema: Game.RewardSchema.latency,
         rewardStrategy: Game.RewardStrategy.sequential,
-        playTokenStrategy: Game.PlayTokenStrategy.unlimited,
+        soloTokenStrategy: Game.PlayTokenStrategy.unlimited,
+        coopTokenStrategy: Game.PlayTokenStrategy.unlimited,
         leaderTimeout: 100
     }
 
@@ -260,5 +261,68 @@ describe('Reward', () => {
         }
         // "Reached limit of iterations"
         expect(maxIter).toBeGreaterThan(0)
+    });
+});
+
+describe('BusinessDayToken Tests', () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date('2024-12-16T11:35:17Z').getTime());
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    test('Token is initially valid', () => {
+        const token = new Game.BusinessDayToken(1, 1); // Monday, 1-day increment
+        expect(token.isInvalid()).toBe(true);
+    });
+
+    test('Token expires after 24 hours', () => {
+        const token = new Game.BusinessDayToken(1, 1);
+        token.startDate -= 3 * 24 * 60 * 60 * 1000; // Set to 3d ago, Friday
+        expect(token.validPeriod()).toBe('2024-12-13');
+        expect(token.isInvalid()).toBe(false);
+        expect(token.validPeriod()).toBe('2024-12-17');
+    });
+
+    test('Token moves to next business day after expiration', () => {
+        const token = new Game.BusinessDayToken(4, 2); // Thrusday, 2-day increment
+        token.startDate -= 7 * 24 * 60 * 60 * 1000; // Expired 1w ago
+        token.isInvalid(); // This should trigger a move
+        const newStartDate = new Date(token.startDate);
+        expect(newStartDate.getDay()).not.toBe(0); // Not Sunday
+        expect(newStartDate.getDay()).not.toBe(6); // Not Saturday
+        expect(token.validPeriod()).toBe('2024-12-18');
+    });
+
+    test('Valid period returns correct date', () => {
+        const token = new Game.BusinessDayToken(1, 1);
+        const expectedDate = new Date(token.startDate).toISOString().split('T')[0];
+        expect(token.validPeriod()).toBe(expectedDate);
+    });
+
+    test('Spend moves token to next business day', () => {
+        const token = new Game.BusinessDayToken(1, 6);
+        expect(token.validPeriod()).toBe('2024-12-16');
+        const oldStartDate = token.startDate;
+        token.spend();
+        expect(token.startDate).not.toBe(oldStartDate);
+        expect(token.validPeriod()).toBe('2024-12-24');
+    });
+
+    test('Token can be stored', () => {
+        const token = new Game.BusinessDayToken(1, 6);
+        expect(token.validPeriod()).toBe('2024-12-16');
+        const toBeStored = {className: token.constructor.name, data: token}
+        const stored = JSON.stringify(toBeStored);
+
+        const restored = JSON.parse(stored);
+        const newTok = new Game.BusinessDayToken();
+        Object.assign(newTok, restored.className);
+        expect(token.validPeriod()).toBe('2024-12-16');
+        expect(token.startDate).toBe(1734325200000);
+        expect(token.increment).toBe(6);
     });
 });

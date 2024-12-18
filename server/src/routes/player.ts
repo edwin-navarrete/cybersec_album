@@ -61,7 +61,7 @@ router.post('/player', [
     validateInput
     ], async (req: Request, res: Response) => {
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
-    const {playerId, playerName, isLeader} = req.body
+    const {playerId, playerName, isLeader = null} = req.body
     const mode = req.body.mode
     let newPlayer: PlayerRow = { playerId, playerName, isLeader, isGroup: false };
     try {

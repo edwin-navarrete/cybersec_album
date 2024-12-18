@@ -17,7 +17,6 @@ const AlbumView = () => {
     const stickers = useSelector(selectStickers);
     const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
-    const canEarn = !localStorage.getItem("groupId") || !!localStorage.getItem("isLeader") 
 
     // Load initial album state
     useEffect(() => {
@@ -145,7 +144,7 @@ const AlbumView = () => {
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
                 <div className='buttonGrp'>
-                {(!isComplete && canEarn) && <Button 
+                {!isComplete && <Button 
                     className={stickers.length === 1? "glowingBtn" : ""}
                     key='button0' variant="contained" 
                     onClick={handleMoreStickers}>{t("button.earn")}

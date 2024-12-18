@@ -158,7 +158,8 @@ describe('Quiz', () => {
             quizStrategy: Game.QuizStrategy.easiestUnseen,
             rewardSchema: Game.RewardSchema.latency,
             rewardStrategy: Game.RewardStrategy.sequential,
-            playTokenStrategy: Game.PlayTokenStrategy.unlimited,
+            soloTokenStrategy: Game.PlayTokenStrategy.unlimited,
+            coopTokenStrategy: Game.PlayTokenStrategy.unlimited,
             leaderTimeout: 100
         }
         const album: Sticker.Album = {
