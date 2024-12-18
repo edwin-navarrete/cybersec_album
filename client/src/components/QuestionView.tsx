@@ -85,11 +85,6 @@ const QuestionView = () => {
     }
 
     function renderFeedback(success?: boolean | null) {
-        // if isLeader, decrement to avoid immediate turn 
-        const isLeader : number = +(localStorage.getItem("isLeader") ?? 0);
-        if(isLeader){
-            localStorage.setItem("isLeader", String(isLeader - 1));
-        }
         if (success === true) {
             return (<div className="feedbackFrame">
                 <label className="feedbackMsg">{t("quiz.success")}</label>

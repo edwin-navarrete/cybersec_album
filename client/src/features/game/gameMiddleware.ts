@@ -102,19 +102,21 @@ export const glueSticker = createAsyncThunk<Sticker.AlbumStiker[], Sticker.Album
 export const nextQuestion = createAsyncThunk<QuestionState>
     ('question/nextQuestion', async () => {
         const tokenFactory = getPlayTokenFactory(!!localStorage.getItem("groupId"));
-        const playToken = localStorage.getItem("playToken");
-        // Create the token 
-        if(!playToken) {
-            const token = tokenFactory.produceToken();
-            localStorage.setItem("playToken", tokenFactory.storeToken(token));
+        let playToken = localStorage.getItem("playToken");
+        let token = null;
+        // Create the token if not exists or it was previously disabled 
+        if(!playToken || tokenFactory.loadToken(playToken).constructor.name === 'DisabledToken') {
+            token = tokenFactory.produceToken();
         }
-        else{
+        else {
             // Spend the existing token
             console.log('Spending token')
-            const token = tokenFactory.loadToken(playToken);
+            token = tokenFactory.loadToken(playToken);
             token.spend()
-            localStorage.setItem("playToken",tokenFactory.storeToken(token));
         }
+        playToken = tokenFactory.storeToken(token);
+        localStorage.setItem("playToken", playToken);
+
         let questions = await theQuiz.generate(1)
         if (!questions[0] || !questions[0].id) throw new Error('Illegal question in Middleware')
         return questions[0] as QuestionState
@@ -132,10 +134,8 @@ async function reloadTeam() {
             const updateIsLeader = (player: Game.Player) => {
                 if (player.id === +playerId) {
                     localStorage.setItem("isLeader", String(player.isLeader));
-                    // FIXME generate playing token
                 } else {
                     localStorage.removeItem("isLeader");
-                    // FIXME clear playing token
                 }
             };
             theTeam.players.sort((a,b)=>{

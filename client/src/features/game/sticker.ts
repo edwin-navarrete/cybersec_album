@@ -1,7 +1,6 @@
 import axios from "axios"
 import { Question } from "./question";
 import {v4 as uuidv4 } from "uuid"
-import { getPlayTokenFactory } from "./gameMiddleware";
 
 function getNextBusinessDay(date:Date) {
     const dayOfWeek = date.getDay();
@@ -107,15 +106,13 @@ export namespace Game {
 
         spend() {
             const status = this.isInvalid()
-            console.log(`Token ${this.validPeriod()} Status`,status)
-            if(status == 0){
+            if(status === 0){
                 // If valid then increment
                 this.moveStart((i) => i >= this.increment);
             }
             else if(status > 0){
                 // If expired, allow to play as soon as posible
                 this.moveStart(() => true);
-                console.log(`ASAP Token ${this.validPeriod()}`, this.isInvalid())
             }
         }
 
