@@ -42,7 +42,6 @@ export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
         let stickers = await theAlbum.getStickers()
         if(!stickers.size){
             // if first time, give the first sticker as a sample
-            console.log("Adding Sample")
             let stickerSample = await stickerDAO.findAll({ include: [1] })
             let newStickers = await theAlbum.ownStickers(stickerSample);
             await theAlbum.glueSticker(newStickers[0]);
@@ -117,7 +116,6 @@ export const nextQuestion = createAsyncThunk<QuestionState>
 
         let questions = await theQuiz.generate(1)
         if (!questions[0] || !questions[0].id) throw new Error('Illegal question in Middleware');
-        console.log("nextQuestion", questions[0]);
         return questions[0] as QuestionState
     })
 

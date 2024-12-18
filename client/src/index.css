@@ -48,12 +48,39 @@ code {
     monospace;
 }
 
-.navTitle {
+.navTitle {  
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: auto;
-  padding: 1px;
+  padding: 0 7px;
   text-align: center;
   color: var(--navbar-txt);
   background: linear-gradient(to bottom, var(--navbar-0), var(--navbar-0), var(--navbar-1));
+}
+
+.navTitle button {
+  margin-right: auto;
+  background-color: transparent;
+  border: none;
+  color: var(--navbar-txt);
+  font-size: 16px;
+  cursor: pointer;
+
+}
+
+.navTitle h2 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.navTitle a {
+  text-decoration: none;
+  color: inherit;
+  font-size: 30px;
+  font-weight: bold;
 }
 
 .grecaptcha-badge {
@@ -67,7 +94,7 @@ code {
   background-color: white;
   position: fixed;
   bottom: 0;
-  padding: 5px 0;
+  padding: 5px 0 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -80,6 +107,7 @@ code {
   display: flex;
   gap: 8px;
   justify-content: center;
+  height: 36px;
 }
 
 .albumContainer {

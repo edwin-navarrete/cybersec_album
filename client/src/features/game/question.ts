@@ -83,8 +83,6 @@ export namespace Question {
             newSolution.push(shuffledOptions.length - 1);
           }
         }
-        console.log("shuffledOptions",shuffledOptions);
-        console.log("newSolution",newSolution);
         return {
           ...q,
           options: shuffledOptions,
@@ -111,13 +109,11 @@ export namespace Question {
             // Easiest unseen question first,
             // then the oldest failed questions
             // and then the oldest succeeded
-            console.log("generate", count)
             let self = this
             let curLanguage = localStorage.getItem("lang");
             return this.userAnswerDAO.findAll({ filter:{ albumId: await this.album.getAlbumId() }, order: ["+success", "+answeredOn"] })
                 .then(answers => answers.map(answer => answer.questionId))
                 .then(seen => {
-                    console.log("seen", seen);
                     return self.questionDefDAO.findAll({
                         filter:{ lang: curLanguage || 'es' },
                         exclude: seen,

@@ -11,11 +11,11 @@ function App() {
     return (
         <BrowserRouter>
             <div className="Initial" data-testid="app-1">
-                {Header()}
+                <Header />
                 <Routes>
                     <Route path="/" element={<AlbumIntroView />} />
                     <Route path="/album" element={<AlbumView />} />
-                    <Route path="/reto" element={<QuestionView />} />
+                    <Route path="/quest" element={<QuestionView />} />
                     <Route path="/players" element={<PlayerView />} />
                 </Routes>
             </div>

@@ -53,7 +53,7 @@ const AlbumView = () => {
 
     function handleMoreStickers() {
         dispatch(nextQuestion())
-        navigate("/reto/")
+        navigate("/quest")
     }
 
     function getStickerView(spot: string) {

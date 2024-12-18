@@ -165,7 +165,6 @@ const QuestionView = () => {
             </section>
             <div className='buttonContainer'>
                 <div className='buttonGrp'>
-                <Button variant="contained" onClick={() => navigate("/album")}>{t("button.back")}</Button>
                 {hasGroupId && ( <Button variant="contained"  onClick={handleTeamRedirect}>
                         <i className="fas fa-users" />
                     </Button>)}

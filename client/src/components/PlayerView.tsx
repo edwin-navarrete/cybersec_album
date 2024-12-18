@@ -73,10 +73,7 @@ const PlayerView = () => {
             </header>
             <section className="playerContainer">
                 { team.map(member => getPlayerView(member)) }
-            </section>           
-            <div className='buttonContainer'>
-                <Button variant="contained" onClick={() => navigate("/album")}>{t("button.back")}</Button>
-            </div>
+            </section>
         </section>
     );
 }
