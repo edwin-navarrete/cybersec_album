@@ -1,5 +1,8 @@
 {
     "rewardStrategy" : "sequential",
     "rewardSchema": "difficulty",
-    "quizStrategy": "randomUnseen"
+    "quizStrategy": "randomUnseen",
+    "coopTokenStrategy": "bussinessDays",
+    "soloTokenStrategy": "bussinessDays",
+    "leaderTimeout": 86400000
 }

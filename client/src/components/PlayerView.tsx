@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { AppDispatch } from "../app/store";
 import { useDispatch, useSelector } from 'react-redux';
-import { loadTeam, changeLeader } from "../features/game/gameMiddleware";
+import { loadTeam, changeLeader, getLeaderDeadline } from "../features/game/gameMiddleware";
 import { selectTeam, selectTeamName } from "../features/game/gameSlice";
-import { Sticker } from "../features/game/sticker";
+import { Game } from "../features/game/sticker";
 
 const PlayerView = () => {
     const { t } = useTranslation(); // i18n
@@ -14,8 +14,7 @@ const PlayerView = () => {
     const dispatch = useDispatch() as AppDispatch;
     const team = useSelector(selectTeam)
     const teamName = useSelector(selectTeamName)
-    const isLeader = localStorage.getItem('isLeader') ? true : false;
-    const LEADER_TIMEOUT = 2 * 24 * 60 * 60 * 1000; // 2d
+    const isLeader = localStorage.getItem('isLeader') ?? 0;
     const [dueLeader, setDueLeader] = useState('');
 
     // Load team members
@@ -38,20 +37,18 @@ const PlayerView = () => {
         return parts.length > 0 ? parts.join(' ') : '';
     }
 
-    function getLeaderTime(player: Sticker.Player) {
-        const date =Date.parse(player.modifiedOn);
-        const now = Date.now()
-        const due = LEADER_TIMEOUT + date;
-        if (due > now && dueLeader == '') setDueLeader(getTimeDiff(due , Date.now()))
+    function getLeaderTime(player: Game.Player) {
+        const [now, date, due] = getLeaderDeadline(player)
+        if (due > 0 && dueLeader === '') setDueLeader(getTimeDiff(due ,now))
         return getTimeDiff(date, now)
     }
 
-    function handleSwitchLeader(player: Sticker.Player){
+    function handleSwitchLeader(player: Game.Player){
         dispatch( changeLeader(player) );
     }
 
 
-    function getPlayerView(player: Sticker.Player) {
+    function getPlayerView(player: Game.Player) {
         return  <div className="playerRowContainer" key={player.id}>
                     <div className="playerNameContainer"><p>{player.isLeader && <i className="fas fa-crown"/>}{player.isLeader && getLeaderTime(player)} {player.playerName}</p></div>
                     <div className="playerStarsContainer">

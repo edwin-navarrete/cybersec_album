@@ -22,7 +22,7 @@ interface PlayerRow {
     playerId?: number
     playerName: string
     isGroup: boolean
-    isLeader?: boolean
+    isLeader?: number
     groupId?: number
     groupName?: string
     groupSize?: number
@@ -61,7 +61,7 @@ router.post('/player', [
     validateInput
     ], async (req: Request, res: Response) => {
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
-    const {playerId, playerName, isLeader} = req.body
+    const {playerId, playerName, isLeader = null} = req.body
     const mode = req.body.mode
     let newPlayer: PlayerRow = { playerId, playerName, isLeader, isGroup: false };
     try {
@@ -70,8 +70,11 @@ router.post('/player', [
                 //Switch leader
                 const upd = await mysqlDriver.fetch(
                     'SELECT group_id FROM player WHERE player_id = ? AND is_leader IS NULL',[playerId]);
-                const groupId = upd?.[0]?.group_id
+                const groupId = upd?.[0]?.group_id;
                 if(groupId){
+                    const curLeader = await mysqlDriver.fetch(
+                        'SELECT MAX(is_leader) is_leader FROM player WHERE group_id = ?',[groupId]);
+                    newPlayer.isLeader = curLeader?.[0]?.is_leader + 1;
                     // Clear leader
                     await mysqlDriver.insert('UPDATE player SET is_leader = NULL WHERE group_id = ?', [groupId])
                 }
@@ -90,9 +93,11 @@ router.post('/player', [
                 }
                 newPlayer.groupId = assignedGrp.playerId
                 if(!assignedGrp.groupSize){
-                    // First player become leader
-                    newPlayer.isLeader = true
+                    // First player become leader, the ordinal can be set
+                    newPlayer.isLeader = Math.max(1, newPlayer.isLeader)
                 }
+                else delete newPlayer.isLeader;
+
                 await dao.update(newPlayer)
                 newPlayer.groupName = assignedGrp.playerName
             }

@@ -2,7 +2,220 @@ import axios from "axios"
 import { Question } from "./question";
 import {v4 as uuidv4 } from "uuid"
 
-export module Sticker {
+function getNextBusinessDay(date:Date) {
+    const dayOfWeek = date.getDay();
+    const nextDay = new Date(date);
+    nextDay.setDate(date.getDate() + (dayOfWeek > 4 ? 8 - dayOfWeek : 1));
+    return nextDay;
+}
+
+export namespace Game {
+
+    export interface GameConfig {
+        rewardStrategy: RewardStrategy,
+        rewardSchema: RewardSchema,
+        quizStrategy: QuizStrategy,
+        soloTokenStrategy: PlayTokenStrategy,
+        coopTokenStrategy: PlayTokenStrategy,
+        leaderTimeout: number
+    }
+
+    export enum RewardStrategy {
+        sequential = "sequential",
+        randomWeigthed = "randomWeigthed"
+    }
+
+    export enum RewardSchema {
+        latency = "latency",
+        difficulty = "difficulty"
+    }
+
+    export enum QuizStrategy {
+        randomUnseen = "randomUnseen",
+        easiestUnseen = "easiestUnseen"
+    }
+
+    export enum PlayTokenStrategy {
+        bussinessDays = "bussinessDays",
+        unlimited = "unlimited"
+    }
+
+    /*
+        A play token determines when is allowed to play. Currently based on Date.now().
+        validPeriod returns an independent from language representing the period of time where it become valid.
+        toString returns a string representation
+
+        NOTE:
+        New token iplementations must be in AbstractPlayTokenFactory.register
+    */
+    export interface PlayToken {
+        isInvalid: () => number; // 0 means valid, -1 means is still pending, 1 means it has expired
+        validPeriod:  () => string;
+        spend: () => void;
+    }
+
+    export class UnlimitedToken implements PlayToken {
+        isInvalid ():number {
+            return 0
+        }
+        validPeriod(): string{
+            return '∞';
+        }
+        spend() {
+        }
+    }
+
+    export class DisabledToken implements PlayToken {
+        isInvalid ():number {
+            return 1
+        }
+        validPeriod(): string{
+            return '??';
+        }
+        spend() {
+        }
+    }
+
+    /*
+        Represents a Token that is valid on a specific business day only. (From the very first hour of the day to the end of the day)
+        If is expired or being spent, it is automatically moved to the next n-th 
+        where n is given by increment .
+     */
+    export class BusinessDayToken implements PlayToken {
+        increment: number;
+        startDate: number;
+
+        // Set the startDate to the first businessDay given by businessDay (transformed to 1..5). If zero then next biz day
+        constructor(businessDay: number = 1, increment: number = 1){
+            businessDay = Math.round(Math.max(( (businessDay + 4) % 5 ) + 1, 1));
+            this.increment = Math.round(Math.max(increment, 1));
+            this.startDate = this.moveStart((i, bizDay) => bizDay.getDay() === businessDay);
+        }
+
+
+        isInvalid():number {
+            const now =Date.now();
+            const expirationTime = this.startDate + 24 * 60 * 60 * 1000;
+            return now < this.startDate ? -1 : now >= expirationTime ? 1 : 0;
+        }
+
+        validPeriod(): string{
+            const startDate = new Date(this.startDate);
+            return startDate.toISOString().split('T')[0];;
+        };
+
+        spend() {
+            const status = this.isInvalid()
+            if(status === 0){
+                // If valid then increment
+                this.moveStart((i) => i >= this.increment);
+            }
+            else if(status > 0){
+                // If expired, allow to play as soon as posible
+                this.moveStart(() => true);
+            }
+        }
+
+        // Move to next n business day after now where n is given by this.increment
+        moveStart(until: (i:number, bizDay:Date)=>boolean): number {
+            let n = 0;
+            let nextBizDay = new Date();
+            while (!until(n, nextBizDay)) {
+                nextBizDay = getNextBusinessDay(nextBizDay);
+                n++;
+            }
+            nextBizDay.setHours(0, 0, 0, 0);
+            this.startDate = nextBizDay.getTime();
+            return this.startDate;
+        }
+    }
+    
+    export interface PlayTokenFactory {
+        produceToken(): PlayToken
+        storeToken(token:PlayToken):string
+        loadToken(stored:string):PlayToken
+    }
+
+    abstract class AbstractPlayTokenFactory implements PlayTokenFactory {
+        static register: Record<string,()=>PlayToken> = {
+            'BusinessDayToken': () => new BusinessDayToken(),
+            'UnlimitedToken': () => new UnlimitedToken(),
+            'DisabledToken': () => new DisabledToken(),
+        };
+
+        abstract produceToken(): PlayToken;
+        storeToken(token:PlayToken):string {
+            if(!AbstractPlayTokenFactory.register[token.constructor.name] ){
+                throw new Error(`Unssupported play token ${token.constructor.name}`);
+            }
+            const toStore = {
+                className : token.constructor.name,
+                data: token
+            }
+            return JSON.stringify(toStore);
+        } 
+        loadToken(stored:string):PlayToken{
+            if(!stored) return new DisabledToken();
+            const loaded = JSON.parse(stored);
+            if(!AbstractPlayTokenFactory.register[loaded.className] || !loaded.data ){
+                throw new Error(`Invalid stored token`);
+            }
+            const newToken:PlayToken = AbstractPlayTokenFactory.register[loaded.className]()
+            Object.assign(newToken, loaded.data)
+            return newToken;
+        }
+    }
+
+    export class UnlimitedPlayTokenFactory extends AbstractPlayTokenFactory {
+        produceToken(): PlayToken{
+            return new UnlimitedToken();
+        }
+    }
+
+    export class BussinessDaysPlayTokenFactory extends AbstractPlayTokenFactory{
+        produceToken(): PlayToken {
+            const groupId = localStorage.getItem("groupId")
+            const leaderOrdinal = +(localStorage.getItem("isLeader") ?? 0)
+
+            // for Solo next bizDay after yesterday, increment 1
+            if(!groupId){
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const nxtBizDay = getNextBusinessDay(yesterday).getDay();
+                return new BusinessDayToken(nxtBizDay, 1);
+            }
+            // for Coop, if is the leader choose a bizDay according to its ordinal and enable once every week
+            if( leaderOrdinal > 0 ){
+                return new BusinessDayToken(leaderOrdinal, 5);
+            }
+            else {
+                // Disabled for others
+                return new DisabledToken()
+            }
+        }
+    }
+
+
+    export interface Player extends Question.Identifiable {
+        playerName: string
+        isGroup: boolean
+        isLeader: number
+        modifiedOn: string
+    }
+
+    export class PlayerDAO extends Question.DAO<Player> {
+        constructor(initialDB:Player[]){
+            super("player", initialDB)
+        }
+
+        async findAll(options: Question.QueryOptions = {}): Promise<Player[]> {
+            this.loaded = false
+            return super.findAll(options)
+        }
+    }
+}
+
+export namespace Sticker {
 
     export interface StickerDef extends Question.Identifiable {
         spot: string
@@ -13,7 +226,7 @@ export module Sticker {
     export interface Player extends Question.Identifiable {
         playerName: string
         isGroup: boolean
-        isLeader: boolean
+        isLeader: number
         modifiedOn: string
     }
 
@@ -36,9 +249,9 @@ export module Sticker {
         stickerDAO: StickerDAO
         latencySchema: Map<number, number> // maxLatency-> stickerCount
         difficultySchema: Map<number, number> // maxDifficulty-> stickerCount
-        config: Question.GameConfig
+        config: Game.GameConfig
 
-        constructor(config: Question.GameConfig, album: Album, stickerDAO: StickerDAO) {
+        constructor(config: Game.GameConfig, album: Album, stickerDAO: StickerDAO) {
             this.album = album
             this.stickerDAO = stickerDAO
             // fibbonaccy reward
@@ -62,7 +275,7 @@ export module Sticker {
                     stickers = stickers.filter(s => !owned.includes(s.spot)) || stickers;
                     let result: StickerDef[] = [];
 
-                    if (self.config.rewardStrategy === Question.RewardStrategy.randomWeigthed) {
+                    if (self.config.rewardStrategy === Game.RewardStrategy.randomWeigthed) {
                         // select random count of stickers based on weight
                         stickers.sort((a, b) => b.weight - a.weight);
                         let top = stickers.reduce((sum, s) => sum + s.weight, 0);
@@ -92,7 +305,7 @@ export module Sticker {
             if (!answer.success) return 0
             let schema = this.difficultySchema
             let marker = answer.difficulty || 0.5
-            if (answer.latency && this.config.rewardSchema === Question.RewardSchema.latency) {
+            if (answer.latency && this.config.rewardSchema === Game.RewardSchema.latency) {
                 schema = this.latencySchema
                 marker = answer.latency
             }
@@ -157,25 +370,26 @@ export module Sticker {
             let self = this
             return this.userStickerDAO.findAll({ filter: { albumId: await this.getAlbumId() }, order: "+inAlbum" })
                 .then(userStickers => 
-                    self.stickerDAO.findAll({
-                        include: userStickers.map(s => s.stickerId)
-                    }).then(stickers => {
-                        let stickerMap = new Map(userStickers.map(us => {
-                            let s = stickers.find(s => s.id === us.stickerId)
-                            if (!s) throw new Error('Inconsistent stickers DB')
-                            let as = {
-                                ...s,
-                                id: us.id,
-                                inAlbum: us.inAlbum,
-                                albumId: us.albumId,
-                                addedOn: us.addedOn,
-                                stickerId: us.stickerId
-                            } as AlbumStiker
-                            return [s.spot, as]
-                        }))
-                        return stickerMap
-                    }
-                ))
+                     self.stickerDAO.findAll({
+                            include: userStickers.map(s => s.stickerId)
+                        }).then(stickers => {
+                            let stickerMap = new Map(userStickers.map(us => {
+                                let s = stickers.find(s => s.id === us.stickerId)
+                                if (!s) throw new Error('Inconsistent stickers DB')
+                                let as = {
+                                    ...s,
+                                    id: us.id,
+                                    inAlbum: us.inAlbum,
+                                    albumId: us.albumId,
+                                    addedOn: us.addedOn,
+                                    stickerId: us.stickerId
+                                } as AlbumStiker
+                                return [s.spot, as]
+                            }))
+                            return stickerMap
+                        }
+                    )
+                )
 
         }
 
@@ -213,7 +427,6 @@ export module Sticker {
                 newPlayer.groupId && localStorage.setItem("groupId", newPlayer.groupId);
                 newPlayer.isLeader && localStorage.setItem("isLeader", newPlayer.isLeader);
                 localStorage.setItem("modifiedOn", newPlayer.modifiedOn);
-                
                 // Register the album immediately
                 await this.getAlbumId()
                 return playerName;
@@ -286,7 +499,7 @@ export module Sticker {
                 sticker.id = this.db.length + 1
                 sticker.addedOn = Date.now();
                 sticker.inAlbum = sticker.inAlbum || false;
-                super.push(sticker)
+                await super.push(sticker)
             }
             else {
                 // just update some fields
@@ -294,7 +507,7 @@ export module Sticker {
                 if (!found) throw new Error("Invalid DB at UserStickerDAO")
                 found.inAlbum = sticker.inAlbum || false
                 found.addedOn = Date.now()
-                super.push(found)
+                await super.push(found)
                 sticker = found
             }
             return sticker;
@@ -307,15 +520,6 @@ export module Sticker {
         }
     }
 
-    export class PlayerDAO extends Question.DAO<Player> {
-        constructor(initialDB:Player[]){
-            super("player", initialDB)
-        }
 
-        async findAll(options: Question.QueryOptions = {}): Promise<Player[]> {
-            this.loaded = false
-            return super.findAll(options)
-        }
-    }
 }
 
