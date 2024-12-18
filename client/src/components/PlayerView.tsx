@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
 import Button from '@mui/material/Button';
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import { AppDispatch } from "../app/store";
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,7 +9,6 @@ import { Game } from "../features/game/sticker";
 
 const PlayerView = () => {
     const { t } = useTranslation(); // i18n
-    const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     const team = useSelector(selectTeam)
     const teamName = useSelector(selectTeamName)

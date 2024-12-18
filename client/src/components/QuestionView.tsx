@@ -7,7 +7,7 @@ import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import '../index.css';
 import { selectQuestion, selectUnclaimed, selectAchievement, updateToken, QuestionState } from '../features/game/gameSlice';
-import { putAnswer, nextQuestion, getPlayTokenFactory } from '../features/game/gameMiddleware';
+import { putAnswer, getPlayTokenFactory } from '../features/game/gameMiddleware';
 
 import { AppDispatch, RootState } from '../app/store'
 import Button from '@mui/material/Button';
@@ -79,11 +79,6 @@ const QuestionView = () => {
         }
     }
 
-    function handleNewQuestion() {
-        setTimer(-1)
-        dispatch(nextQuestion())
-    }
-
     function renderFeedback(success?: boolean | null) {
         if (success === true) {
             return (<div className="feedbackFrame">
@@ -129,8 +124,7 @@ const QuestionView = () => {
 
         if(message){
             return (<div className='questionFrame'>
-                {isCoop && !isLeader && <img src="../waitleader.jpeg" alt="Wait for Leader"></img>}
-                {(!isCoop || isLeader) && <img src="../sandtimer.gif" alt="Wait for your turn"></img>}
+                <img {...getImageSrc()}></img>
                 <p>{message}</p>{isCoop && (<><p>{t("quiz.leaderHint")}<i className="fas fa-users"></i></p></>) }
             </div>);
         }

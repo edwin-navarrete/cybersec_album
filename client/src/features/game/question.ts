@@ -1,7 +1,5 @@
 import axios from "axios"
 import { Game, Sticker } from "./sticker"
-import { count } from "console"
-import { randomInt } from "crypto"
 
 function shuffleCollection(collection:any[]){
     for (let i = collection.length - 1; i > 0; i--) {

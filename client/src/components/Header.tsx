@@ -6,7 +6,6 @@ export default function Header() {
     const location = useLocation();
     const backRoutes = ["/quest", "/players"];
     const showBackButton = backRoutes.includes(location.pathname);
-    console.log("showBackButton",location.pathname);
     return (<div className="navTitle">
             {showBackButton && (
                 <Link to="/album" className="back-button">←</Link>
