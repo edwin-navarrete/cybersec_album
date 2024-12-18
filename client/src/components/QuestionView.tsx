@@ -122,9 +122,15 @@ const QuestionView = () => {
                 message += t("quiz.playDisabled",{timeDesc: token.validPeriod()}) ;
             }
         }
+        const getImageSrc = () => {
+            if (isCoop && !isLeader) return { src: "../waitleader.jpeg", alt: "Wait for Leader" };
+            return { src: "../sandtimer.gif", alt: "Wait for your turn" };
+        };
 
         if(message){
             return (<div className='questionFrame'>
+                {isCoop && !isLeader && <img src="../waitleader.jpeg" alt="Wait for Leader"></img>}
+                {(!isCoop || isLeader) && <img src="../sandtimer.gif" alt="Wait for your turn"></img>}
                 <p>{message}</p>{isCoop && (<><p>{t("quiz.leaderHint")}<i className="fas fa-users"></i></p></>) }
             </div>);
         }
@@ -160,7 +166,6 @@ const QuestionView = () => {
             <div className='buttonContainer'>
                 <div className='buttonGrp'>
                 <Button variant="contained" onClick={() => navigate("/album")}>{t("button.back")}</Button>
-                {questionState?.success !== undefined && <Button variant="contained" onClick={handleNewQuestion}>{t("button.earn")}</Button>}
                 {hasGroupId && ( <Button variant="contained"  onClick={handleTeamRedirect}>
                         <i className="fas fa-users" />
                     </Button>)}
