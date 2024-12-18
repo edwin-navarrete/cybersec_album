@@ -5,6 +5,7 @@
   "main": "dist/src/app.js",
   "scripts": {
     "start": "tsc && node dist/app.js",
+    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client",
     "lint": "eslint . --ext .ts --fix",
     "server": "nodemon",
     "client": "npm start --prefix client",

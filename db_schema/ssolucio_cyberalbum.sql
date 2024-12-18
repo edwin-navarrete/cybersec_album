@@ -103,7 +103,7 @@ ON UPDATE CASCADE;
 
 -- Crear la tabla question
 
-DROP TABLE question;
+DROP TABLE IF EXISTS `question`;
 CREATE TABLE `question` (
   `question_id` SMALLINT UNSIGNED NOT NULL,
   `lang` varchar(10) NOT NULL,

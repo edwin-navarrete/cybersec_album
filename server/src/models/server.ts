@@ -2,16 +2,20 @@ import express from 'express'
 import cors from 'cors'
 import recaptcha from './recaptcha'
 import useragent from 'express-useragent'
-// import path from 'path'
+import path from 'path';
 
 export class Server {
   port: string | undefined
   app = express()
 
   constructor () {
-    this.port = process.env.PORT // Loaded from .env file
+    this.port = process.env.PORT || '5006' // Loaded from .env file
     this.middlewares()
-    // this.app.use(express.static(path.join(__dirname, '../client/build')))
+
+    this.app.use(express.static(path.join(__dirname, '../client/build')))
+    this.app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+    });
     // this.app.use('/cybersec_album', express.static(path.join(__dirname, '../client/build')))
     this.routes()
   }
@@ -37,5 +41,7 @@ export class Server {
     const listener = this.app.listen(this.port, () => {
       console.log('Server running on port: ', listener.address())
     })
+    return listener
   }
 }
+
