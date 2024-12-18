@@ -116,7 +116,8 @@ export const nextQuestion = createAsyncThunk<QuestionState>
         localStorage.setItem("playToken", playToken);
 
         let questions = await theQuiz.generate(1)
-        if (!questions[0] || !questions[0].id) throw new Error('Illegal question in Middleware')
+        if (!questions[0] || !questions[0].id) throw new Error('Illegal question in Middleware');
+        console.log("nextQuestion", questions[0]);
         return questions[0] as QuestionState
     })
 

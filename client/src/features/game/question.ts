@@ -1,5 +1,16 @@
 import axios from "axios"
 import { Game, Sticker } from "./sticker"
+import { count } from "console"
+import { randomInt } from "crypto"
+
+function shuffleCollection(collection:any[]){
+    for (let i = collection.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [collection[i], collection[j]] = [collection[j], collection[i]];
+      }
+}
+
+
 
 export namespace Question {
 
@@ -41,6 +52,46 @@ export namespace Question {
         limit?: number
     }
 
+    /*
+    Shuffles the options and maintain the solution correct. 
+    It won't move the "all of the above" option.
+    */
+    function shuffleQuestion(q: QuestionDef): QuestionDef {
+        const lastOption = q.options[q.options.length - 1].toLowerCase()
+        const hasAllOfTheAbove = lastOption.includes("all of the above") || lastOption.includes("todas las anteriores");
+      
+        const itemsToShuffle = hasAllOfTheAbove 
+          ? q.options.slice(0, -1) 
+          : q.options;
+      
+        const paired = itemsToShuffle.map((option, index) => ({ option, index }));
+      
+        // Desordenar usando Fisher-Yates
+        for (let i = paired.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [paired[i], paired[j]] = [paired[j], paired[i]];
+        }
+      
+        const shuffledOptions = paired.map(p => p.option);
+        const newSolution = paired
+          .filter(p => q.solution.includes(p.index))
+          .map(p => paired.indexOf(p));
+      
+        if (hasAllOfTheAbove) {
+          shuffledOptions.push(q.options[q.options.length - 1]);
+          if (q.solution.includes(q.options.length - 1)) {
+            newSolution.push(shuffledOptions.length - 1);
+          }
+        }
+        console.log("shuffledOptions",shuffledOptions);
+        console.log("newSolution",newSolution);
+        return {
+          ...q,
+          options: shuffledOptions,
+          solution: newSolution
+        };
+      }
+
     export class Quiz {
         album: Sticker.Album
         userAnswerDAO: UserAnswerDAO
@@ -60,12 +111,14 @@ export namespace Question {
             // Easiest unseen question first,
             // then the oldest failed questions
             // and then the oldest succeeded
+            console.log("generate", count)
             let self = this
             let curLanguage = localStorage.getItem("lang");
             return this.userAnswerDAO.findAll({ filter:{ albumId: await this.album.getAlbumId() }, order: ["+success", "+answeredOn"] })
                 .then(answers => answers.map(answer => answer.questionId))
-                .then(seen =>
-                    self.questionDefDAO.findAll({
+                .then(seen => {
+                    console.log("seen", seen);
+                    return self.questionDefDAO.findAll({
                         filter:{ lang: curLanguage || 'es' },
                         exclude: seen,
                         order: (this.config.quizStrategy === "randomUnseen" ? "__random" : "+difficulty"),
@@ -73,16 +126,20 @@ export namespace Question {
                     }).then(unseen => {
                         let missingCnt = count - unseen.length
                         if (missingCnt > 0) {
-                            // complete with seen
+                            // complete with seen, randomly
+                            shuffleCollection(seen)
                             let missing = seen.slice(0, missingCnt)
                             return self.questionDefDAO.findAll({
                                 include: missing
-                            }).then(missingDefs => unseen.concat(missingDefs))
+                            }).then(missingDefs =>{
+                                const result= unseen.concat(missingDefs);
+                                return result.map( (q)=> shuffleQuestion(q) );
+                            })
                         }
-                        return unseen
+                        // Shuffle options and solutions
+                        return unseen.map( (q)=> shuffleQuestion(q) )
                     })
-                )
-
+                })
         }
 
         async putAnswer(question: QuestionDef, response: number[], latency?: number): Promise<Answer> {
@@ -138,10 +195,7 @@ export namespace Question {
             );
             if (order) {
                 if (order === '__random'){
-                    for (let i = results.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));  
-                        [results[i], results[j]] = [results[j], results[i]];
-                      }
+                    shuffleCollection(results)
                 }
                 else {
                     const orders = (Array.isArray(order) ? order : [order]).map(o => ({
