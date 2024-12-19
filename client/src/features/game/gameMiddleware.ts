@@ -29,6 +29,7 @@ const playTokenFactories: Record<Game.PlayTokenStrategy, () => Game.PlayTokenFac
 };
 
 export const getPlayTokenFactory = (coopMode:boolean) : Game.PlayTokenFactory => {
+    console.log("game config",config);
     return coopMode? playTokenFactories[gameConfig.coopTokenStrategy]() : playTokenFactories[gameConfig.soloTokenStrategy]()
 };
 
