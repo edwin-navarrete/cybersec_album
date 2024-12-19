@@ -8,6 +8,6 @@
   },
   "scripts": {
     "start": "npm start --prefix server",
-    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client"
+    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client && npm install --prefix server && npm run build --prefix server"
   }
 }
