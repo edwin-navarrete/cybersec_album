@@ -49,12 +49,14 @@ export namespace Game {
         New token iplementations must be in AbstractPlayTokenFactory.register
     */
     export interface PlayToken {
+        className: string
         isInvalid: () => number; // 0 means valid, -1 means is still pending, 1 means it has expired
         validPeriod:  () => string;
         spend: () => void;
     }
 
     export class UnlimitedToken implements PlayToken {
+        className = "UnlimitedToken"
         isInvalid ():number {
             return 0
         }
@@ -66,6 +68,7 @@ export namespace Game {
     }
 
     export class DisabledToken implements PlayToken {
+        className = "DisabledToken"
         isInvalid ():number {
             return 1
         }
@@ -82,6 +85,7 @@ export namespace Game {
         where n is given by increment .
      */
     export class BusinessDayToken implements PlayToken {
+        className = "BusinessDayToken"
         increment: number;
         startDate: number;
 
@@ -145,11 +149,11 @@ export namespace Game {
 
         abstract produceToken(): PlayToken;
         storeToken(token:PlayToken):string {
-            if(!AbstractPlayTokenFactory.register[token.constructor.name] ){
-                throw new Error(`Unssupported play token ${token.constructor.name}`);
+            if(!AbstractPlayTokenFactory.register[token.className] ){
+                throw new Error(`Unssupported play token ${token.className}`);
             }
             const toStore = {
-                className : token.constructor.name,
+                className : token.className,
                 data: token
             }
             return JSON.stringify(toStore);
