@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/src/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js",
+    "start": "node dist/app.js",
     "heroku-postbuild": "npm install --prefix client && npm run build --prefix client",
     "lint": "eslint . --ext .ts --fix",
     "server": "nodemon",
