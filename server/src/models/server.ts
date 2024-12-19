@@ -15,11 +15,11 @@ export class Server {
     // this.app.use('/cybersec_album', express.static(path.join(__dirname, '../client/build')))
     this.routes()
 
-    // Serve the React app here
-    this.app.use(express.static(path.join(__dirname, '../../../client/build')))
-    this.app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '../../../client/build', 'index.html'));
-    });
+    // // Serve the React app here
+    // this.app.use(express.static(path.join(__dirname, '../../../client/build')))
+    // this.app.get('*', (req, res) => {
+    //   res.sendFile(path.join(__dirname, '../../../client/build', 'index.html'));
+    // });
   }
 
   middlewares () {
