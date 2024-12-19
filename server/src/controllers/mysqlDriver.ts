@@ -68,11 +68,15 @@ class MySQLDriver {
   }
 }
 
-const connOpts: mysql.ConnectionOptions = {}
+const connOpts: mysql.ConnectionOptions = {
+  connectionLimit: 10
+}
 
 const jawsdbUrl = process.env.JAWSDB_MARIA_URL;
+
 if(jawsdbUrl){
   const parsedUrl = new URL(jawsdbUrl);
+  console.log('JAWSDB_MARIA_URL',parsedUrl.hostname);
   connOpts.user = parsedUrl.username;  
   connOpts.password = parsedUrl.password;  
   connOpts.host = parsedUrl.hostname;  
@@ -88,10 +92,4 @@ else {
   connOpts.database = process.env.DB_NAME;
 }
 
-export default new MySQLDriver({
-  user: process.env.DB_USER,
-  password: process.env.DB_PWD,
-  database: process.env.DB_NAME,
-  host: process.env.DB_HOST,
-  connectionLimit: 3
-})
+export default new MySQLDriver(connOpts);
