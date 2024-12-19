@@ -12,9 +12,9 @@ export class Server {
     this.port = process.env.PORT || '5006' // Loaded from .env file
     this.middlewares()
 
-    this.app.use(express.static(path.join(__dirname, '../../client/build')))
+    this.app.use(express.static(path.join(__dirname, '../../../client/build')))
     this.app.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
+      res.sendFile(path.join(__dirname, '../../../client/build', 'index.html'));
     });
     // this.app.use('/cybersec_album', express.static(path.join(__dirname, '../client/build')))
     this.routes()
