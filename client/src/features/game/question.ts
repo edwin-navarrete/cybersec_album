@@ -151,6 +151,7 @@ export namespace Question {
                 store.success = null;
             }
             answer = await this.userAnswerDAO.put(store)
+            console.log("userAnswerDAO stored:", answer);
             this.answers.push(answer)
             return answer
         }
