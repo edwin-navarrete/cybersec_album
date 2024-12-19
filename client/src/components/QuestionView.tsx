@@ -123,8 +123,10 @@ const QuestionView = () => {
         };
 
         if(message){
-            return (<div className='questionFrame'>
-                <img {...getImageSrc()}></img>
+            const imageProps = getImageSrc();
+            return (
+                <div className='questionFrame'>
+                    <img src={imageProps.src} alt={imageProps.alt}></img>
                 <p>{message}</p>{isCoop && (<><p>{t("quiz.leaderHint")}<i className="fas fa-users"></i></p></>) }
             </div>);
         }
