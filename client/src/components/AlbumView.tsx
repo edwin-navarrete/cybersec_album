@@ -131,11 +131,10 @@ const AlbumView = () => {
                 </div>
             </form>);
     }
-
+    const captchaKey = process.env.CAPTCHAKEY;
     return (
         <section className="pageContainer">
-
-            <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>
+            {captchaKey && <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>}
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>
