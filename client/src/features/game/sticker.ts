@@ -505,7 +505,7 @@ export namespace Sticker {
         }
         async upsert(sticker: UserSticker): Promise<UserSticker> {
             if (!sticker.id) {
-                sticker.id = this.db.length + 1
+                // Is a new sticker
                 sticker.addedOn = Date.now();
                 sticker.inAlbum = sticker.inAlbum || false;
                 await super.push(sticker)
