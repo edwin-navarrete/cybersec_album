@@ -273,11 +273,9 @@ export namespace Sticker {
 
             return self.stickerDAO.findAll()
                 .then(async stickers => {
-                    console.log("3.1 stickerDAO.findAll");
                     // remove from spotMap those that are already available for the album
                     // unless the album is full
                     let owned = Array.from((await self.album.getStickers()).keys());
-                    console.log("3.2 album.getStickers");
                     stickers = stickers.filter(s => !owned.includes(s.spot)) || stickers;
                     let result: StickerDef[] = [];
 
@@ -376,11 +374,9 @@ export namespace Sticker {
             let self = this
             return this.userStickerDAO.findAll({ filter: { albumId: await this.getAlbumId() }, order: "+inAlbum" })
                 .then(userStickers => {
-                    console.log("5.2 userStickerDAO.findAll", userStickers);
                     return self.stickerDAO.findAll({
                             include: userStickers.map(s => s.stickerId)
                         }).then(stickers => {
-                            console.log("5.3 stickerDAO.findAll", stickers);
                             let stickerMap = new Map(userStickers.map(us => {
                                 let s = stickers.find(s => s.id === us.stickerId)
                                 if (!s) throw new Error('Inconsistent stickers DB')
@@ -409,10 +405,9 @@ export namespace Sticker {
                     albumId: albumId,
                     stickerId: stickerDef.id
                 }).then(userSticker => {
-                    console.log("4.1 userStickerDAO.upsert", userSticker);
                     return {
+                        ...stickerDef,
                         ...userSticker,
-                        ...stickerDef
                     }
                 })
             })

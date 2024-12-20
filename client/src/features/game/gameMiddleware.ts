@@ -39,15 +39,21 @@ const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, the
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {
-        let stickers = await theAlbum.getStickers()
-        if(!stickers.size){
-            // if first time, give the first sticker as a sample
-            let stickerSample = await stickerDAO.findAll({ include: [1] })
-            let newStickers = await theAlbum.ownStickers(stickerSample);
-            await theAlbum.glueSticker(newStickers[0]);
-            stickers = await theAlbum.getStickers()
+        try{
+            let stickers = await theAlbum.getStickers()
+            if(!stickers.size){
+                // if first time, give the first sticker as a sample
+                let stickerSample = await stickerDAO.findAll({ include: [1] })
+                let newStickers = await theAlbum.ownStickers(stickerSample);
+                await theAlbum.glueSticker(newStickers[0]);
+                stickers = await theAlbum.getStickers()
+            }
+            return Array.from(stickers.values())
+
+        }catch(err){
+            console.error(err);
+            return []
         }
-        return Array.from(stickers.values())
     })
 
 export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>
@@ -63,19 +69,13 @@ export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>
 export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state: RootState }>
     ('question/putAnswer', async (attempt, thunkApi) => {
         // Store the answer
-        console.log("1- putAnswer invoked");
         const question = thunkApi.getState().game.question
         if (!question) throw new Error("Illegal answer without question")
         Question.DAO.token = thunkApi.getState().game.token;
-        console.log("2- theQuiz.putAnswer");
         let answer = await theQuiz.putAnswer(question, attempt.response, attempt.latency)
         let reward = new Sticker.Reward(gameConfig, theAlbum, stickerDAO);
-        console.log("3- Sticker.Reward");
         const stickerDefs = await reward.produceStickers([answer])
-        console.log("4- theAlbum.ownStickers");
         await theAlbum.ownStickers(stickerDefs);
-        
-        console.log("5 returning");
         let wrong = attempt.response.filter(r => !question.solution.includes(r))
         return {
             wrong: wrong,
