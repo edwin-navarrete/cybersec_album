@@ -123,17 +123,21 @@ const QuestionView = () => {
         };
 
         if(message){
-            return (<div className='questionFrame'>
-                <img {...getImageSrc()}></img>
+            const imageProps = getImageSrc();
+            return (
+                <div className='questionFrame'>
+                    <img src={imageProps.src} alt={imageProps.alt}></img>
                 <p>{message}</p>{isCoop && (<><p>{t("quiz.leaderHint")}<i className="fas fa-users"></i></p></>) }
             </div>);
         }
     
         if (!questionState) return (<div className='questionFrame' />);
 
+        const captchaKey = process.env.CAPTCHAKEY;
+
         const { question, options, success, solution, wrong } = questionState
         return (<div className='questionFrame' >
-            <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/>
+            { captchaKey && <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/> }
             <h3>{question}</h3>
             {solution.length > 1 && <h4>{t("quiz.multipleWrn")}</h4>}
             {options.map((option, i) =>

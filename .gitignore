@@ -40,3 +40,4 @@ statClient/build.zip
 *.map
 client/local.env
 client/production.env
+client/build

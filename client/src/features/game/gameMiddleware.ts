@@ -39,15 +39,21 @@ const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, the
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {
-        let stickers = await theAlbum.getStickers()
-        if(!stickers.size){
-            // if first time, give the first sticker as a sample
-            let stickerSample = await stickerDAO.findAll({ include: [1] })
-            let newStickers = await theAlbum.ownStickers(stickerSample);
-            await theAlbum.glueSticker(newStickers[0]);
-            stickers = await theAlbum.getStickers()
+        try{
+            let stickers = await theAlbum.getStickers()
+            if(!stickers.size){
+                // if first time, give the first sticker as a sample
+                let stickerSample = await stickerDAO.findAll({ include: [1] })
+                let newStickers = await theAlbum.ownStickers(stickerSample);
+                await theAlbum.glueSticker(newStickers[0]);
+                stickers = await theAlbum.getStickers()
+            }
+            return Array.from(stickers.values())
+
+        }catch(err){
+            console.error(err);
+            return []
         }
-        return Array.from(stickers.values())
     })
 
 export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>

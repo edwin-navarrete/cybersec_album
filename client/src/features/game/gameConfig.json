@@ -3,6 +3,6 @@
     "rewardSchema": "difficulty",
     "quizStrategy": "randomUnseen",
     "coopTokenStrategy": "bussinessDays",
-    "soloTokenStrategy": "bussinessDays",
+    "soloTokenStrategy": "unlimited",
     "leaderTimeout": 86400000
 }

@@ -55,4 +55,37 @@ React-Redux aplicación cliente
 /client/public
 Recursos estáticos
 
-# Diseño
+# Heroku
+The app can be deployed in Heroku 
+The cost is ~$0.010/hour, $7.00 per month.
+
+It requires git version 2.47.1,  Node v22.12.0, npm v10.9.0
+These were the commands used to deploy it:
+```
+$ git --version                                                                   
+git version 2.47.1
+
+$ heroku login
+$ heroku create --app ciberalbum
+Creating app... done, ⬢ shrouded-anchorage-35377
+... | https://git.heroku.com/ciberalbum.git
+
+$ heroku addons:create jawsdb:kitefin --app ciberalbum 
+$ git remote add heroku https://git.heroku.com/ciberalbum.git
+$ git push heroku my_branch:main
+$ heroku config:set SERVER_PATH=
+$ heroku config:set REACT_APP_API=/api
+```
+
+jawsdb:kitefin is mysql BD, once is created, connect with a client and run the script in /db_schema/ssolucio_cyberalbum.sql
+
+To see logs
+$ heroku logs --app ciberalbum
+
+To descalate the app to zero instances
+$ heroku ps:scale web=0 --app ciberalbum 
+
+To destroy the app
+$ heroku apps:destroy --app ciberalbum --confirm ciberalbum
+
+

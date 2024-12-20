@@ -18,6 +18,7 @@ CREATE TABLE `ssolucio_cyberalbum`.`user_sticker` (
     INDEX `album_id_idx` (`album_id`) ) ENGINE = InnoDB;
 */
 interface UserStickerRow {
+    userStickerId?: number,
     albumId: string,
     stickerId: number,
     inAlbum: boolean,
@@ -35,17 +36,20 @@ router.post('/userSticker', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_sticker')
-  const {albumId, stickerId, inAlbum, addedOn} = req.body
-  const value: UserStickerRow = {albumId, stickerId, inAlbum, addedOn}
-  dao.post(value).then((val)=>{
-    console.log('userSticker updated', val.affectedRows)
+  const {userStickerId = null, albumId, stickerId, inAlbum, addedOn} = req.body
+  const value: UserStickerRow = { userStickerId, albumId, stickerId, inAlbum, addedOn}
+  try{
+    const postResult = await dao.post(value)
+    if(postResult.insertId){
+      value.userStickerId = postResult.insertId;
+    }
+    console.log('userSticker updated', postResult.affectedRows)
     res.status(200).json(value)
-  })
-  .catch((err) => {
+  }
+  catch(err){
     console.log('failed userSticker post answer:', err)
     res.status(400).json({ errorMessage: err })
-  })
-  
+  }
 })
 
 router.get('/userSticker',[ 

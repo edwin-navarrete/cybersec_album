@@ -41,6 +41,18 @@ questionsRouterinfo.get('/question',[
     const albumIdsQuest = await dao.get({
       filter:{lang:lang}
     })
+    albumIdsQuest.forEach((item) => {
+      try {
+        if (typeof item.options === "string") {
+          item.options = JSON.parse(item.options);
+        }
+        if (typeof item.solution === "string") {
+              item.solution = JSON.parse(item.solution);
+        }
+      } catch {
+        console.error("Error al parsear options:", item.options);
+      }
+    });
     res.status(200).json({ results: albumIdsQuest })
   } catch (error) {
     console.log(error)

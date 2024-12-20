@@ -81,7 +81,7 @@ const AlbumView = () => {
     function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
         if (playerName.trim() === '') {
-            setErrorMessage("El nombre no puede estar vacío.");
+            setErrorMessage(t("emptyName.err"));
             return;
         }
         dispatch(registerPlayer({ playerName, gameMode: 'solo'}))
@@ -99,12 +99,14 @@ const AlbumView = () => {
         });
     }
     const playerId = localStorage.getItem("playerId");
+
     useEffect(() => {
-        if (playerId) {
-            const timer = setTimeout(() => setSplash(false), 5000); // Oculta en 5 segundos
-            return () => clearTimeout(timer); // Limpieza
+        if (playerId && isFull) {
+            setTimeout(() => {
+                setSplash(false);
+            }, 4500);
         }
-    }, [playerId]);
+    });
     function success() {
         return splash && (
             <form className='successSplash' onSubmit={handleSubmit}>
@@ -131,11 +133,10 @@ const AlbumView = () => {
                 </div>
             </form>);
     }
-
+    const captchaKey = process.env.CAPTCHAKEY;
     return (
         <section className="pageContainer">
-
-            <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>
+            {captchaKey && <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>}
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>

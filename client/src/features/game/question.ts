@@ -232,12 +232,15 @@ export namespace Question {
         }
 
         async push(record: Type){
+            const self = this;
             if(this.entrypoint){
                 try {
                     let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
-                    await axios.post(uri,record,{
+                    const apiResponse = await axios.post(uri,record,{
                         headers:{"g-recaptcha-response":DAO.token
                     }});
+                    const newUserAnswer = apiResponse.data;
+                    record.id = newUserAnswer[self.entrypoint+'Id']
                 } catch (error){
                     console.error("API error", error);
                 }
@@ -249,6 +252,7 @@ export namespace Question {
             else {
                 this.db.push(record);
             }
+            return record
         }
     }
 
@@ -260,7 +264,6 @@ export namespace Question {
         async put(answer: Answer): Promise<Answer> {
             let db = this.db
             return new Promise((resolve) => {
-                answer.id = db.length + 1
                 let found = db.find(a =>
                     a.questionId === answer.questionId && a.albumId === answer.albumId)
                 if (!found) {
