@@ -19,11 +19,16 @@ import {
 } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUsers, faUser  } from '@fortawesome/free-solid-svg-icons';
 const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats';
 
 interface IData {
+  is_group:number;
+  group_id:string;
+  is_leader:number;
   player_name: string;
+  team : string;
   started_on: number;
   ended_on: number | string;
   number_errors: number;
@@ -111,6 +116,8 @@ export default function BasicTable() {
         return 0;
       });
     }
+
+
     return sortableData;
   }, [data, sortConfig]);
 
@@ -159,7 +166,9 @@ export default function BasicTable() {
         <TableHead>
           <TableRow>
             <TableCell>Posición</TableCell>
-            <TableCell>Nombre o Album Id</TableCell>
+            <TableCell>
+                        Jugador
+            </TableCell>
             <TableCell align="center">Número de errores</TableCell>
             <TableCell align="center">Preguntas respondidas</TableCell>
             <TableCell align="center"onClick={() => handleSort('finished')} >
@@ -184,7 +193,18 @@ export default function BasicTable() {
             >
               <TableCell>{row.rank}</TableCell>
               <TableCell align="center">
-                {(row.player_name === '' || row.player_name === null || row.player_name.length < 3) ? row.album_id.slice(-5) : row.player_name}
+                {row.is_group === 1 ? 
+                        <>
+                          <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
+                          {row.player_name}
+                        </>
+                      : 
+                        <>
+                        <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />  
+                        {row.player_name}
+                        </>
+                      }
+                {/* {(row.player_name === '' || row.player_name === null || row.player_name.length < 3) ? row.album_id.slice(-5) : row.player_name}  */}
               </TableCell>
               <TableCell align="center">{row.number_errors}</TableCell>
               <TableCell align="center">{row.answered}</TableCell>
