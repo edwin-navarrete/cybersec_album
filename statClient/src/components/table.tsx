@@ -192,7 +192,7 @@ export default function BasicTable() {
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
               <TableCell>{row.rank}</TableCell>
-              <TableCell align="center">
+              <TableCell align="left">
                 {row.is_group === 1 ? 
                         <>
                           <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
