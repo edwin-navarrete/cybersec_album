@@ -11,7 +11,9 @@ import {
   Typography,
   Paper,
   Tooltip,
-  Divider
+  Divider,
+  ToggleButton,
+  ToggleButtonGroup
 } from '@mui/material';
 import {
   LocalizationProvider,
@@ -44,6 +46,7 @@ export default function BasicTable() {
   const [selectedDate, setSelectedDate] = useState('');
   const [data, setData] = useState<IData[]>([]);
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' | null }>({ key: '', direction: null });
+  const [selectedMode, setSelectedMode] = useState('general'); 
 
   useEffect(() => {
     getRanking();
@@ -121,46 +124,115 @@ export default function BasicTable() {
     return sortableData;
   }, [data, sortConfig]);
 
+  const handleModeChange = (event: React.MouseEvent<HTMLElement>, newMode: string | null) => {
+    if (newMode !== null) {
+      setSelectedMode(newMode);
+    }
+  };
+
   return (
+
     <TableContainer component={Paper}>
-      <Toolbar sx={{
-        border: '5px solid white',
-      }}>
+      <Toolbar
+  sx={{
+    border: '5px solid white',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }}
+>
 
-        <Typography
-          sx={{
-            flex: '1 1 100%',
-            display: 'flex',
-            width: 'fit-content',
-            border: (theme) => `1px solid white`,
-            borderRadius: 1,
-          }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Tabla de Clasificación
-        </Typography>
+  <Typography
+    sx={{
+      display: 'flex',
+      width: 'fit-content',
+      border: (theme) => `1px solid white`,
+      borderRadius: 1,
+    }}
+    variant="h6"
+    id="tableTitle"
+    component="div"
+  >
+    <h3>
+      Tabla de Clasificación
+    </h3>
+  </Typography>
 
-        <Tooltip title="Filtrar por fecha" sx={{
-          alignItems: 'center',
-        }}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={['DatePicker']}>
-              <DemoItem>
-                <DatePicker
-                  value={selectedDate}
-                  onAccept={(event) => setSelectedDate(event as string)}
-                  format="DD/MM/YYYY"
-                  views={['year', 'month', 'day']}
-                />
-              </DemoItem>
-            </DemoContainer>
-          </LocalizationProvider>
-        </Tooltip>
+  <ToggleButtonGroup
+    value={selectedMode}
+    exclusive
+    onChange={handleModeChange}
+    aria-label="gameMode"
+    size="medium"
+    sx={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}
+    
+  >
+    <ToggleButton value="general" aria-label="solo">
+      <div className="languageToggle">
+        <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
+        <i className="fas fa-user"> General</i>
+      </div>
+    </ToggleButton>
+    <ToggleButton value="alone" aria-label="solo">
+      <div className="languageToggle">
+        <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />
+        <i className="fas fa-user"> Invividual</i>
+      </div>
+    </ToggleButton>
+    <ToggleButton value="group" aria-label="cooperative">
+      <div className="languageToggle">
+        <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
+        <i className="fas fa-users"> Equipo</i>
+      </div>
+    </ToggleButton>
+  </ToggleButtonGroup>
 
-      </Toolbar>
+  <Tooltip
+    title="Filtrar por fecha"
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+    }}
+  >
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <DemoContainer components={['DatePicker']}>
+        <DemoItem>
+          <DatePicker
+            value={selectedDate}
+            onAccept={(event) => setSelectedDate(event as string)}
+            format="DD/MM/YYYY"
+            views={['year', 'month', 'day']}
+          />
+        </DemoItem>
+      </DemoContainer>
+    </LocalizationProvider>
+  </Tooltip>
+</Toolbar>
 
+
+      <Divider></Divider>
+      <h3  style={{ textAlign: 'center' }} >
+      {selectedMode === 'general' && (
+        <>
+          <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
+            Resultados Generales
+        </>
+      )}
+
+      {selectedMode === 'group' && (
+        <>
+          <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
+            Resultados Grupales
+        </>
+      )}
+
+      {selectedMode === 'alone' && (
+        <>
+          <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />
+            Resultados Individuales
+        </>
+      )}
+      </h3>
       <Divider></Divider>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -186,36 +258,61 @@ export default function BasicTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortedData.map((row) => (
-            <TableRow
-              key={row.album_id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
-              <TableCell>{row.rank}</TableCell>
-              <TableCell align="left">
-                {row.is_group === 1 ? 
-                        <>
-                          <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
-                          {row.player_name}
-                        </>
-                      : 
-                        <>
-                        <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />  
-                        {row.player_name}
-                        </>
-                      }
-                {/* {(row.player_name === '' || row.player_name === null || row.player_name.length < 3) ? row.album_id.slice(-5) : row.player_name}  */}
-              </TableCell>
-              <TableCell align="center">{row.number_errors}</TableCell>
-              <TableCell align="center">{row.answered}</TableCell>
-              <TableCell align="center">{row.finished ? "Si" : "No"}</TableCell>
-              <TableCell align="center">{Math.round(row.total_latency)}</TableCell>
-              <TableCell align="center">{Math.round(row.errors * 100)} % </TableCell>
-              <TableCell align="center">{new Date(row.started_on).toLocaleString()}</TableCell>
-              {/* <TableCell align="center">{row.ended_on ? new Date(row.ended_on).toLocaleString(): "No finalizado"}</TableCell> */}
-            </TableRow>
-          ))}
-        </TableBody>
+  {sortedData
+    .filter((row) => {
+      if (selectedMode === 'general') return true; // Muestra todos los datos
+      if (selectedMode === 'group' && row.is_group === 1) return true; // Solo los grupos en modo 'group'
+      if (selectedMode === 'alone' && row.is_group === 0) return true; // Solo los individuales en modo 'individual'
+      return false; // No mostrar otros casos
+    })
+    .map((row, index) => (
+      <TableRow
+        key={row.album_id}
+        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+      >
+        <TableCell>
+          {/* Renumeración dinámica solo en vistas 'group' e 'individual' */}
+          {selectedMode !== 'general' ? index + 1 : row.rank}
+        </TableCell> {/* Aquí asignamos la posición dinámica */}
+        
+        <TableCell align="left">
+          {selectedMode === 'general' && (
+            <>
+              {row.is_group === 1 ? (
+                <>
+                  <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
+                  {row.player_name}
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />
+                  {row.player_name}
+                </>
+              )}
+            </>
+          )}
+          {selectedMode === 'group' && row.is_group === 1 && (
+            <>
+              <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
+              {row.player_name}
+            </>
+          )}
+          {selectedMode === 'alone' && row.is_group === 0 && (
+            <>
+              <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />
+              {row.player_name}
+            </>
+          )}
+        </TableCell>
+        <TableCell align="center">{row.number_errors}</TableCell>
+        <TableCell align="center">{row.answered}</TableCell>
+        <TableCell align="center">{row.finished ? "Si" : "No"}</TableCell>
+        <TableCell align="center">{Math.round(row.total_latency)}</TableCell>
+        <TableCell align="center">{Math.round(row.errors * 100)} %</TableCell>
+        <TableCell align="center">{new Date(row.started_on).toLocaleString()}</TableCell>
+      </TableRow>
+    ))}
+</TableBody>
       </Table>
     </TableContainer>
   );
