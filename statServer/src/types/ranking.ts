@@ -9,6 +9,7 @@ export interface Ranking{
     rank: number,
     album_id: string,
     player_name: string,
+    is_group:boolean,
     } 
 /*
     "data":[
@@ -19,7 +20,7 @@ export interface Ranking{
            "answered": 14,  // Número de preguntas respondidas
            "errors": 5,   // Número de preguntas que aún no se han respondido correctamente
            "rank":1,  // Posición en el ranking 
-           "album_id": "cd1de1e9-85d0-4833-8270-f8e959027c4a"
+            "album_id": "cd1de1e9-85d0-4833-8270-f8e959027c4a"
         },...
 
         */

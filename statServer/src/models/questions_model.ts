@@ -31,18 +31,18 @@ import { RowDataPacket } from "mysql2";
 
         const queryString = `
             SELECT
-                q.id AS questionId,
+                q.question_id AS questionId,
                 q.question,
                 COUNT(ua.question_id) AS attempts,
                 AVG(ua.latency / 1000) AS avgLatency,
                 SUM(ua.success) / COUNT(ua.question_id) AS successProb
             FROM question q
-            LEFT JOIN vw_user_answer ua ON q.id = ua.question_id
+            LEFT JOIN vw_user_answer ua ON q.question_id = ua.question_id
             WHERE
                 ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
-            GROUP BY q.id, q.question
+            GROUP BY q.question_id, q.question
             ORDER BY avgLatency DESC;
-        `;
+            `;
     
         db.query(queryString, (err, result) => {
             if (err) {
