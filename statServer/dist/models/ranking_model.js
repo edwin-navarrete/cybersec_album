@@ -10,38 +10,24 @@ const getRankingByDate = (date) => {
             : '1=1';
         const queryString = `
         SELECT t.*, 
-              ROW_NUMBER() OVER (ORDER BY t.finalizacion_album DESC, t.porcentaje_error ASC, t.tiempo_total_de_respuesta ASC) AS ranking
+        ROW_NUMBER() OVER (ORDER BY t.finalizacion_album DESC,  t.porcentaje_error ASC,t.tiempo_total_de_respuesta ASC) AS ranking
         FROM (
-            SELECT 
-                a.album_id,
-                p.player_id,
-                p.player_name,
-                p.is_group,
-                p.group_id,
-                p.is_leader,
-                a.started_on,
-                a.ended_on,
-                a.ended_on IS NOT NULL AS finalizacion_album,
-                COUNT(DISTINCT ua.question_id) AS preguntas_respondidas,
-                COUNT(DISTINCT ua.question_id) - SUM(ua.success) AS numero_de_errores,
-                (COUNT(DISTINCT ua.question_id) - SUM(ua.success)) / COUNT(DISTINCT ua.question_id) AS porcentaje_error,
-                SUM(ua.latency) / 1000 AS tiempo_total_de_respuesta
-            FROM album a
-            LEFT JOIN player p ON p.player_id = a.player_id
-            LEFT JOIN vw_user_answer ua ON ua.album_id = a.album_id
-            WHERE 
-                ${whereClause}  -- Condición WHERE dinámica
-            GROUP BY 
-                a.album_id, 
-                p.player_id, 
-                p.player_name, 
-                p.is_group, 
-                p.group_id, 
-                p.is_leader, 
-                a.started_on, 
-                a.ended_on
+          SELECT  a.album_id,
+          player_name,
+          a.started_on,
+          a.ended_on,
+          a.ended_on IS NOT NULL AS finalizacion_album,
+          COUNT(DISTINCT question_id) AS preguntas_respondidas,
+          COUNT(DISTINCT question_id) - SUM(success) AS numero_de_errores,
+          (COUNT(DISTINCT question_id) - SUM(success)) / COUNT(DISTINCT question_id) AS porcentaje_error,
+          SUM(latency) / 1000 AS tiempo_total_de_respuesta
+          FROM vw_user_answer ua
+          JOIN album a ON ua.album_id = a.album_id
+          WHERE 
+              ${whereClause}  -- Se inserta la condición WHERE aquí
+          GROUP BY a.album_id, player_name, a.started_on, a.ended_on
         ) t
-        ORDER BY t.finalizacion_album DESC, t.porcentaje_error ASC, t.tiempo_total_de_respuesta ASC;
+        ORDER BY t.finalizacion_album DESC, t.porcentaje_error ASC,t.tiempo_total_de_respuesta ASC;
         `;
         db_1.db.query(queryString, (err, result) => {
             if (err) {
@@ -62,7 +48,6 @@ const getRankingByDate = (date) => {
                     rank: row.ranking,
                     album_id: row.album_id,
                     player_name: row.player_name,
-                    is_group: row.is_group,
                 };
                 ranking.push(a_id);
             });

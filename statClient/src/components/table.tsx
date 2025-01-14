@@ -169,7 +169,6 @@ export default function BasicTable() {
   >
     <ToggleButton value="general" aria-label="solo">
       <div className="languageToggle">
-        <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
         <i className="fas fa-user"> General</i>
       </div>
     </ToggleButton>
@@ -214,8 +213,7 @@ export default function BasicTable() {
       <h3  style={{ textAlign: 'center' }} >
       {selectedMode === 'general' && (
         <>
-          <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
-            Resultados Generales
+          Resultados Generales
         </>
       )}
 

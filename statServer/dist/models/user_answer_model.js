@@ -35,6 +35,7 @@ FROM
 JOIN
 	album ON user_answer.album_id = album.album_id
 GROUP BY album_id
+
 `;
     /*  const queryString = `
       SELECT
