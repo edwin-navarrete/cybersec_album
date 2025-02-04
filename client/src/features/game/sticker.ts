@@ -31,6 +31,7 @@ export namespace Game {
     }
 
     export enum QuizStrategy {
+        thompson = "thompson",
         randomUnseen = "randomUnseen",
         easiestUnseen = "easiestUnseen"
     }

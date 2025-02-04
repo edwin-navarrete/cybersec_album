@@ -104,11 +104,20 @@ export namespace Question {
         }
 
         async generate(count: number): Promise<QuestionDef[]> {
+            let curLanguage = localStorage.getItem("lang") ?? 'es';
+            let albumId = await this.album.getAlbumId();
+            // Thompson Sampling that will exploit the most difficult questions
+            if(this.config.quizStrategy === "thompson"){
+                const questions = []
+                for(let i = 0; i< count; i++){
+                    questions.push( await this.questionDefDAO.nextThompson(curLanguage, albumId));
+                }
+                return questions;
+            }
             // Easiest unseen question first,
             // then the oldest failed questions
             // and then the oldest succeeded
             let self = this
-            let curLanguage = localStorage.getItem("lang");
             return this.userAnswerDAO.findAll({ filter:{ albumId: await this.album.getAlbumId() }, order: ["+success", "+answeredOn"] })
                 .then(answers => answers.map(answer => answer.questionId))
                 .then(seen => {
@@ -297,6 +306,19 @@ export namespace Question {
                 this.loaded = false
             }
             return super.findAll(options)
+        }
+
+        async nextThompson(lang: string, albumId: string){
+            let uri = process.env.REACT_APP_API+`/${this.entrypoint}/thompson`;
+            let resp = await axios.get(uri,{
+                params: { lang: lang, albumId: albumId },
+                headers:{"g-recaptcha-response":DAO.token
+            }})
+            if( resp.data.results ) {
+                let question = resp.data.results;
+                question.id = question[this.entrypoint+'Id'];
+                return question;
+            }
         }
     }
 }

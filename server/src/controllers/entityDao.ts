@@ -25,12 +25,12 @@ export default class EntityDAO<T extends Object> {
     this.insert = insert
   }
 
-  private snakeToCamel(row: Record<string, any>): Record<string, any> {
+  protected snakeToCamel(row: Record<string, any>): Record<string, any> {
     return Object.fromEntries(
       Object.entries(row).map(([key, value]) => [toCamel(key), value])
     );
   }
-  private camelToSnake(row: Record<string, any>): Record<string, any> {
+  protected camelToSnake(row: Record<string, any>): Record<string, any> {
     return Object.fromEntries(
       Object.entries(row).map(([key, value]) => [toSnake(key), value])
     );

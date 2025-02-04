@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/edwin-navarrete/cybersec_album#readme",
   "dependencies": {
+    "@stdlib/random-base-beta": "^0.2.1",
     "@types/cors": "^2.8.17",
     "@types/express-useragent": "^1.0.5",
     "@types/jest": "^28.1.8",

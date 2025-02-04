@@ -32,7 +32,7 @@ const AlbumView = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const [splash, setSplash] = useState(true);
+    const [splash, setSplash] = useState(localStorage.getItem('splash')!='1');
     const [intro, setIntro] = useState(true);
     const [playerName, setPlayerName] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -102,6 +102,7 @@ const AlbumView = () => {
 
     useEffect(() => {
         if (playerId && isFull) {
+            localStorage.setItem('splash','1');
             setTimeout(() => {
                 setSplash(false);
             }, 4500);
@@ -145,11 +146,12 @@ const AlbumView = () => {
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
                 <div className='buttonGrp'>
-                {!isComplete && <Button 
+                { <Button 
                     className={stickers.length === 1? "glowingBtn" : ""}
                     key='button0' variant="contained" 
-                    onClick={handleMoreStickers}>{t("button.earn")}
-                 </Button>}    
+                    onClick={handleMoreStickers}>{!isComplete ? t("button.earn") : "Seguir jugando"}
+                 </Button>}
+ 
                 {hasGroupId && (<Button variant="contained" onClick={handleTeamRedirect}>
                     <i className="fas fa-users"/></Button>)}
                 </div>

@@ -31,7 +31,7 @@ class UserStickerDAO extends EntityDAO<AnswerRow> {
 }
 
 router.get('/userAnswer', [
-  check('albumId', 'album_id is required').isUUID(4),
+  check('albumId', 'albumId is required').isUUID(4),
   validateInput
 ], async (req: Request, res: Response) => {
   const albumId = req.query.albumId as string
