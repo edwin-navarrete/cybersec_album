@@ -296,9 +296,11 @@ export namespace Sticker {
                     }
                     else { // sequential
                         // select sequentially the stickers based on spot
-                        stickers.sort((a, b) => a.spot.localeCompare(b.spot));
-                        for (let i = 0; count-- > 0; i++) {
-                            result.push(stickers[i % stickers.length]);
+                        if(stickers.length){
+                            stickers.sort((a, b) => a.spot.localeCompare(b.spot));
+                            for (let i = 0; count-- > 0; i++) {
+                                result.push(stickers[i % stickers.length]);
+                            }
                         }
                     }
                     return result;

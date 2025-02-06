@@ -148,8 +148,9 @@ const AlbumView = () => {
                 <div className='buttonGrp'>
                 { <Button 
                     className={stickers.length === 1? "glowingBtn" : ""}
-                    key='button0' variant="contained" 
-                    onClick={handleMoreStickers}>{!isComplete ? t("button.earn") : "Seguir jugando"}
+                    key='button0' variant="contained"
+                    startIcon={<i className="fas fa-hand-fist"></i>}
+                    onClick={handleMoreStickers}>{!isComplete ? t("button.earn") : t("button.try")}
                  </Button>}
  
                 {hasGroupId && (<Button variant="contained" onClick={handleTeamRedirect}>
@@ -161,3 +162,4 @@ const AlbumView = () => {
     );
 };
 export default AlbumView;
+

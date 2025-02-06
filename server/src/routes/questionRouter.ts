@@ -31,23 +31,33 @@ interface QuestionRow {
 }
 class QuestionDAO extends EntityDAO<QuestionRow> {
   public async thompson (lang: string, albumId:string): Promise<QuestionRow> {
+    // Exclude questions answered 5 min ago
     let qry = 
-    `SELECT q.question_id, coalesce(sum(success),0) success, coalesce(sum(attempts),0) attempts, max( answered_on ) answered_on, min( latency ) min_latency 
+    `SELECT q.question_id,
+            CAST(coalesce(sum(success), 0) AS UNSIGNED) AS success, 
+            CAST(coalesce(sum(attempts), 0) AS UNSIGNED) AS attempts, 
+            max( answered_on ) answered_on, min( latency ) min_latency,
+            (UNIX_TIMESTAMP() - max( answered_on ) / 1000) DIV 60 answered_min_ago
        FROM question q
        LEFT JOIN user_answer ua ON ua.question_id = q.question_id AND album_id = ?
       WHERE q.lang = ?
-      GROUP BY q.question_id
-      HAVING max( answered_on ) < NOW() - INTERVAL 5 MINUTE`
+      GROUP BY q.question_id`
     
-    const results = await this.fetch(qry,[albumId, lang]);
+    let results = await this.fetch(qry,[albumId, lang]);
     
     results.forEach(q => {
       let alpha = (q.attempts - q.success) || 1e-9;
       let betaParam = q.success || 1e-9;
       q.beta_sample = beta(alpha , betaParam);
-      console.log(` question_id = ${q.question_id}, q.beta_sample = ${q.beta_sample} for ${alpha}, ${betaParam}`)
+      console.log(` question_id = ${q.question_id}, q.beta_sample = ${q.beta_sample} for (${alpha}, ${betaParam}) ${q.answered_min_ago}m ago`)
     })
+    // If some have been seen more than 5 minutes ago, we can exclude them from the results
+    const UNSEEN_MIN_AGO = 5;
+    if (results.some( a => a.answered_min_ago >= UNSEEN_MIN_AGO && !a.success )) {
+      results = results.filter(a => !a.answered_min_ago || a.answered_min_ago >= UNSEEN_MIN_AGO);
+    }
     results.sort((a,b)=> b.beta_sample - a.beta_sample )
+
     let found = await this.get( { filter: { questionId : results[0].question_id, lang: lang } } )
     return this.snakeToCamel(found[0]) as QuestionRow;
   }

@@ -7,7 +7,7 @@ import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import '../index.css';
 import { selectQuestion, selectUnclaimed, selectAchievement, updateToken, QuestionState } from '../features/game/gameSlice';
-import { putAnswer, getPlayTokenFactory } from '../features/game/gameMiddleware';
+import { putAnswer, getPlayTokenFactory, nextQuestion } from '../features/game/gameMiddleware';
 
 import { AppDispatch, RootState } from '../app/store'
 import Button from '@mui/material/Button';
@@ -29,6 +29,10 @@ const QuestionView = () => {
     const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
     const handleTeamRedirect = () => {
         navigate('/players');
+    };
+
+    const handleAlbumRedirect = () => {
+        navigate('/album');
     };
 
     let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6)
@@ -77,6 +81,11 @@ const QuestionView = () => {
             }))
             setOptState(new Array(optCount).fill(false))
         }
+    }
+
+    function handleNewQuestion() {
+        setTimer(-1)
+        dispatch(nextQuestion())
     }
 
     function renderFeedback(success?: boolean | null) {
@@ -163,7 +172,17 @@ const QuestionView = () => {
             </section>
             <div className='buttonContainer'>
                 <div className='buttonGrp'>
-                {hasGroupId && ( <Button variant="contained"  onClick={handleTeamRedirect}>
+                {unclaimed > 0 && <Button 
+                    size="small"
+                    className="glowingBtn"
+                    startIcon={<i className="fas fa-hand-holding-heart"></i>}
+                    variant="contained">{t("button.claim")}
+                 </Button>}
+                {questionState?.success !== undefined && 
+                    <Button size='small' variant="contained" onClick={handleNewQuestion} startIcon={<i className="fas fa-hand-fist"></i>}>
+                    {t("button.try")}
+                    </Button>}
+                {hasGroupId && ( <Button size='small' variant="contained"  onClick={handleTeamRedirect}>
                         <i className="fas fa-users" />
                     </Button>)}
                 </div>

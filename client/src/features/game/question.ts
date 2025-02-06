@@ -110,7 +110,7 @@ export namespace Question {
             if(this.config.quizStrategy === "thompson"){
                 const questions = []
                 for(let i = 0; i< count; i++){
-                    questions.push( await this.questionDefDAO.nextThompson(curLanguage, albumId));
+                    questions.push( shuffleQuestion(await this.questionDefDAO.nextThompson(curLanguage, albumId)) );
                 }
                 return questions;
             }
