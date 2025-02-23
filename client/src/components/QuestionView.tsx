@@ -6,16 +6,21 @@ import { useTranslation } from 'react-i18next';
 import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import '../index.css';
-import { selectQuestion, selectUnclaimed, selectAchievement, updateToken, QuestionState } from '../features/game/gameSlice';
+import { selectQuestion, selectScore, selectUnclaimed, updateToken, QuestionState } from '../features/game/gameSlice';
 import { putAnswer, getPlayTokenFactory, nextQuestion } from '../features/game/gameMiddleware';
 
-import { AppDispatch, RootState } from '../app/store'
+import { AppDispatch } from '../app/store'
 import Button from '@mui/material/Button';
+import { Question } from '../features/game/question';
+
+import Rating from "@mui/material/Rating";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 
 const QuestionView = () => {
+    const score = useSelector(selectScore);
     const questionState = useSelector(selectQuestion);
     const unclaimed = useSelector(selectUnclaimed);
-    const achievement = useSelector((state: RootState) => selectAchievement(state, true));
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     const { t } = useTranslation(); // i18n
@@ -88,12 +93,37 @@ const QuestionView = () => {
         dispatch(nextQuestion())
     }
 
-    function renderFeedback(success?: boolean | null) {
+    function renderFeedback(success?: boolean | null, score?: Question.QuestionScore) {
         if (success === true) {
-            return (<div className="feedbackFrame">
-                <label className="feedbackMsg">{t("quiz.success")}</label>
-                <p className="rewardMsg">{t("quiz.reward", { number: unclaimed })}</p>
-            </div>)
+            if (unclaimed === 0 && score) {
+                return (
+                    <div className="feedbackFrame">
+                        <label className="feedbackMsg">{t("quiz.success_score")}</label>
+                        <div className="scoreDetails">
+                            <Box display="flex" alignItems="center" gap={2} marginTop={2}>
+                                <Rating
+                                    name="score-rating"
+                                    value={(score.score * 10) / 2} // Convertir a rango 0-5
+                                    precision={0.1}
+                                    readOnly
+                                />
+                                <Typography variant="h6">
+                                    {t("quiz.score", {score: score.score})}
+                                </Typography>
+                            </Box>
+                            <p>{t("quiz.expert",{ perc: score.expert/score.total})}</p>
+                            <p>{t("quiz.proficient",{ perc: score.proficient/score.total})}</p>
+                            <p>{t("quiz.beginner",{ perc: score.beginner/score.total})}</p>
+                            <p>{t("quiz.total", { value: score.total})}</p>
+                        </div>
+                    </div>
+                );
+            } else {
+                return (<div className="feedbackFrame">
+                    <label className="feedbackMsg">{t("quiz.success")}</label>
+                    <p className="rewardMsg">{t("quiz.reward", { number: unclaimed })}ooo</p>
+                </div>)
+            }
         }
         if (success === false || success === null) {
             return (<div>
@@ -111,7 +141,7 @@ const QuestionView = () => {
         return "questionOption";
     }
 
-    function renderQuestion(questionState?: QuestionState) {
+    function renderQuestion(questionState?: QuestionState, score?: Question.QuestionScore) {
         const isCoop = !!localStorage.getItem("groupId")
         const isLeader = +(localStorage.getItem("isLeader") ?? 0);
         let message = ''
@@ -161,20 +191,21 @@ const QuestionView = () => {
             {questionState?.success === undefined && <div id="timer">
                 <div id="seconds">{timer}<span>{t("timer.secs")}</span></div>
             </div>}
-            {renderFeedback(success)}
+            {renderFeedback(success, score)}
         </div>);
     }
 
     return (
         <section className="pageContainer">
             <section className="questionContainer" data-testid="container-a">
-                {renderQuestion(questionState)}
+                {renderQuestion(questionState, score)}
             </section>
             <div className='buttonContainer'>
                 <div className='buttonGrp'>
                 {unclaimed > 0 && <Button 
                     size="small"
                     className="glowingBtn"
+                    onClick={handleAlbumRedirect}
                     startIcon={<i className="fas fa-hand-holding-heart"></i>}
                     variant="contained">{t("button.claim")}
                  </Button>}

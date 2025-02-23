@@ -26,7 +26,14 @@ const resources = {
             "quiz.leaderHint":"Or also you could choose a new leader with the button: ",
             "quiz.multipleWrn": "(Select more than one answer)",
             "quiz.fail": "I'm sorry, but keep trying!",
+            "quiz.success_score": "CONGRATULATIONS! You improved your score!",
             "quiz.success": "CONGRATULATIONS! Claim each sticker with a click and continue playing!",
+            "quiz.expert": "Expert: {{perc, percent}}",
+            "quiz.proficient": "Proficient: {{perc, percent}}",
+            "quiz.beginner": "Beginner: {{perc, percent}}",
+            "quiz.novice": "Novice: {{perc, percent}}",
+            "quiz.total": "Total attempts: {{value}}",
+            "quiz.score": "{{score, score}}",
             "quiz.completed": "YOU DID IT! Register and enjoy your completed album",
             "quiz.reward": "Now you have $t(stickers, {\"count\": {{number}} }) to claim.",
             "stickers_one": "{{count}} sticker",
@@ -60,7 +67,14 @@ const resources = {
             "quiz.playDisabled":"Tu siguiente turno se habilita el {{timeDesc}}.",
             "quiz.multipleWrn": "(Escoge más de una respuesta)",
             "quiz.fail": "Lo lamento, pero sigue intentándolo!",
+            "quiz.success_score": "FELICITACIONES! Mejoraste tu puntaje!",
             "quiz.success": "FELICITACIONES! Reclama cada lámina con un click y sigue jugando!",
+            "quiz.expert": "Experto: {{perc, percent}}",
+            "quiz.proficient": "Competente: {{perc, percent}}",
+            "quiz.beginner": "Principiante: {{perc, percent}}",
+            "quiz.novice": "Novato: {{perc, percent}}",
+            "quiz.total": "Intentos totales: {{value}}",
+            "quiz.score": "{{score, score}}",
             "quiz.completed": "LO LOGRASTE! Regístrate y disfruta tu álbum completado.",
             "quiz.reward": "Ahora tienes $t(stickers, {\"count\": {{number}} }) por reclamar.",
             "stickers_one": "{{count}} lámina",
@@ -84,7 +98,22 @@ i18n
         // if you're using a language detector, do not define the lng option
 
         interpolation: {
-            escapeValue: false // react already safes from xss
+            escapeValue: false, // react already safes from xss
+            format: function (value, format, lng) {
+                if (format === "percent") {
+                    return new Intl.NumberFormat(lng, {
+                        style: "percent",
+                        minimumFractionDigits: 2,
+                    }).format(value);
+                }
+                else if (format === "score") {
+                    return new Intl.NumberFormat(lng, {
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 2
+                      }).format(value * 5); 
+                }
+                return value;
+            }
         }
     });
 

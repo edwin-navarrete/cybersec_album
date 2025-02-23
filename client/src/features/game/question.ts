@@ -31,6 +31,15 @@ export namespace Question {
         feedback?: string
     }
 
+    export interface QuestionScore {
+        expert: number,
+        proficient: number,
+        beginner: number,
+        novice: number,
+        total: number,
+        score: number,
+    }
+
     export interface Answer extends Identifiable {
         albumId: string
         questionId: number
@@ -164,6 +173,12 @@ export namespace Question {
             return answer
         }
 
+        async currScore(){
+            let curLanguage = localStorage.getItem("lang") ?? 'es';
+            let albumId = await this.album.getAlbumId();
+            return await this.questionDefDAO.currScore(curLanguage, albumId);
+        }
+        
         getAnswers(): Answer[] {
             return this.answers
         }
@@ -319,6 +334,15 @@ export namespace Question {
                 question.id = question[this.entrypoint+'Id'];
                 return question;
             }
+        }
+
+        async currScore(lang: string, albumId: string): Promise<QuestionScore>{
+            let uri = process.env.REACT_APP_API+`/${this.entrypoint}/score`;
+            let resp = await axios.get(uri,{
+                params: { lang: lang, albumId: albumId },
+                headers:{"g-recaptcha-response":DAO.token
+            }})
+            return resp.data.results;
         }
     }
 }

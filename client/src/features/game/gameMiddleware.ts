@@ -76,10 +76,12 @@ export const putAnswer = createAsyncThunk<FeedbackAndStickers, Attempt, { state:
         let reward = new Sticker.Reward(gameConfig, theAlbum, stickerDAO);
         const stickerDefs = await reward.produceStickers([answer])
         await theAlbum.ownStickers(stickerDefs);
+        let score = await theQuiz.currScore();
         let wrong = attempt.response.filter(r => !question.solution.includes(r))
         return {
             wrong: wrong,
             success: answer.success,
+            score: score,
             stickers: Array.from((await theAlbum.getStickers()).values())
         } as FeedbackAndStickers;
     })

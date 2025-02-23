@@ -203,3 +203,28 @@ CREATE TABLE `player` (
   UNIQUE KEY `player_name` (`player_name`),
   UNIQUE KEY `group_id` (`group_id`,`is_leader`)
 ) ENGINE=InnoDB AUTO_INCREMENT=653 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP VIEW vw_user_answer;
+CREATE VIEW vw_user_answer AS
+select `u`.`album_id`,
+	`u`.`question_id`,
+    max(`u`.`success`) AS `success`,
+    sum(`u`.`latency`) AS `latency`,
+    count(*) AS `attempts`,
+    max(`u`.`answered_on`) AS `answered_on` 
+from `user_answer` `u` 
+group by `u`.`album_id`,`u`.`question_id`;
+
+ALTER TABLE user_answer DROP COLUMN attempts;
+
+WITH to_del AS(SELECT min(user_answer_id) FROM user_answer GROUP BY answered_on HAVING count(*) > 1)
+DELETE FROM user_answer WHERE user_answer_id IN(SELECT * FROM to_del);
+
+ALTER TABLE user_answer ADD UNIQUE INDEX uk_answered_on(answered_on);
+
+DELETE FROM user_answer
+WHERE success IS NULL;
+
+ALTER TABLE user_answer
+MODIFY COLUMN success tinyint(1) NOT NULL;

@@ -16,6 +16,7 @@ export interface Attempt {
 export interface Feedback {
     wrong?: number[]
     success?: boolean | null
+    score?: Question.QuestionScore
 }
 
 export type FeedbackAndStickers = Feedback & {
@@ -31,6 +32,7 @@ export interface AlbumState {
     token: string
     stickerCount: number
     stickers: Sticker.AlbumStiker[]
+    score?: Question.QuestionScore
     team?: Sticker.Team
     question?: QuestionState
 }
@@ -43,6 +45,9 @@ const initialState: AlbumState = {
 
 // Selector for the question
 export const selectQuestion = (state: RootState) => state.game.question;
+
+// Selector for the most recent score
+export const selectScore = (state: RootState) => state.game.score;
 
 // Selector for album stickers
 export const selectStickers = (state: RootState) => state.game.stickers;
@@ -91,6 +96,7 @@ export const abumSlice = createSlice({
                 state.question.success = action.payload.success;
                 state.question.wrong = action.payload.wrong;
             }
+            state.score = action.payload.score
         });
         builder.addCase(fetchAlbum.fulfilled, (state, action) => {
             state.stickers = action.payload

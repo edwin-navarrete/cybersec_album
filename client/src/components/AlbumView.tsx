@@ -32,7 +32,7 @@ const AlbumView = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    const [splash, setSplash] = useState(localStorage.getItem('splash')!='1');
+    const [splash, setSplash] = useState(localStorage.getItem('splash')!=='1');
     const [intro, setIntro] = useState(true);
     const [playerName, setPlayerName] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);

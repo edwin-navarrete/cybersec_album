@@ -14,7 +14,6 @@ CREATE TABLE `ssolucio_cyberalbum`.`user_answer` (
    `question_id` INT NOT NULL ,
    `success` BOOLEAN,
    `latency` INT,
-   `attempts` INT,
    `answered_on` BIGINT NOT NULL,
     PRIMARY KEY (`user_answer_id`),
     INDEX `album_id_idx` (`album_id`) ) ENGINE = InnoDB;
@@ -24,7 +23,6 @@ interface AnswerRow {
     questionId: number
     success?: boolean
     latency?: number
-    attempts?: number
     answeredOn: number
 }
 class UserStickerDAO extends EntityDAO<AnswerRow> {
@@ -49,15 +47,14 @@ router.get('/userAnswer', [
 router.post('/userAnswer', [
   check('albumId', 'album_id is required').isUUID(4),
   check('questionId', 'question_id is required').isNumeric(),
-  check('attempts', 'attempts is required').optional().isNumeric(),
   check('success', 'success is required').optional({ nullable: true }).isBoolean(),
   check('latency', 'latency is required').optional().isNumeric(),
   check('answeredOn', 'answered_on is required').isNumeric(),
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new UserStickerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'user_answer')
-  const { albumId, questionId, answeredOn, success = null, latency = null, attempts = null } = req.body;
-  const value: AnswerRow = { albumId, questionId, answeredOn, success, latency, attempts };
+  const { albumId, questionId, answeredOn, success = null, latency = null } = req.body;
+  const value: AnswerRow = { albumId, questionId, answeredOn, success, latency };
   
   try {
     let result = await dao.post(value)
