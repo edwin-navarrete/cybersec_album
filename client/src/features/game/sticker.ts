@@ -417,6 +417,7 @@ export namespace Sticker {
         async registerPlayer(playerName: string, gameMode: string): Promise<string> {
            try {
                 const playerId = localStorage.getItem("playerId");
+                console.log(process.env.REACT_APP_API);
                 const apiResponse = await axios.post(process.env.REACT_APP_API+'/player',{
                     playerId: playerId,
                     playerName: playerName,
