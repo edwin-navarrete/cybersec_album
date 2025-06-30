@@ -5,10 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
-
 import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
-import { nextQuestion, stickerSample, glueSticker, registerPlayer } from '../features/game/gameMiddleware';
-import { AppDispatch } from '../app/store'
+import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
+import { AppDispatch, RootState } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
 
@@ -16,7 +15,19 @@ const AlbumView = () => {
     const dispatch = useDispatch() as AppDispatch;
     const spots = useSelector(selectStickerSpots);
     const stickers = useSelector(selectStickers);
+    const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
+
+    // Load initial album state
+    useEffect(() => {
+        dispatch(fetchAlbum());
+    }, [dispatch]);
+
+    const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
+    const handleTeamRedirect = () => {
+        navigate('/players');
+    };
+
 
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -24,6 +35,7 @@ const AlbumView = () => {
     const [splash, setSplash] = useState(true);
     const [intro, setIntro] = useState(true);
     const [playerName, setPlayerName] = useState('');
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         var player = localStorage.getItem('playerName')
@@ -36,13 +48,12 @@ const AlbumView = () => {
     const handleCaptcha = useCallback(async (token : string) => {
         // console.log(token.slice(-5));
         dispatch(updateToken(token));
-        if(stickers.length === 1 && !stickers[0].inAlbum) dispatch(glueSticker(await stickerSample))
         // eslint-disable-next-line
     }, [dispatch, stickers]);
 
     function handleMoreStickers() {
         dispatch(nextQuestion())
-        navigate("/reto/")
+        navigate("/quest")
     }
 
     function getStickerView(spot: string) {
@@ -63,38 +74,69 @@ const AlbumView = () => {
 
     const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPlayerName(event.target.value);
+        setErrorMessage(null); 
     };
 
 
-    function handleSubmit() {
-        if (playerName.trim() !== '') {
-            dispatch(registerPlayer(playerName));
-            setSplash(false);
+    function handleSubmit(event: React.FormEvent) {
+        event.preventDefault();
+        if (playerName.trim() === '') {
+            setErrorMessage(t("emptyName.err"));
+            return;
         }
+        dispatch(registerPlayer({ playerName, gameMode: 'solo'}))
+        .unwrap()
+        .then(() => {
+            setErrorMessage(null); 
+            setSplash(false);
+        })
+        .catch((error) => {
+            if (error.message === "DUPLICATE_NAME") {
+                setErrorMessage(t("dupName.err"));
+            } else {
+                setErrorMessage(t("registration.err"));
+            }
+        });
     }
+    const playerId = localStorage.getItem("playerId");
 
+    useEffect(() => {
+        if (playerId && isFull) {
+            setTimeout(() => {
+                setSplash(false);
+            }, 4500);
+        }
+    });
     function success() {
         return splash && (
             <form className='successSplash' onSubmit={handleSubmit}>
                 <div className="successForm">
                     <p className="completed" >{t("quiz.completed")}</p>
-                    <TextField
-                        id="playerName"
-                        type="text"
-                        variant="standard"
-                        value={playerName}
-                        onChange={handleNameChange}
-                        placeholder={t("hint.register")}
-                        required />
-                    <Button type="submit" className="glowingBtn">{t("button.register")}</Button>
+                    {!playerId && (
+                        <>
+                            <TextField
+                                id="playerName"
+                                type="text"
+                                variant="standard"
+                                value={playerName}
+                                onChange={handleNameChange}
+                                placeholder={t("hint.register")}
+                                error={!!errorMessage}
+                                required
+                            />
+                            {errorMessage && <p className="errorMessage">{errorMessage}</p>}
+                            <Button type="submit" className="glowingBtn">
+                                {t("button.register")}
+                            </Button>
+                        </>
+                    )}
                 </div>
             </form>);
     }
-
+    const captchaKey = process.env.CAPTCHAKEY;
     return (
         <section className="pageContainer">
-
-            <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>
+            {captchaKey && <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>}
             <section className="albumContainer" data-testid="container-a" key='album0'>
                 {spots.map((spot) => getStickerView(spot))}
             </section>
@@ -102,7 +144,15 @@ const AlbumView = () => {
             {isFull && success()}
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
-                {!isFull && <Button className={stickers.length === 1? "glowingBtn" : ""} key='button0' variant="contained" onClick={handleMoreStickers}>{t("button.earn")}</Button>}
+                <div className='buttonGrp'>
+                {!isComplete && <Button 
+                    className={stickers.length === 1? "glowingBtn" : ""}
+                    key='button0' variant="contained" 
+                    onClick={handleMoreStickers}>{t("button.earn")}
+                 </Button>}    
+                {hasGroupId && (<Button variant="contained" onClick={handleTeamRedirect}>
+                    <i className="fas fa-users"/></Button>)}
+                </div>
             </div>
         </section>
 

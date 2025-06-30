@@ -7,7 +7,7 @@ import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import '../index.css';
 import { selectQuestion, selectUnclaimed, selectAchievement, updateToken, QuestionState } from '../features/game/gameSlice';
-import { putAnswer, nextQuestion } from '../features/game/gameMiddleware';
+import { putAnswer, getPlayTokenFactory } from '../features/game/gameMiddleware';
 
 import { AppDispatch, RootState } from '../app/store'
 import Button from '@mui/material/Button';
@@ -26,6 +26,11 @@ const QuestionView = () => {
         // eslint-disable-next-line
     }, [dispatch, questionState]);
 
+    const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
+    const handleTeamRedirect = () => {
+        navigate('/players');
+    };
+
     let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6)
     let optCount = questionState?.options.length || 4;
 
@@ -33,7 +38,7 @@ const QuestionView = () => {
     const [timestamp, setTimestamp] = useState(-1)
 
     // go to album if answered enough to fill the album
-    useEffect(() => { achievement && navigate("/") })
+    useEffect(() => { achievement && navigate("/album") })
     useEffect(() => {
         let interval: NodeJS.Timer;
         if (questionState?.success === undefined) {
@@ -74,11 +79,6 @@ const QuestionView = () => {
         }
     }
 
-    function handleNewQuestion() {
-        setTimer(-1)
-        dispatch(nextQuestion())
-    }
-
     function renderFeedback(success?: boolean | null) {
         if (success === true) {
             return (<div className="feedbackFrame">
@@ -103,11 +103,41 @@ const QuestionView = () => {
     }
 
     function renderQuestion(questionState?: QuestionState) {
+        const isCoop = !!localStorage.getItem("groupId")
+        const isLeader = +(localStorage.getItem("isLeader") ?? 0);
+        let message = ''
+        if(isCoop && !isLeader){
+            message += t("quiz.notLeader");
+        }
+        else {
+            const tokenFactory = getPlayTokenFactory(isCoop);
+            const playToken = localStorage.getItem("playToken") ?? '';
+            const token = tokenFactory.loadToken(playToken);
+            if(token.isInvalid()){
+                message += t("quiz.playDisabled",{timeDesc: token.validPeriod()}) ;
+            }
+        }
+        const getImageSrc = () => {
+            if (isCoop && !isLeader) return { src: "../waitleader.jpeg", alt: "Wait for Leader" };
+            return { src: "../sandtimer.gif", alt: "Wait for your turn" };
+        };
+
+        if(message){
+            const imageProps = getImageSrc();
+            return (
+                <div className='questionFrame'>
+                    <img src={imageProps.src} alt={imageProps.alt}></img>
+                <p>{message}</p>{isCoop && (<><p>{t("quiz.leaderHint")}<i className="fas fa-users"></i></p></>) }
+            </div>);
+        }
+    
         if (!questionState) return (<div className='questionFrame' />);
+
+        const captchaKey = process.env.CAPTCHAKEY;
 
         const { question, options, success, solution, wrong } = questionState
         return (<div className='questionFrame' >
-            <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/>
+            { captchaKey && <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/> }
             <h3>{question}</h3>
             {solution.length > 1 && <h4>{t("quiz.multipleWrn")}</h4>}
             {options.map((option, i) =>
@@ -132,8 +162,11 @@ const QuestionView = () => {
                 {renderQuestion(questionState)}
             </section>
             <div className='buttonContainer'>
-                <Button variant="contained" onClick={() => navigate("/")}>{t("button.back")}</Button>
-                {questionState?.success !== undefined && <Button variant="contained" onClick={handleNewQuestion}>{t("button.earn")}</Button>}
+                <div className='buttonGrp'>
+                {hasGroupId && ( <Button variant="contained"  onClick={handleTeamRedirect}>
+                        <i className="fas fa-users" />
+                    </Button>)}
+                </div>
             </div>
         </section>
     );

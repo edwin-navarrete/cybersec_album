@@ -1,6 +1,7 @@
 // get the client
 import mysql from 'mysql2/promise'
 import { Fetch, Insert } from './DBDriver'
+import { URL } from 'url';
 
 class MySQLDriver {
   // create the connection to database
@@ -33,15 +34,14 @@ class MySQLDriver {
     return connection;
   }
 
-  fetch: Fetch = async (query: string) => {
+  fetch: Fetch = async (query: string, values?: any[]) => {
     const connection = await this.getConnection(1000);
     if (!connection) {
       throw new Error('Unable to acquire database connection');
     }
     try {
         console.log('FETCH', query)
-        const connection = await this.getConnection(1000)
-        const [rows] = await connection.execute(query)
+        const [rows] = await connection.execute(query, values)
         connection.release();
         return rows as any[]
     } catch (error) {
@@ -68,10 +68,28 @@ class MySQLDriver {
   }
 }
 
-export default new MySQLDriver({
-  user: process.env.DB_USER,
-  password: process.env.DB_PWD,
-  database: process.env.DB_NAME,
-  host: process.env.DB_HOST,
-  connectionLimit: 3
-})
+const connOpts: mysql.ConnectionOptions = {
+  connectionLimit: 10
+}
+
+const jawsdbUrl = process.env.JAWSDB_MARIA_URL;
+
+if(jawsdbUrl){
+  const parsedUrl = new URL(jawsdbUrl);
+  console.log('JAWSDB_MARIA_URL',parsedUrl.hostname);
+  connOpts.user = parsedUrl.username;  
+  connOpts.password = parsedUrl.password;  
+  connOpts.host = parsedUrl.hostname;  
+  connOpts.port = Number(parsedUrl.port) || 3306;  
+  connOpts.database = parsedUrl.pathname.split('/')[1]; 
+
+}
+else {
+  connOpts.user = process.env.DB_USER;
+  connOpts.password = process.env.DB_PWD;
+  connOpts.host = process.env.DB_HOST;
+  connOpts.port = 3306;
+  connOpts.database = process.env.DB_NAME;
+}
+
+export default new MySQLDriver(connOpts);

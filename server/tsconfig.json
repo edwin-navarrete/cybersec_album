@@ -9,9 +9,10 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "dist",
+    "sourceMap": true,
     "resolveJsonModule": true,
     "target": "es6"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }

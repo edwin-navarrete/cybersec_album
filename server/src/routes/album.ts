@@ -3,6 +3,7 @@ import { check, validationResult } from 'express-validator'
 
 import EntityDAO from '../controllers/entityDao'
 import mysqlDriver from '../controllers/mysqlDriver'
+import validateInput from './validateInput'
 
 const router = Router()
 
@@ -21,28 +22,19 @@ CREATE TABLE `ssolucio_cyberalbum`.`album` (
 */
 
 interface AlbumRow {
-    album_id: string
-    player_name: string
-    started_on: number
-    ended_on?: number
+    albumId: string
+    playerId: number
+    startedOn: number
+    endedOn?: number
     language: number
     os?: string
     platform? : string
     browser? : string
     version? : string
-    is_mobile ? : boolean
+    isMobile ? : boolean
 }
 
 class AlbumDAO extends EntityDAO<AlbumRow> {
-}
-
-const validateInput = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    console.log('Failed validation for: ', req.body)
-    return res.status(400).json(errors)
-  }
-  next()
 }
 
 router.post('/album', [
@@ -53,22 +45,52 @@ router.post('/album', [
   validateInput
 ], async (req: Request, res: Response) => {
   const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
-  const value = {
-    album_id: req.body.albumId,
-    player_name: req.body.playerName || null,
-    started_on: req.body.startedOn,
-    ended_on: req.body.endedOn || null,
+  const value: AlbumRow = {
+    albumId: req.body.albumId,
+    playerId: req.body.playerId ?? null,
+    startedOn: req.body.startedOn,
+    endedOn: req.body.endedOn ?? null,
     language: req.body.language,
-    os: req.useragent?.os,
-    platform: req.useragent?.platform,
-    browser: req.useragent?.browser,
-    version: req.useragent?.version,
-    is_mobile: req.useragent?.isMobile
-  } as AlbumRow
-  dao.upsert(value).catch(err => {
-    console.log('Failed post album:', err)
-  })
-  res.status(200).json(value)
+    os: req.useragent?.os ?? null,
+    platform: req.useragent?.platform ?? null,
+    browser: req.useragent?.browser ?? null,
+    version: req.useragent?.version ?? null,
+    isMobile: req.useragent?.isMobile ?? false
+  };
+  try {
+    await dao.post(value)
+    // owner player is set only once
+    if(value.playerId){
+      await mysqlDriver.insert('UPDATE album SET player_id = COALESCE(player_id,?) WHERE album_id=?', [value.playerId, value.albumId])
+    }
+    res.status(200).json(value)
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({ errorMessage: error })
+  }
+})
+
+router.get('/album',[
+  check('albumId', 'album_id is UUID').optional().isUUID(4),
+  check('playerId', 'playerId must be numeric').optional({ nullable: true }).isNumeric(),
+  validateInput
+], async (req: Request, res: Response) => {
+  const albumId = req.query.albumId as string
+  const playerId = req.query.playerId as string
+  if(!albumId && !playerId){
+    return res.status(400).json({ errorMessage: "requires albumId or playerId" })
+  }
+  const dao = new AlbumDAO(mysqlDriver.fetch, mysqlDriver.insert, 'album')
+  try {
+    const albums = await dao.get({
+      filter:{albumId, playerId, endedOn: null},
+      order: "-startedOn"
+    })
+    res.status(200).json({ results: albums })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ errorMessage: error })
+  }
 })
 
 module.exports = router

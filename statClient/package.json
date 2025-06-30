@@ -5,6 +5,9 @@
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@mui/icons-material": "^5.11.11",
     "@mui/material": "^5.12.1",
     "@mui/x-date-pickers": "^6.2.1",
@@ -19,6 +22,7 @@
     "dayjs": "^1.11.7",
     "demo": "^0.1.10",
     "dotenv": "^16.0.3",
+    "manager-ui": "file:",
     "react": "^18.2.0",
     "react-calendar": "^4.2.1",
     "react-dom": "^18.2.0",

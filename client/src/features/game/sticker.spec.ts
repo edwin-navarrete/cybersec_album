@@ -1,8 +1,13 @@
 
 import { Question } from "./question";
-import { Sticker } from "./sticker";
+import { Game, Sticker } from "./sticker";
 import questionDB from './test/sampleQuestions.json';
 import stickersDB from './test/sampleStickers.json';
+import axios from 'axios'
+
+// Mock de Axios
+jest.mock('axios')
+const mockedAxios = axios as jest.Mocked<typeof axios>
 
 describe('UserStickerDAO', () => {
 
@@ -10,6 +15,7 @@ describe('UserStickerDAO', () => {
 
     beforeEach(() => {
         userStickerDAO = new Sticker.UserStickerDAO([])
+        mockedAxios.post.mockClear()
     })
 
 
@@ -36,10 +42,13 @@ describe('Album', () => {
     var userStickerDAO: Sticker.UserStickerDAO
     var album: Sticker.Album
 
-    beforeEach(() => {
+    beforeEach(() => {  
         let stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
         userStickerDAO = new Sticker.UserStickerDAO([])
-        album = new Sticker.Album(stickerDAO, userStickerDAO, "juan")
+        // Disable remote access
+        userStickerDAO.entrypoint = ""
+        album = new Sticker.Album(stickerDAO, userStickerDAO)
+        jest.spyOn(album, 'getAlbumId').mockResolvedValue('juan')
     })
 
 
@@ -122,30 +131,37 @@ describe('Reward', () => {
     let quiz: Question.Quiz
     let userAnswerDAO: Question.UserAnswerDAO
 
-    let config: Question.GameConfig = {
-        quizStrategy: Question.QuizStrategy.randomUnseen,
-        rewardSchema: Question.RewardSchema.latency,
-        rewardStrategy: Question.RewardStrategy.sequential
+    let config: Game.GameConfig = {
+        quizStrategy: Game.QuizStrategy.randomUnseen,
+        rewardSchema: Game.RewardSchema.latency,
+        rewardStrategy: Game.RewardStrategy.sequential,
+        soloTokenStrategy: Game.PlayTokenStrategy.unlimited,
+        coopTokenStrategy: Game.PlayTokenStrategy.unlimited,
+        leaderTimeout: 100
     }
 
     beforeEach(() => {
         questionDefDAO = new Question.QuestionDefDAO(questionDB as Question.QuestionDef[])
+        questionDefDAO.entrypoint=""
         stickerDAO = new Sticker.StickerDAO(stickersDB as Sticker.StickerDef[])
+        stickerDAO.entrypoint = ""
         userStickerDAO = new Sticker.UserStickerDAO([])
-        album = new Sticker.Album(stickerDAO, userStickerDAO, "juan")
+        userStickerDAO.entrypoint = ""
+        album = new Sticker.Album(stickerDAO, userStickerDAO)
         reward = new Sticker.Reward(config, album, stickerDAO)
         userAnswerDAO = new Question.UserAnswerDAO()
+        userAnswerDAO.entrypoint = ""
     })
 
     it('no rewards when no answers', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let rewards = await reward.produceStickers([])
         // "Waiting no rewards"
         expect(rewards.length).toEqual(0)
     });
 
     it('no rewards when all is wrong', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let questions = await quiz.generate(3);
         for (const q of questions) {
             let wrong = q.options
@@ -160,7 +176,7 @@ describe('Reward', () => {
 
 
     it('reward by latency', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let questions = await quiz.generate(3);
         let latencies = [1_000, 4_500, 5_500, 10_000].values()
         for (const q of questions) {
@@ -176,7 +192,7 @@ describe('Reward', () => {
 
 
     it('reward by difficulty', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let questions = await quiz.generate(6);
         let expected = []
         for (const q of questions) {
@@ -201,7 +217,7 @@ describe('Reward', () => {
 
 
     it('max rewards on perfect quiz', async () => {
-        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+        quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
         let questions = await quiz.generate(3);
         for (const q of questions) {
             await quiz.putAnswer(q, q.solution, 1_000)
@@ -221,7 +237,7 @@ describe('Reward', () => {
         let maxIter = 100
         let filledPerc = 0
         while (filledPerc < 1 && maxIter--) {
-            quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, "juan")
+            quiz = new Question.Quiz(config, userAnswerDAO, questionDefDAO, album)
             let questions = await quiz.generate(3);
             for (const q of questions) {
                 const rndInt = Math.floor(Math.random() * q.options.length)
@@ -245,5 +261,68 @@ describe('Reward', () => {
         }
         // "Reached limit of iterations"
         expect(maxIter).toBeGreaterThan(0)
+    });
+});
+
+describe('BusinessDayToken Tests', () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date('2024-12-16T11:35:17Z').getTime());
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    test('Token is initially valid', () => {
+        const token = new Game.BusinessDayToken(1, 1); // Monday, 1-day increment
+        expect(token.isInvalid()).toBe(true);
+    });
+
+    test('Token expires after 24 hours', () => {
+        const token = new Game.BusinessDayToken(1, 1);
+        token.startDate -= 3 * 24 * 60 * 60 * 1000; // Set to 3d ago, Friday
+        expect(token.validPeriod()).toBe('2024-12-13');
+        expect(token.isInvalid()).toBe(false);
+        expect(token.validPeriod()).toBe('2024-12-17');
+    });
+
+    test('Token moves to next business day after expiration', () => {
+        const token = new Game.BusinessDayToken(4, 2); // Thrusday, 2-day increment
+        token.startDate -= 7 * 24 * 60 * 60 * 1000; // Expired 1w ago
+        token.isInvalid(); // This should trigger a move
+        const newStartDate = new Date(token.startDate);
+        expect(newStartDate.getDay()).not.toBe(0); // Not Sunday
+        expect(newStartDate.getDay()).not.toBe(6); // Not Saturday
+        expect(token.validPeriod()).toBe('2024-12-18');
+    });
+
+    test('Valid period returns correct date', () => {
+        const token = new Game.BusinessDayToken(1, 1);
+        const expectedDate = new Date(token.startDate).toISOString().split('T')[0];
+        expect(token.validPeriod()).toBe(expectedDate);
+    });
+
+    test('Spend moves token to next business day', () => {
+        const token = new Game.BusinessDayToken(1, 6);
+        expect(token.validPeriod()).toBe('2024-12-16');
+        const oldStartDate = token.startDate;
+        token.spend();
+        expect(token.startDate).not.toBe(oldStartDate);
+        expect(token.validPeriod()).toBe('2024-12-24');
+    });
+
+    test('Token can be stored', () => {
+        const token = new Game.BusinessDayToken(1, 6);
+        expect(token.validPeriod()).toBe('2024-12-16');
+        const toBeStored = {className: token.constructor.name, data: token}
+        const stored = JSON.stringify(toBeStored);
+
+        const restored = JSON.parse(stored);
+        const newTok = new Game.BusinessDayToken();
+        Object.assign(newTok, restored.className);
+        expect(token.validPeriod()).toBe('2024-12-16');
+        expect(token.startDate).toBe(1734325200000);
+        expect(token.increment).toBe(6);
     });
 });

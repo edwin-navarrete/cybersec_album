@@ -29,10 +29,16 @@ export default function ToggleLang() {
             size="small"
         >
             <ToggleButton value="es" aria-label="left aligned">
-                Español
+                <div className="languageToggle">
+                    <img src="flag-spain.svg" alt="Español" className="flagIcon" />
+                    Español
+                </div>
             </ToggleButton>
             <ToggleButton value="en" aria-label="centered">
-                English
+                <div className="languageToggle">
+                    <img src="flag-uk.svg" alt="English" className="flagIcon" />
+                    English
+                </div>
             </ToggleButton>
         </ToggleButtonGroup>
     );

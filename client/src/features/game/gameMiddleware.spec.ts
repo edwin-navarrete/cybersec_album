@@ -1,14 +1,87 @@
 // import { AnyAction } from 'redux'
 // import { PayloadAction } from '@reduxjs/toolkit'
-import { userStickerDAO, nextQuestion, putAnswer, glueSticker } from './gameMiddleware'
+import { userStickerDAO, userAnswerDAO, questionDefDAO, nextQuestion, putAnswer, glueSticker } from './gameMiddleware'
 import { QuestionState, FeedbackAndStickers } from './gameSlice'
-import { Sticker } from "./sticker";
+import { Game, Sticker } from "./sticker";
+import axios from 'axios'
+
+// Mock de Axios
+jest.mock('axios')
+const mockedAxios = axios as jest.Mocked<typeof axios>
+
+describe('WorkingDaysPlayTokenFactory', () => {
+    let factory: Game.BussinessDaysPlayTokenFactory;
+
+    beforeEach(() => {
+        factory = new Game.BussinessDaysPlayTokenFactory();
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
+    const mockDate = (isoDate: string) => {
+        jest.spyOn(global.Date, 'now').mockImplementation(() => new Date(isoDate).getTime());
+    };
+
+    it('should produce correct play token for Solo', async () => {
+        localStorage.removeItem("groupId");
+        localStorage.removeItem("isLeader");
+        const token = factory.produceToken();
+        expect(token.constructor.name).toBe('BusinessDayToken');
+        const bizDayTok : Game.BusinessDayToken = token as Game.BusinessDayToken;
+        expect(bizDayTok.increment).toBe(1);
+    })
+
+    it('should produce correct play token for Coop/Leader', async () => {
+        localStorage.removeItem("groupId");
+        localStorage.removeItem("isLeader");
+        const token = factory.produceToken();
+        expect(token.constructor.name).toBe('BusinessDayToken');
+        const bizDayTok : Game.BusinessDayToken = token as Game.BusinessDayToken;
+        expect(bizDayTok.increment).toBe(5);
+    })
+
+    it('should produce correct play token for Coop/NoLeader', async () => {
+        localStorage.removeItem("groupId");
+        localStorage.removeItem("isLeader");
+        const token = factory.produceToken();
+        expect(token.constructor.name).toBe('DisabledToken');
+    })
+
+    test.each([
+        [1, new Date(2024, 11, 16)], // Monday
+        [2, new Date(2024, 11, 17)], // Tuesday
+        [3, new Date(2024, 11, 18)], // Wednesday
+        [4, new Date(2024, 11, 19)], // Thursday
+        [5, new Date(2024, 11, 13)], // Friday
+        [6, new Date(2024, 11, 16)], // Monday
+        [7, new Date(2024, 11, 17)], // Tuesday
+    ])(
+        'should produce correct play token for leaderOrdinal %i starting on %s',
+        (leaderOrdinal, expectedStartDate) => {
+            mockDate('2024-12-13T12:00:00Z'); // A Friday
+            localStorage.setItem("isLeader", String(leaderOrdinal));
+            const token = factory.produceToken();
+
+            const expectedEnd = new Date(expectedStartDate);
+            expectedEnd.setDate(expectedEnd.getDate() + 1);
+
+            expect(token.validPeriod()).toBe(expectedStartDate.toISOString().split('T')[0]);
+        }
+    );
+});
 
 describe('gameMiddleware', () => {
 
     beforeEach(() => {
         // Clear userStickerDAO
         userStickerDAO.db.length = 0
+        // Disconnect remote access
+        userStickerDAO.entrypoint = ""
+        userAnswerDAO.entrypoint = ""
+        questionDefDAO.entrypoint = ""
+        mockedAxios.post.mockClear()
     })
 
     it('should do a full cycle', async () => {
@@ -42,9 +115,11 @@ describe('gameMiddleware', () => {
         // any sticker can be glued
         let originalSize = feedback.stickers.length;
         let sticker = feedback.stickers.values().next().value
-        let stickerAction = await glueSticker(sticker)(dispatch, state, {})
-        let album = stickerAction.payload as Sticker.AlbumStiker[];
-        expect(album.length).toEqual(originalSize);
-        expect(Array.from(album.values()).some((s: Sticker.UserSticker) => s.inAlbum)).toBeTruthy()
+        if(sticker){
+            let stickerAction = await glueSticker(sticker)(dispatch, state, {})
+            let album = stickerAction.payload as Sticker.AlbumStiker[];
+            expect(album.length).toEqual(originalSize);
+            expect(Array.from(album.values()).some((s: Sticker.UserSticker) => s.inAlbum)).toBeTruthy()
+        }
     });
 })

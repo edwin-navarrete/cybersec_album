@@ -11,16 +11,24 @@ import './i18n';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
+const captchaKey = process.env.CAPTCHAKEY;
 
 root.render(
-    <React.StrictMode>
-        <GoogleReCaptchaProvider reCaptchaKey="6LcyfW0gAAAAAG83fUNaYUF8X-x87Cg-Af5RPhnM">
-            <Provider store={store}>
-                <App />
-            </Provider>
-        </GoogleReCaptchaProvider>
-    </React.StrictMode>
+  <React.StrictMode>
+    {captchaKey ? (
+      <GoogleReCaptchaProvider reCaptchaKey={captchaKey}>
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </GoogleReCaptchaProvider>
+    ) : (
+      <Provider store={store}>
+        <App />
+      </Provider>
+    )}
+  </React.StrictMode>
 );
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

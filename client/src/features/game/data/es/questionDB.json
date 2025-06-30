@@ -348,17 +348,16 @@
     "type": "multiple",
     "question": "Son clases de vulnerabilidades:",
     "options": [
-      "Deliberada, Accidental ",
-      "Red, Lugar",
+      "Deliberada, Accidental",
+      "Externa, Interna",
       "Hardware, Software",
       "Personal, Organización"
     ],
     "solution": [
-      1,
-      2,
-      3
+      3,
+      4
     ],
-    "difficulty": 2.3,
+    "difficulty": 3.0,
     "feedback": "Las clases de vulnerabilidades incluyen las relacionadas con hardware, software y las personales u organizacionales. Es crucial identificar y abordar cada una para mantener la seguridad de la información."
   }
 ]

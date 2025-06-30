@@ -48,12 +48,39 @@ code {
     monospace;
 }
 
-.navTitle {
+.navTitle {  
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: auto;
-  padding: 15px;
+  padding: 0 7px;
   text-align: center;
   color: var(--navbar-txt);
   background: linear-gradient(to bottom, var(--navbar-0), var(--navbar-0), var(--navbar-1));
+}
+
+.navTitle button {
+  margin-right: auto;
+  background-color: transparent;
+  border: none;
+  color: var(--navbar-txt);
+  font-size: 16px;
+  cursor: pointer;
+
+}
+
+.navTitle h2 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.navTitle a {
+  text-decoration: none;
+  color: inherit;
+  font-size: 30px;
+  font-weight: bold;
 }
 
 .grecaptcha-badge {
@@ -67,8 +94,20 @@ code {
   background-color: white;
   position: fixed;
   bottom: 0;
-  padding: 5px 0;
+  padding: 5px 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  /* justify-content: center; */
   background: linear-gradient(to bottom,  var(--navbar-1), var(--navbar-0), var(--navbar-0));
+}
+
+.buttonGrp {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  height: 36px;
 }
 
 .albumContainer {
@@ -77,6 +116,58 @@ code {
   grid-template-columns: repeat(3, 1fr);
   margin-bottom: 75px;
 }
+
+.playersHeader {
+  text-align: center;
+  padding: 2px;
+  background-color: steelblue;
+  color: white;
+}
+
+.playersHeader i {
+  margin-right: 8px;
+}
+
+.playerContainer {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: repeat(1, 1fr);
+  margin-bottom: 75px;
+}
+
+.playerRowContainer {
+  width: 100%;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(2, 2fr);
+  background-color: whitesmoke;
+  color: darkslateblue;
+}
+
+.playerNameContainer {
+  text-align: center;
+  width: 100%;
+  padding: 5px 0;
+}
+
+.playerStarsContainer {
+  text-align: left;
+  width: 58%;
+  padding: 15px 5px;
+}
+
+.playerButtonContainer {
+  text-align: center;
+  width: 86%;
+  padding: 5px 5px;
+}
+
+.playerRow {
+  width: 100%;
+  background-color: #d3c199;
+  border: 1px solid bisque;
+}
+
 
 .questionOption {
     margin: 10px;
@@ -132,6 +223,8 @@ code {
     display: flex;
     flex-direction: column;
     padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
 }
 
 .feedbackFrame {
@@ -227,6 +320,20 @@ code {
   bottom: -24px;
 }
 
+.languageToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacio entre la bandera y el texto */
+}
+
+.flagIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%; /* Hace que la imagen sea redonda */
+  object-fit: cover; /* Ajusta la imagen al contenedor */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para un mejor efecto */
+}
+
 .successSplash {
     place-items: end;
     display: grid;
@@ -242,15 +349,61 @@ code {
     background-position: center center;
 }
 
+.registrationForm
+{
+  max-width: 400px; /* Ajusta al tamaño deseado */
+  margin: 0 auto; /* Centra el formulario */
+  padding: 20px;
+  background-color: #f9f9f9; /* Fondo suave */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  font-family: Arial, sans-serif;
+}
+
+.formHeader {
+  text-align: center;
+}
+
+.formHeader h2 {
+  margin: 10px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.formHeader h3 {
+  margin: 10px 0;
+  font-size: 1.0  rem;
+  color: #555;
+}
+
+.gameModeSelector {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.playerNameField {
+  margin: 20px 0;
+}
+
+.formActions {
+  margin-top: 20px;
+  text-align: center;
+}
+
 .successForm
 {
     margin: 10px 10px;
     text-align: center;
 }
-.successForm button {
-    color: cyan;
+
+.errorMessage {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  text-align: left; /* Alineación opcional */
 }
 
+successSplash
 .rewardMsg {
     font-family: 'Itim', cursive;
     font-size: 20px;
