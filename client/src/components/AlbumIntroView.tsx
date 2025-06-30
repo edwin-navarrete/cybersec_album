@@ -51,6 +51,8 @@ const AlbumIntroView = () => {
         .catch((error) => {
             if (error.message === "DUPLICATE_NAME") {
                 setErrorMessage("dupName.err");
+            } else if (error.message === "INVALID_NAME") {
+                setErrorMessage("badName.err");
             } else {
                 setErrorMessage("registration.err");
             }

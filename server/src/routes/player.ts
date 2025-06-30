@@ -57,7 +57,7 @@ router.post('/player', [
     check('lang', "lang must be 'es' or 'en'").default('es').optional().matches('(en|es)'),
     check('playerId', 'playerId must be numeric').optional({ nullable: true }).isNumeric(),
     check('isLeader', "isLeader must be boolean").optional().isBoolean(),
-    check('playerName', 'playerName is required and is chars and spaces').isAlpha('es-ES', { ignore: ' ' }),
+    check('playerName', 'playerName is required and is chars numbers and spaces').isAlphanumeric('es-ES', { ignore: ' ' }),
     validateInput
     ], async (req: Request, res: Response) => {
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')

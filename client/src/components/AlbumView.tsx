@@ -92,9 +92,11 @@ const AlbumView = () => {
         })
         .catch((error) => {
             if (error.message === "DUPLICATE_NAME") {
-                setErrorMessage(t("dupName.err"));
+                setErrorMessage("dupName.err");
+            } else if (error.message === "INVALID_NAME") {
+                setErrorMessage("badName.err");
             } else {
-                setErrorMessage(t("registration.err"));
+                setErrorMessage("registration.err");
             }
         });
     }
