@@ -130,7 +130,7 @@ async function assignGroup( lang: string){
                 "AND a.player_id IS NULL " +
                 "GROUP BY p.player_name " +
                 "HAVING COUNT(DISTINCT t.player_id) < " + GROUP_LIMIT +
-                " ORDER BY p.modified_on ASC " +
+                " ORDER BY group_size ASC " +
                 "LIMIT 2";
 
     while(true){
