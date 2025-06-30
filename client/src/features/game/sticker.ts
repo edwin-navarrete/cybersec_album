@@ -436,8 +436,11 @@ export namespace Sticker {
                 return playerName;
             }  
             catch (error: any) {
-                if (axios.isAxiosError(error) && error.response?.status === 409) {
-                    throw new Error("DUPLICATE_NAME");
+                if (axios.isAxiosError(error)) {
+                    if(error.response?.status === 409)
+                        throw new Error("DUPLICATE_NAME");
+                    else 
+                        throw new Error("INVALID_NAME");
                 } else {
                     console.error("API error", error);
                     throw new Error("GENERAL_ERROR");
