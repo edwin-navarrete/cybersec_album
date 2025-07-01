@@ -1,8 +1,8 @@
 import axios from "axios"
 import { Question } from "./question";
-import {v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid"
 
-function getNextBusinessDay(date:Date) {
+function getNextBusinessDay(date: Date) {
     const dayOfWeek = date.getDay();
     const nextDay = new Date(date);
     nextDay.setDate(date.getDate() + (dayOfWeek > 4 ? 8 - dayOfWeek : 1));
@@ -37,6 +37,7 @@ export namespace Game {
 
     export enum PlayTokenStrategy {
         bussinessDays = "bussinessDays",
+        timeout = "timeout",
         unlimited = "unlimited"
     }
 
@@ -51,16 +52,16 @@ export namespace Game {
     export interface PlayToken {
         className: string
         isInvalid: () => number; // 0 means valid, -1 means is still pending, 1 means it has expired
-        validPeriod:  () => string;
+        validPeriod: () => string;
         spend: () => void;
     }
 
     export class UnlimitedToken implements PlayToken {
         className = "UnlimitedToken"
-        isInvalid ():number {
+        isInvalid(): number {
             return 0
         }
-        validPeriod(): string{
+        validPeriod(): string {
             return '∞';
         }
         spend() {
@@ -69,13 +70,47 @@ export namespace Game {
 
     export class DisabledToken implements PlayToken {
         className = "DisabledToken"
-        isInvalid ():number {
+        isInvalid(): number {
             return 1
         }
-        validPeriod(): string{
+        validPeriod(): string {
             return '??';
         }
         spend() {
+        }
+    }
+
+    export class TimeoutToken implements PlayToken {
+        className = "TimeoutToken";
+        timeoutSecs: number;
+        timeToLiveSecs: number;
+        nextDate: number | null;
+
+        // timeout is the time that the token become invalid after being used
+        constructor(timeoutSecs: number = 60, timeToLiveSecs: number = 60) {
+            this.timeoutSecs = Math.max(timeoutSecs, 15);
+            this.timeToLiveSecs = Math.max(timeoutSecs, 15);
+            // next date in the past to spend will first set to null and second in the future
+            this.nextDate = Date.now() - 1;
+        }
+
+        isInvalid(): number {
+            if (!this.nextDate || new Date(this.nextDate).getTime() < Date.now()) {
+                return 0;
+            }
+            return 1;
+        }
+
+        validPeriod(): string {
+            var locale = localStorage.getItem("lang") === 'en'? 'en-US' : 'es-419'
+            return this.nextDate? new Date(this.nextDate).toLocaleTimeString(locale) : '';
+        }
+
+        spend() {
+            if(!this.nextDate) 
+                this.nextDate = Date.now() + this.timeoutSecs * 1000;
+            else if(new Date(this.nextDate).getTime() < Date.now())
+                this.nextDate = null;
         }
     }
 
@@ -90,38 +125,38 @@ export namespace Game {
         startDate: number;
 
         // Set the startDate to the first businessDay given by businessDay (transformed to 1..5). If zero then next biz day
-        constructor(businessDay: number = 1, increment: number = 1){
-            businessDay = Math.round(Math.max(( (businessDay + 4) % 5 ) + 1, 1));
+        constructor(businessDay: number = 1, increment: number = 1) {
+            businessDay = Math.round(Math.max(((businessDay + 4) % 5) + 1, 1));
             this.increment = Math.round(Math.max(increment, 1));
             this.startDate = this.moveStart((i, bizDay) => bizDay.getDay() === businessDay);
         }
 
 
-        isInvalid():number {
-            const now =Date.now();
+        isInvalid(): number {
+            const now = Date.now();
             const expirationTime = this.startDate + 24 * 60 * 60 * 1000;
             return now < this.startDate ? -1 : now >= expirationTime ? 1 : 0;
         }
 
-        validPeriod(): string{
+        validPeriod(): string {
             const startDate = new Date(this.startDate);
-            return startDate.toISOString().split('T')[0];;
+            return startDate.toISOString().split('T')[0];
         };
 
         spend() {
             const status = this.isInvalid()
-            if(status === 0){
+            if (status === 0) {
                 // If valid then increment
                 this.moveStart((i) => i >= this.increment);
             }
-            else if(status > 0){
+            else if (status > 0) {
                 // If expired, allow to play as soon as posible
                 this.moveStart(() => true);
             }
         }
 
         // Move to next n business day after now where n is given by this.increment
-        moveStart(until: (i:number, bizDay:Date)=>boolean): number {
+        moveStart(until: (i: number, bizDay: Date) => boolean): number {
             let n = 0;
             let nextBizDay = new Date();
             while (!until(n, nextBizDay)) {
@@ -133,63 +168,71 @@ export namespace Game {
             return this.startDate;
         }
     }
-    
+
     export interface PlayTokenFactory {
         produceToken(): PlayToken
-        storeToken(token:PlayToken):string
-        loadToken(stored:string):PlayToken
+        storeToken(token: PlayToken): string
+        loadToken(stored: string): PlayToken
     }
 
     abstract class AbstractPlayTokenFactory implements PlayTokenFactory {
-        static register: Record<string,()=>PlayToken> = {
+        static register: Record<string, () => PlayToken> = {
             'BusinessDayToken': () => new BusinessDayToken(),
+            'TimeoutToken': () => new TimeoutToken(),
             'UnlimitedToken': () => new UnlimitedToken(),
             'DisabledToken': () => new DisabledToken(),
         };
 
         abstract produceToken(): PlayToken;
-        storeToken(token:PlayToken):string {
-            if(!AbstractPlayTokenFactory.register[token.className] ){
+        storeToken(token: PlayToken): string {
+            if (!AbstractPlayTokenFactory.register[token.className]) {
                 throw new Error(`Unssupported play token ${token.className}`);
             }
             const toStore = {
-                className : token.className,
+                className: token.className,
                 data: token
             }
             return JSON.stringify(toStore);
-        } 
-        loadToken(stored:string):PlayToken{
-            if(!stored) return new DisabledToken();
+        }
+
+        loadToken(stored: string): PlayToken {
+            if (!stored) return new DisabledToken();
             const loaded = JSON.parse(stored);
-            if(!AbstractPlayTokenFactory.register[loaded.className] || !loaded.data ){
+            if (!AbstractPlayTokenFactory.register[loaded.className] || !loaded.data) {
                 throw new Error(`Invalid stored token`);
             }
-            const newToken:PlayToken = AbstractPlayTokenFactory.register[loaded.className]()
+            const newToken: PlayToken = AbstractPlayTokenFactory.register[loaded.className]()
             Object.assign(newToken, loaded.data)
             return newToken;
         }
     }
 
     export class UnlimitedPlayTokenFactory extends AbstractPlayTokenFactory {
-        produceToken(): PlayToken{
+        produceToken(): PlayToken {
             return new UnlimitedToken();
         }
     }
 
-    export class BussinessDaysPlayTokenFactory extends AbstractPlayTokenFactory{
+    export class TimeoutPlayTokenFactory extends AbstractPlayTokenFactory {
+        produceToken(): PlayToken {
+            return new TimeoutToken();
+        }
+    }
+
+    export class BussinessDaysPlayTokenFactory extends AbstractPlayTokenFactory {
         produceToken(): PlayToken {
             const groupId = localStorage.getItem("groupId")
             const leaderOrdinal = +(localStorage.getItem("isLeader") ?? 0)
 
             // for Solo next bizDay after yesterday, increment 1
-            if(!groupId){
+            if (!groupId) {
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
                 const nxtBizDay = getNextBusinessDay(yesterday).getDay();
                 return new BusinessDayToken(nxtBizDay, 1);
             }
             // for Coop, if is the leader choose a bizDay according to its ordinal and enable once every week
-            if( leaderOrdinal > 0 ){
+            if (leaderOrdinal > 0) {
                 return new BusinessDayToken(leaderOrdinal, 5);
             }
             else {
@@ -199,7 +242,6 @@ export namespace Game {
         }
     }
 
-
     export interface Player extends Question.Identifiable {
         playerName: string
         isGroup: boolean
@@ -208,7 +250,7 @@ export namespace Game {
     }
 
     export class PlayerDAO extends Question.DAO<Player> {
-        constructor(initialDB:Player[]){
+        constructor(initialDB: Player[]) {
             super("player", initialDB)
         }
 
@@ -334,16 +376,16 @@ export namespace Sticker {
 
         async getAlbumId(): Promise<string> {
             let albumId = localStorage.getItem("albumId");
-            if(!albumId){
+            if (!albumId) {
                 try {
                     const playerId = localStorage.getItem("playerId");
                     const groupId = localStorage.getItem("groupId");
                     const isLeader = localStorage.getItem("isLeader");
-                    const uri = process.env.REACT_APP_API+`/album`;
-                    const headers = {"g-recaptcha-response": Question.DAO.token}
-                    if( groupId && !isLeader ){
-                        const getResp = await axios.get(uri,{
-                            params: {playerId:groupId},
+                    const uri = process.env.REACT_APP_API + `/album`;
+                    const headers = { "g-recaptcha-response": Question.DAO.token }
+                    if (groupId && !isLeader) {
+                        const getResp = await axios.get(uri, {
+                            params: { playerId: groupId },
                             headers
                         });
                         albumId = getResp.data.results?.[0]?.albumId as string ?? 'undefined';
@@ -352,7 +394,7 @@ export namespace Sticker {
                         albumId = uuidv4();
                         const ownerId = groupId ?? playerId;
                         const startedOn = Date.now().toString()
-                        await axios.post(uri,{
+                        await axios.post(uri, {
                             albumId: albumId,
                             playerId: ownerId,
                             startedOn: startedOn,
@@ -360,7 +402,7 @@ export namespace Sticker {
                         }, { headers });
                         localStorage.setItem("startedOn", startedOn);
                     }
-                } catch (error){
+                } catch (error) {
                     albumId = 'undefined';
                     console.error("API error", error);
                 }
@@ -375,23 +417,23 @@ export namespace Sticker {
             return this.userStickerDAO.findAll({ filter: { albumId: await this.getAlbumId() }, order: "+inAlbum" })
                 .then(userStickers => {
                     return self.stickerDAO.findAll({
-                            include: userStickers.map(s => s.stickerId)
-                        }).then(stickers => {
-                            let stickerMap = new Map(userStickers.map(us => {
-                                let s = stickers.find(s => s.id === us.stickerId)
-                                if (!s) throw new Error('Inconsistent stickers DB')
-                                let as = {
-                                    ...s,
-                                    id: us.id,
-                                    inAlbum: us.inAlbum,
-                                    albumId: us.albumId,
-                                    addedOn: us.addedOn,
-                                    stickerId: us.stickerId
-                                } as AlbumStiker
-                                return [s.spot, as]
-                            }))
-                            return stickerMap
-                        }
+                        include: userStickers.map(s => s.stickerId)
+                    }).then(stickers => {
+                        let stickerMap = new Map(userStickers.map(us => {
+                            let s = stickers.find(s => s.id === us.stickerId)
+                            if (!s) throw new Error('Inconsistent stickers DB')
+                            let as = {
+                                ...s,
+                                id: us.id,
+                                inAlbum: us.inAlbum,
+                                albumId: us.albumId,
+                                addedOn: us.addedOn,
+                                stickerId: us.stickerId
+                            } as AlbumStiker
+                            return [s.spot, as]
+                        }))
+                        return stickerMap
+                    }
                     )
                 })
 
@@ -415,16 +457,18 @@ export namespace Sticker {
         }
 
         async registerPlayer(playerName: string, gameMode: string): Promise<string> {
-           try {
+            try {
                 const playerId = localStorage.getItem("playerId");
-                const apiResponse = await axios.post(process.env.REACT_APP_API+'/player',{
+                const apiResponse = await axios.post(process.env.REACT_APP_API + '/player', {
                     playerId: playerId,
                     playerName: playerName,
                     mode: gameMode,
                     lang: localStorage.getItem("lang") ?? 'es'
-                },{
-                    headers:{"g-recaptcha-response": Question.DAO.token
-                }});
+                }, {
+                    headers: {
+                        "g-recaptcha-response": Question.DAO.token
+                    }
+                });
                 const newPlayer = apiResponse.data
                 localStorage.setItem("playerId", newPlayer.playerId);
                 localStorage.setItem("playerName", playerName);
@@ -434,10 +478,13 @@ export namespace Sticker {
                 // Register the album immediately
                 await this.getAlbumId()
                 return playerName;
-            }  
+            }
             catch (error: any) {
-                if (axios.isAxiosError(error) && error.response?.status === 409) {
-                    throw new Error("DUPLICATE_NAME");
+                if (axios.isAxiosError(error)) {
+                    if(error.response?.status === 409)
+                        throw new Error("DUPLICATE_NAME");
+                    else 
+                        throw new Error("INVALID_NAME");
                 } else {
                     console.error("API error", error);
                     throw new Error("GENERAL_ERROR");
@@ -446,7 +493,7 @@ export namespace Sticker {
         }
 
         async glueSticker(albumStiker: AlbumStiker): Promise<UserSticker> {
-            try{
+            try {
                 if (!albumStiker.inAlbum) {
                     albumStiker = { ...albumStiker, inAlbum: true };
                     // to trigger the start of the album
@@ -466,9 +513,9 @@ export namespace Sticker {
                 ? albumSpots.size
                 : Array.from(albumSpots.values())
                     .reduce((cnt, s) => s.inAlbum ? cnt + 1 : cnt, 0)
-            if(filled === 1 || filled >= allSpots){
+            if (filled === 1 || filled >= allSpots) {
                 // Album started or finished
-                if(filled >= allSpots){
+                if (filled >= allSpots) {
                     localStorage.setItem("endedOn", Date.now().toString());
                 }
                 else {
@@ -476,16 +523,18 @@ export namespace Sticker {
                 }
 
                 try {
-                    let uri = process.env.REACT_APP_API+`/album`;
-                    await axios.post(uri,{
+                    let uri = process.env.REACT_APP_API + `/album`;
+                    await axios.post(uri, {
                         albumId: localStorage.getItem("albumId"),
                         startedOn: localStorage.getItem("startedOn"),
                         endedOn: localStorage.getItem("endedOn"),
                         language: navigator.language
-                    },{
-                        headers:{"g-recaptcha-response": Question.DAO.token
-                    }});
-                } catch (error){
+                    }, {
+                        headers: {
+                            "g-recaptcha-response": Question.DAO.token
+                        }
+                    });
+                } catch (error) {
                     console.error("API error", error);
                 }
             }
@@ -495,8 +544,8 @@ export namespace Sticker {
 
 
     export class UserStickerDAO extends Question.DAO<UserSticker> {
-        constructor(initialDB:UserSticker[]) {
-            super("userSticker",initialDB)
+        constructor(initialDB: UserSticker[]) {
+            super("userSticker", initialDB)
         }
         async upsert(sticker: UserSticker): Promise<UserSticker> {
             if (!sticker.id) {
@@ -519,8 +568,8 @@ export namespace Sticker {
     }
 
     export class StickerDAO extends Question.DAO<StickerDef> {
-        constructor(initialDB:StickerDef[]) {
-            super("",initialDB)
+        constructor(initialDB: StickerDef[]) {
+            super("", initialDB)
         }
     }
 

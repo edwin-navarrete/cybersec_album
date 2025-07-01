@@ -25,7 +25,7 @@ const QuestionView = () => {
         dispatch(updateToken(token));
         // eslint-disable-next-line
     }, [dispatch, questionState]);
-
+        
     const hasGroupId = localStorage.getItem('groupId') !== null && localStorage.getItem('groupId') !== undefined;
     const handleTeamRedirect = () => {
         navigate('/players');
@@ -108,6 +108,7 @@ const QuestionView = () => {
         let message = ''
         if(isCoop && !isLeader){
             message += t("quiz.notLeader");
+            localStorage.removeItem("playToken");
         }
         else {
             const tokenFactory = getPlayTokenFactory(isCoop);

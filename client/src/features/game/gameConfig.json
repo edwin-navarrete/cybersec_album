@@ -2,7 +2,7 @@
     "rewardStrategy" : "sequential",
     "rewardSchema": "difficulty",
     "quizStrategy": "randomUnseen",
-    "coopTokenStrategy": "bussinessDays",
+    "coopTokenStrategy": "timeout",
     "soloTokenStrategy": "unlimited",
-    "leaderTimeout": 86400000
+    "leaderTimeout": 600000
 }

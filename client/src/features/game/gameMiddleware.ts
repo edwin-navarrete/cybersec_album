@@ -26,6 +26,7 @@ const gameConfig = config as Game.GameConfig;
 const playTokenFactories: Record<Game.PlayTokenStrategy, () => Game.PlayTokenFactory> = {
     [Game.PlayTokenStrategy.bussinessDays]: () => new Game.BussinessDaysPlayTokenFactory(),
     [Game.PlayTokenStrategy.unlimited]: () => new Game.UnlimitedPlayTokenFactory(),
+    [Game.PlayTokenStrategy.timeout]: () => new Game.TimeoutPlayTokenFactory(),
 };
 
 export const getPlayTokenFactory = (coopMode:boolean) : Game.PlayTokenFactory => {
@@ -105,7 +106,8 @@ export const glueSticker = createAsyncThunk<Sticker.AlbumStiker[], Sticker.Album
 
 export const nextQuestion = createAsyncThunk<QuestionState>
     ('question/nextQuestion', async () => {
-        const tokenFactory = getPlayTokenFactory(!!localStorage.getItem("groupId"));
+        const isCoop = !!localStorage.getItem("groupId");
+        const tokenFactory = getPlayTokenFactory(isCoop);
         let playToken = localStorage.getItem("playToken");
         let token = null;
         // Create the token if not exists or it was previously disabled 
@@ -113,10 +115,12 @@ export const nextQuestion = createAsyncThunk<QuestionState>
             token = tokenFactory.produceToken();
         }
         else {
-            // Spend the existing token
+            // Spend the existing token if individual or leader
             token = tokenFactory.loadToken(playToken);
-            token.spend()
         }
+        await reloadTeam();
+        if(!isCoop || localStorage.getItem("isLeader"))
+            token.spend()
         playToken = tokenFactory.storeToken(token);
         localStorage.setItem("playToken", playToken);
 
@@ -167,6 +171,7 @@ export const changeLeader = createAsyncThunk<Sticker.Team, Game.Player>
     ('album/changeLeader', async (leader : Game.Player) => {
         try {
             const groupId = localStorage.getItem("groupId");
+            localStorage.removeItem("playToken");
             if(groupId){
                 await playerDefDAO.push({ ...leader, isLeader: 1 } as Game.Player);       
             }
