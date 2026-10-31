@@ -1,0 +1,26 @@
+# Local development database only. Run server and client on the host (see CLAUDE.md).
+#   docker compose up -d
+#   docker compose down        # keeps data
+#   docker compose down -v     # wipes data; the schema reloads on next `up`
+services:
+  db:
+    image: mariadb:10.11
+    container_name: cyberalbum-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PWD:-devpass}
+      MARIADB_DATABASE: ${DB_NAME:-cyberalbum}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      # Runs only when the data volume is empty (first start)
+      - ./db_schema/ssolucio_cyberalbum.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  db-data:
