@@ -1,4 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 import { Question } from "./question";
 import { Game, Sticker } from "./sticker";
@@ -36,6 +37,27 @@ export const questionDefDAO = new Question.QuestionDefDAO(questionDB as Question
 export const userAnswerDAO = new Question.UserAnswerDAO()
 const theQuiz = new Question.Quiz(gameConfig, userAnswerDAO, questionDefDAO, theAlbum)
 
+
+// Server settings. On any failure it falls back to 'both', the unrestricted default.
+export const fetchConfig = createAsyncThunk<Game.GameMode>
+    ('config/fetch', async () => {
+        let gameMode: Game.GameMode = 'both'
+        try {
+            const response = await axios.get(process.env.REACT_APP_API + '/config')
+            const received = response.data?.gameMode
+            if (received === 'solo' || received === 'coop' || received === 'both') {
+                gameMode = received
+            }
+        } catch (error) {
+            console.error('Unable to load the server config, allowing both game modes', error)
+        }
+        if (gameMode === 'solo') {
+            // A player that joined a team earlier must not stay stuck waiting for a leader
+            localStorage.removeItem("groupId")
+            localStorage.removeItem("isLeader")
+        }
+        return gameMode
+    })
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {

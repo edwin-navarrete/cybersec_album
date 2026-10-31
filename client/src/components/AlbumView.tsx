@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { selectStickers, selectStickerSpots, selectAchievement, updateToken } from '../features/game/gameSlice';
+import { selectStickers, selectStickerSpots, selectAchievement, selectGameMode, updateToken } from '../features/game/gameSlice';
 import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
 import { AppDispatch, RootState } from '../app/store'
 import Gauge from './Gauge';
@@ -17,6 +17,7 @@ const AlbumView = () => {
     const stickers = useSelector(selectStickers);
     const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
+    const allowedMode = useSelector(selectGameMode);
 
     // Load initial album state
     useEffect(() => {
@@ -84,7 +85,7 @@ const AlbumView = () => {
             setErrorMessage(t("emptyName.err"));
             return;
         }
-        dispatch(registerPlayer({ playerName, gameMode: 'solo'}))
+        dispatch(registerPlayer({ playerName, gameMode: allowedMode === 'coop' ? 'coop' : 'solo'}))
         .unwrap()
         .then(() => {
             setErrorMessage(null); 

@@ -1,8 +1,8 @@
 import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
-import { Sticker } from "./sticker";
+import { Sticker, Game } from "./sticker";
 import { Question } from "./question";
 import { RootState } from '../../app/store';
-import { changeLanguage, putAnswer, glueSticker, nextQuestion, fetchAlbum, loadTeam, changeLeader } from "./gameMiddleware";
+import { changeLanguage, putAnswer, glueSticker, nextQuestion, fetchAlbum, loadTeam, changeLeader, fetchConfig } from "./gameMiddleware";
 
 import stickersDB from './data/es/stickerDB.json';
 
@@ -29,6 +29,8 @@ export type QuestionsAndStickers = {
 
 export interface AlbumState {
     token: string
+    // undefined until the server config is loaded
+    gameMode?: Game.GameMode
     stickerCount: number
     stickers: Sticker.AlbumStiker[]
     team?: Sticker.Team
@@ -40,6 +42,9 @@ const initialState: AlbumState = {
     stickerCount: stickersDB.length,
     stickers: [],
 };
+
+// Selector for the game modes the server allows (undefined while loading)
+export const selectGameMode = (state: RootState) => state.game.gameMode;
 
 // Selector for the question
 export const selectQuestion = (state: RootState) => state.game.question;
@@ -91,6 +96,9 @@ export const abumSlice = createSlice({
                 state.question.success = action.payload.success;
                 state.question.wrong = action.payload.wrong;
             }
+        });
+        builder.addCase(fetchConfig.fulfilled, (state, action) => {
+            state.gameMode = action.payload
         });
         builder.addCase(fetchAlbum.fulfilled, (state, action) => {
             state.stickers = action.payload

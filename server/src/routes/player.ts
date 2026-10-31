@@ -4,6 +4,7 @@ import { check, validationResult } from 'express-validator'
 import EntityDAO from '../controllers/entityDao'
 import mysqlDriver from '../controllers/mysqlDriver'
 import validateInput from './validateInput'
+import { getGameMode, isModeAllowed } from '../models/gameMode'
 
 const router = Router()
 /*
@@ -60,6 +61,10 @@ router.post('/player', [
     check('playerName', 'playerName is required and is chars numbers and spaces').isAlphanumeric('es-ES', { ignore: ' ' }),
     validateInput
     ], async (req: Request, res: Response) => {
+    const gameMode = getGameMode()
+    if (!isModeAllowed(req.body.mode ?? 'solo', gameMode)) {
+        return res.status(400).json({ errorMessage: `Game mode '${req.body.mode ?? 'solo'}' is not allowed, this server only allows '${gameMode}'` })
+    }
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
     const {playerId, playerName, isLeader = null} = req.body
     const mode = req.body.mode

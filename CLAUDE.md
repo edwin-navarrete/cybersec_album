@@ -30,7 +30,7 @@ Data flow: `client` → `server` (`/api/*`) → MySQL ← `statServer` (`/album_
 
 ## Environment variables (names only; never commit values)
 
-- `server/.env`: `DB_HOST`, `DB_USER`, `DB_PWD`, `DB_NAME`, `PORT` (default 5006), `SERVER_PATH` (route prefix), `CAPTCHA_SECRET` (empty disables the reCAPTCHA check), `CAPTCHA_API` (verify URL). Heroku uses `JAWSDB_MARIA_URL`, which overrides the `DB_*` vars.
+- `server/.env`: `DB_HOST`, `DB_USER`, `DB_PWD`, `DB_NAME`, `PORT` (default 5006), `SERVER_PATH` (route prefix), `CAPTCHA_SECRET` (empty disables the reCAPTCHA check), `CAPTCHA_API` (verify URL), `GAME_MODE` (`solo` | `coop` | `both`, default `both`; see Game mode below). Heroku uses `JAWSDB_MARIA_URL`, which overrides the `DB_*` vars.
 - `client/` (`local.env`, `production.env`, and a `.env`): `REACT_APP_API` (API base URL), `CAPTCHAKEY` (public reCAPTCHA v3 key).
 - `statServer/`: `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin).
 - `statClient/`: `REACT_APP_API_URL` (defaults to the production stats URL).
@@ -42,6 +42,7 @@ Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `
 - `app.ts`: loads dotenv, starts `Server`, handles SIGTERM.
 - `models/server.ts`: `Server` class. Middlewares: cors, json, express-useragent, `recaptcha`. Mounts all routers under `${SERVER_PATH}/api`. Serves `../../../client/build` statically, with a `*` fallback to `index.html`.
 - `models/recaptcha.ts`: validates the `g-recaptcha-response` header on GET/POST against Google. Results are memoized (`memoizee`). Responds 403 on failure. Skipped when `CAPTCHA_SECRET` is unset.
+- `models/gameMode.ts`: parses `GAME_MODE` (`getGameMode`, `isModeAllowed`), tested in `gameMode.spec.ts`. `routes/config.ts` serves `GET /api/config` → `{ gameMode }`. It is mounted before the recaptcha middleware because the client reads it before it has a captcha token.
 - `controllers/DBDriver.ts`: `Fetch` and `Insert` types.
 - `controllers/mysqlDriver.ts`: singleton mysql2 pool (limit 10, 1s connection timeout) exposing `fetch` and `insert`.
 - `controllers/entityDao.ts`: generic `EntityDAO<T>` with `get` (filter/order/limit/include/exclude), `post` (insert with optional upsert), `update`, `replace`. It converts camelCase ↔ snake_case, and the table name equals the entity name. `entityDao.spec.ts` covers it.
@@ -72,6 +73,10 @@ Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `
   - `data/{es,en}/questionDB.json` and `stickerDB.json`: bundled content, 22 questions and 21 stickers per language. Questions have `id, type, question, options, solution, difficulty, feedback`. Stickers have `id, spot, weight, image`.
   - Specs: `gameMiddleware.spec.ts`, `gameSlice.spec.ts`, `question.spec.ts`, `sticker.spec.ts`, `test/sample*.json`.
 - Client state also lives in `localStorage`: `albumId`, `playerId`, `playerName`, `groupId`, `isLeader`, `lang`, `startedOn`, `endedOn`, `playToken`, `modifiedOn`. Gameplay logic reads it directly, so it is part of the architecture.
+
+## Game mode (`GAME_MODE`)
+
+The server decides which modes are playable. `POST /player` returns 400 when the requested mode (`solo` if omitted) is not allowed. The client loads the setting with the `fetchConfig` thunk at startup (`gameSlice.gameMode`, `undefined` until loaded; falls back to `both` if the request fails). With `solo`: `AlbumIntroView` hides the mode selector, `/players` redirects to `/album`, and `fetchConfig` clears the local `groupId`/`isLeader` of players who had joined a team. With `coop`: the selector is hidden and `coop` is forced. `AlbumView` registers with the single allowed mode. Changing it needs only a server restart.
 
 ## Database tables (`db_schema/ssolucio_cyberalbum.sql`)
 

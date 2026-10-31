@@ -100,11 +100,13 @@ DB_NAME=cyberalbum
 PORT=8000
 SERVER_PATH=
 CAPTCHA_SECRET=
+GAME_MODE=both
 REACT_APP_API=/api
 ```
 * DB_HOST, DB_PWD, DB_USER, DB_NAME host name, credenciales y nombre de la base de datos donde residen los datos del cyberalbum
 * PORT puerto para ejecutar el servidor Node
 * SERVER_PATH el prefijo para todos los requests publicados por este servidor Node, por ejemplo si dice /api entonces las preguntas se obtienen con /api/question?lang=es
+* GAME_MODE Modos de juego que acepta el servidor: `solo`, `coop` o `both` (por defecto, también si está vacío o tiene un valor inválido). Con `solo` el cliente oculta el selector de modo y la vista de equipo (`/players`), y el servidor rechaza con 400 los registros `coop` (y viceversa con `coop`). El cliente lo lee de `GET /api/config` al arrancar; los jugadores que ya tenían equipo pierden su `groupId` local en modo `solo`. Se aplica al reiniciar el servidor, sin recompilar el cliente.
 * CAPTCHA_SECRET La llave privada de gcaptcha asignada por Google. Si está vacía se deshabilita la seguridad de los requests y cualquier llamada es aceptada.
 
 ### client/.env

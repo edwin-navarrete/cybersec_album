@@ -11,6 +11,9 @@ function getNextBusinessDay(date:Date) {
 
 export namespace Game {
 
+    // Modes the server allows, from its GAME_MODE setting
+    export type GameMode = 'solo' | 'coop' | 'both'
+
     export interface GameConfig {
         rewardStrategy: RewardStrategy,
         rewardSchema: RewardSchema,

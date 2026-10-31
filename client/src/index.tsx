@@ -9,11 +9,13 @@ import App from './App';
 import './index.css';
 import './i18n';
 import { savedLanguage } from './i18n';
-import { changeLanguage } from './features/game/gameMiddleware';
+import { changeLanguage, fetchConfig } from './features/game/gameMiddleware';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 const captchaKey = process.env.CAPTCHAKEY;
+
+store.dispatch(fetchConfig());
 
 // Stickers are bundled per language, so switch them when the player chose a non-default one
 if (savedLanguage() !== 'es') {
