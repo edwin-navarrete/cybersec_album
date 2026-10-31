@@ -12,7 +12,7 @@ Four independent npm packages plus a DB schema folder. The root `package.json` o
 | `server/` | Game API; also serves the built `client/build` | Express 4, TypeScript, mysql2, express-validator, jest/ts-jest |
 | `statClient/` | Stats dashboard UI (ranking + question performance) | React 18, MUI + x-date-pickers, dayjs, axios, CRA |
 | `statServer/` | Stats API (read-only SQL aggregations) | Express, TypeScript, mysql2, body-parser |
-| `db_schema/` | `ssolucio_cyberalbum.sql` (full schema incl. `player` table and `vw_user_answer` view), `sample_data.sql` | MySQL/MariaDB |
+| `db_schema/` | `ssolucio_cyberalbum.sql` (full schema incl. `player` table and `vw_user_answer` view), `sample_data.sql` | MySQL 8 (not MariaDB) |
 
 Root files: `Procfile` (`web: npm start --prefix server`), `.cpanel.yml` (empty), `.gitignore`, `docker-compose.yml` (local dev DB only, see Commands).
 
@@ -20,7 +20,7 @@ Data flow: `client` → `server` (`/api/*`) → MySQL ← `statServer` (`/album_
 
 ## Commands
 
-- Local DB: `docker compose up -d` starts MariaDB 10.11 (`docker-compose.yml`) on `127.0.0.1:3306`. Defaults: `DB_PWD=devpass`, `DB_NAME=cyberalbum`, overridable via shell or root `.env`. The schema (`db_schema/ssolucio_cyberalbum.sql`) loads only on first start, when the `db-data` volume is empty. `docker compose down -v` wipes the data. Set `DB_HOST=127.0.0.1` in `server/.env`. Only the DB runs in Docker; run server and client on the host.
+- Local DB: `docker compose up -d` starts MySQL 8.0 (`docker-compose.yml`; MariaDB fails because the schema uses the MySQL-only `utf8mb4_0900_ai_ci` collation) on `127.0.0.1:3306`. Defaults: `DB_PWD=devpass`, `DB_NAME=cyberalbum`, overridable via shell or root `.env`. The schema (`db_schema/ssolucio_cyberalbum.sql`) loads only on first start, when the `db-data` volume is empty. `docker compose down -v` wipes the data. Set `DB_HOST=127.0.0.1` in `server/.env`. Only the DB runs in Docker; run server and client on the host.
 - Local `server/.env` must set `SERVER_PATH=` (empty). If it is unset, routes mount at `undefined/api`. `client/.env` needs `REACT_APP_API=http://localhost:8000/api`, since CRA does not read `local.env`.
 - Root: `npm start` runs the server. `heroku-postbuild` installs and builds client + server.
 - `server/`: `npm run dev` (nodemon + client via concurrently), `npm run build` (tsc → `dist/`), `npm start` (`node dist/app.js`), `npm test` (jest), `npm run lint`.

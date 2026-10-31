@@ -41,3 +41,6 @@ statClient/build.zip
 client/local.env
 client/production.env
 client/build
+
+# Playwright MCP artifacts
+.playwright-mcp/
