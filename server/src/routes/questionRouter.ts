@@ -4,6 +4,7 @@ import mysqlDriver from '../controllers/mysqlDriver'
 import { check } from 'express-validator'
 
 import validateInput from './validateInput'
+import { getQuestionSet } from '../models/questionSet'
 const questionsRouterinfo = Router()
 
 /*
@@ -16,6 +17,7 @@ CREATE TABLE `question` (
   `solution` JSON,
   `difficulty` float NOT NULL,
   `feedback` text DEFAULT NULL,
+  `question_set` varchar(50) NOT NULL DEFAULT 'default',
   PRIMARY KEY (`question_id`,`lang`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table storing questions for the game';
 */
@@ -27,6 +29,7 @@ interface QuestionRow {
   solution: string
   dificult: number
   feedback: string
+  questionSet: string
 }
 class QuestionDAO extends EntityDAO<QuestionRow> {
 }
@@ -38,9 +41,14 @@ questionsRouterinfo.get('/question',[
   const lang = req.query.lang as string
   const dao = new QuestionDAO(mysqlDriver.fetch, mysqlDriver.insert, 'question')
   try {
+    // Only the configured set is played (QUESTION_SET, 'default' if unset)
+    const questionSet = getQuestionSet()
     const albumIdsQuest = await dao.get({
-      filter:{lang:lang}
+      filter:{lang:lang, questionSet}
     })
+    if (albumIdsQuest.length === 0) {
+      console.warn(`No questions for lang '${lang}' in question set '${questionSet}'`)
+    }
     albumIdsQuest.forEach((item) => {
       try {
         if (typeof item.options === "string") {

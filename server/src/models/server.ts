@@ -4,6 +4,7 @@ import recaptcha from './recaptcha'
 import useragent from 'express-useragent'
 import path from 'path';
 import { getGameMode, isInvalidGameMode } from './gameMode'
+import { getQuestionSet, isInvalidQuestionSet } from './questionSet'
 
 export class Server {
   port: string | undefined
@@ -15,6 +16,10 @@ export class Server {
       console.warn(`Invalid GAME_MODE '${process.env.GAME_MODE}', expected solo|coop|both. Using 'both'`)
     }
     console.log('Game mode:', getGameMode())
+    if (isInvalidQuestionSet()) {
+      console.warn(`Invalid QUESTION_SET '${process.env.QUESTION_SET}', use letters, numbers, '_', '-' or '.' (max 50). Using 'default'`)
+    }
+    console.log('Question set:', getQuestionSet())
     this.middlewares()
     
     // this.app.use('/cybersec_album', express.static(path.join(__dirname, '../client/build')))

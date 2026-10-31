@@ -30,9 +30,9 @@ Data flow: `client` → `server` (`/api/*`) → MySQL ← `statServer` (`/album_
 
 ## Environment variables (names only; never commit values)
 
-- `server/.env`: `DB_HOST`, `DB_USER`, `DB_PWD`, `DB_NAME`, `PORT` (default 5006), `SERVER_PATH` (route prefix), `CAPTCHA_SECRET` (empty disables the reCAPTCHA check), `CAPTCHA_API` (verify URL), `GAME_MODE` (`solo` | `coop` | `both`, default `both`; see Game mode below). Heroku uses `JAWSDB_MARIA_URL`, which overrides the `DB_*` vars.
+- `server/.env`: `DB_HOST`, `DB_USER`, `DB_PWD`, `DB_NAME`, `PORT` (default 5006), `SERVER_PATH` (route prefix), `CAPTCHA_SECRET` (empty disables the reCAPTCHA check), `CAPTCHA_API` (verify URL), `GAME_MODE` (`solo` | `coop` | `both`, default `both`; see Game mode below), `QUESTION_SET` (name of the question set to play, default `default`; see Question sets below). Heroku uses `JAWSDB_MARIA_URL`, which overrides the `DB_*` vars.
 - `client/` (`local.env`, `production.env`, and a `.env`): `REACT_APP_API` (API base URL), `CAPTCHAKEY` (public reCAPTCHA v3 key).
-- `statServer/`: `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin).
+- `statServer/`: `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin), `QUESTION_SET` (must match the game server).
 - `statClient/`: `REACT_APP_API_URL` (defaults to the production stats URL).
 
 Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `.gitignore` lists it, so it was probably tracked before being ignored.
@@ -43,6 +43,7 @@ Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `
 - `models/server.ts`: `Server` class. Middlewares: cors, json, express-useragent, `recaptcha`. Mounts all routers under `${SERVER_PATH}/api`. Serves `../../../client/build` statically, with a `*` fallback to `index.html`.
 - `models/recaptcha.ts`: validates the `g-recaptcha-response` header on GET/POST against Google. Results are memoized (`memoizee`). Responds 403 on failure. Skipped when `CAPTCHA_SECRET` is unset.
 - `models/gameMode.ts`: parses `GAME_MODE` (`getGameMode`, `isModeAllowed`), tested in `gameMode.spec.ts`. `routes/config.ts` serves `GET /api/config` → `{ gameMode }`. It is mounted before the recaptcha middleware because the client reads it before it has a captcha token.
+- `models/questionSet.ts`: parses `QUESTION_SET` (`getQuestionSet`, falls back to `default`), tested in `questionSet.spec.ts`. `routes/questionRouter.ts` filters by it.
 - `controllers/DBDriver.ts`: `Fetch` and `Insert` types.
 - `controllers/mysqlDriver.ts`: singleton mysql2 pool (limit 10, 1s connection timeout) exposing `fetch` and `insert`.
 - `controllers/entityDao.ts`: generic `EntityDAO<T>` with `get` (filter/order/limit/include/exclude), `post` (insert with optional upsert), `update`, `replace`. It converts camelCase ↔ snake_case, and the table name equals the entity name. `entityDao.spec.ts` covers it.
@@ -78,12 +79,16 @@ Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `
 
 The server decides which modes are playable. `POST /player` returns 400 when the requested mode (`solo` if omitted) is not allowed. The client loads the setting with the `fetchConfig` thunk at startup (`gameSlice.gameMode`, `undefined` until loaded; falls back to `both` if the request fails). With `solo`: `AlbumIntroView` hides the mode selector, `/players` redirects to `/album`, and `fetchConfig` clears the local `groupId`/`isLeader` of players who had joined a team. With `coop`: the selector is hidden and `coop` is forced. `AlbumView` registers with the single allowed mode. Changing it needs only a server restart.
 
+## Question sets (`QUESTION_SET`)
+
+`GET /api/question?lang=` returns only the rows whose `question_set` equals `QUESTION_SET` (`default` if unset or invalid). `statServer`'s `/questions` applies the same filter through its own copy of the parser (`statServer/src/models/question_set.ts`), so both processes must share the value. An empty set makes the client fail with "Illegal question in Middleware"; the server logs a warning. `statServer/dist` is committed, so it was rebuilt for this change (`questions_model.js`, `question_set.js`).
+
 ## Database tables (`db_schema/ssolucio_cyberalbum.sql`)
 
 - `album(album_id UUID PK, player_id, started_on, ended_on, language, os/platform/browser/version/is_mobile)`
 - `user_answer(user_answer_id, album_id FK, question_id, success, latency, attempts, answered_on)`
 - `user_sticker(user_sticker_id, album_id FK, sticker_id, in_album, added_on)`
-- `question(question_id, lang, type, question, options JSON, solution JSON, difficulty, feedback)`
+- `question(question_id, lang, type, question, options JSON, solution JSON, difficulty, feedback, question_set)`: `question_set` defaults to `'default'`. The primary key is still `(question_id, lang)`, so ids are unique across sets. `db_schema/add_question_set.sql` migrates older databases.
 - `player(player_id, player_name UNIQUE, is_group, size, group_id, is_leader ordinal, modified_on)`
 - View `vw_user_answer`, used by `statServer`.
 - Timestamps are epoch milliseconds (`BIGINT`).

@@ -101,12 +101,14 @@ PORT=8000
 SERVER_PATH=
 CAPTCHA_SECRET=
 GAME_MODE=both
+QUESTION_SET=default
 REACT_APP_API=/api
 ```
 * DB_HOST, DB_PWD, DB_USER, DB_NAME host name, credenciales y nombre de la base de datos donde residen los datos del cyberalbum
 * PORT puerto para ejecutar el servidor Node
 * SERVER_PATH el prefijo para todos los requests publicados por este servidor Node, por ejemplo si dice /api entonces las preguntas se obtienen con /api/question?lang=es
 * GAME_MODE Modos de juego que acepta el servidor: `solo`, `coop` o `both` (por defecto, también si está vacío o tiene un valor inválido). Con `solo` el cliente oculta el selector de modo y la vista de equipo (`/players`), y el servidor rechaza con 400 los registros `coop` (y viceversa con `coop`). El cliente lo lee de `GET /api/config` al arrancar; los jugadores que ya tenían equipo pierden su `groupId` local en modo `solo`. Se aplica al reiniciar el servidor, sin recompilar el cliente.
+* QUESTION_SET Conjunto de preguntas que se juega (por defecto `default`, también si está vacío o tiene un nombre inválido: solo letras, números, `_`, `-` y `.`, máximo 50). Cada pregunta de la tabla `question` pertenece a un conjunto (columna `question_set`) y `GET /api/question` devuelve únicamente las del conjunto configurado. Para crear un conjunto basta asignarlo a las preguntas, por ejemplo `UPDATE question SET question_set='phishing' WHERE question_id IN (1,2,3)`, y arrancar el servidor con `QUESTION_SET=phishing`. Si el conjunto no tiene preguntas para un idioma el juego no podrá generar preguntas en él, y el servidor lo avisa en el log. El `question_id` es único entre todos los conjuntos (la clave primaria sigue siendo `question_id` + `lang`). `statServer` acepta la misma variable para mostrar solo las preguntas de ese conjunto, así que debe tener el mismo valor. Las bases de datos creadas antes de este cambio necesitan ejecutar `db_schema/add_question_set.sql`.
 * CAPTCHA_SECRET La llave privada de gcaptcha asignada por Google. Si está vacía se deshabilita la seguridad de los requests y cualquier llamada es aceptada.
 
 ### client/.env
