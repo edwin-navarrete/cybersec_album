@@ -453,7 +453,7 @@ export namespace Sticker {
                 if (!albumStiker.inAlbum) {
                     albumStiker = { ...albumStiker, inAlbum: true };
                     // to trigger the start of the album
-                    return this.userStickerDAO.upsert(albumStiker as UserSticker);
+                    return await this.userStickerDAO.upsert(albumStiker as UserSticker);
                 }
                 return albumStiker
             }
