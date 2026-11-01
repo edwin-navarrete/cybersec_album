@@ -103,6 +103,13 @@ The 3-column album grid is read as 7 comic strips of 3 panels (`1A 1B 1C` is str
 - Nothing is announced while the album could not be opened (`albumError`).
 - Tests: `strips.spec.ts`.
 
+## Alias before playing, and the end of the game (client)
+
+The alias (`player.player_name`) identifies the player in the ranking and for the prizes, so nobody plays without one.
+- `RequireAlias` wraps `/album`, `/quest` and `/players`: without `playerId` in `localStorage` it redirects to `/`. The album is created by `registerPlayer`, after the alias exists, so it is born owned by the player. (Older versions asked for the name when the album was completed, which is why the end screen used to say "Regístrate"; that form is gone.)
+- When the album is complete the splash greets the player by name ("¡LO LOGRASTE, {name}!"); it closes on tap or after 10 s, and the name stays in the album's bottom bar (`Jugador: {name}`) so it can be shown to the organizers.
+- Someone with an unfinished album from before this (no alias) is sent to the start screen; that old album is not attached to the new player.
+
 ## Database tables (`db_schema/ssolucio_cyberalbum.sql`)
 
 - `album(album_id UUID PK, player_id, started_on, ended_on, language, os/platform/browser/version/is_mobile)`
