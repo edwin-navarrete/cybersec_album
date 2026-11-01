@@ -1,0 +1,29 @@
+# Local development database only (MySQL 8: the schema uses the utf8mb4_0900_ai_ci collation, which MariaDB lacks). Run server and client on the host (see CLAUDE.md).
+#   docker compose up -d
+#   docker compose down        # keeps data
+#   docker compose down -v     # wipes data; the schema reloads on next `up`
+services:
+  db:
+    image: mysql:8.0
+    container_name: cyberalbum-db
+    restart: unless-stopped
+    # The dump resets the session charset to latin1 before the question INSERTs;
+    # without this the UTF-8 text is stored double-encoded (mojibake).
+    command: --character-set-server=utf8mb4 --character-set-client-handshake=FALSE
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PWD:-devpass}
+      MYSQL_DATABASE: ${DB_NAME:-cyberalbum}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      # Runs only when the data volume is empty (first start)
+      - ./db_schema/ssolucio_cyberalbum.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  db-data:

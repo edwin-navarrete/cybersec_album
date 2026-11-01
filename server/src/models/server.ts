@@ -3,6 +3,8 @@ import cors from 'cors'
 import recaptcha from './recaptcha'
 import useragent from 'express-useragent'
 import path from 'path';
+import { getGameMode, isInvalidGameMode } from './gameMode'
+import { getQuestionSet, isInvalidQuestionSet } from './questionSet'
 
 export class Server {
   port: string | undefined
@@ -10,6 +12,14 @@ export class Server {
 
   constructor () {
     this.port = process.env.PORT || '5006' // Loaded from .env file
+    if (isInvalidGameMode()) {
+      console.warn(`Invalid GAME_MODE '${process.env.GAME_MODE}', expected solo|coop|both. Using 'both'`)
+    }
+    console.log('Game mode:', getGameMode())
+    if (isInvalidQuestionSet()) {
+      console.warn(`Invalid QUESTION_SET '${process.env.QUESTION_SET}', use letters, numbers, '_', '-' or '.' (max 50). Using 'default'`)
+    }
+    console.log('Question set:', getQuestionSet())
     this.middlewares()
     
     // this.app.use('/cybersec_album', express.static(path.join(__dirname, '../client/build')))
@@ -27,6 +37,8 @@ export class Server {
     this.app.options('*', cors())
     this.app.use(express.json())
     this.app.use(useragent.express())
+    // Before recaptcha: the client needs this before it has a captcha token
+    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/config'))
     this.app.use(recaptcha)
   }
 

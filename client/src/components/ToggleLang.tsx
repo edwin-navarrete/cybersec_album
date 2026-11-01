@@ -6,15 +6,18 @@ import { useDispatch } from 'react-redux';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { changeLanguage } from '../features/game/gameMiddleware';
+import { savedLanguage } from '../i18n';
 
 export default function ToggleLang() {
-    const [language, setLanguage] = useState('es');
+    const [language, setLanguage] = useState(savedLanguage());
     const dispatch = useDispatch() as AppDispatch;
 
     const handleLanguage = (
         _event: React.MouseEvent<HTMLElement>,
-        newLanguage: string,
+        newLanguage: string | null,
     ) => {
+        // exclusive ToggleButtonGroup sends null when the selected button is clicked again
+        if (!newLanguage) return;
         setLanguage(newLanguage);
         dispatch(changeLanguage(newLanguage))
         i18n.changeLanguage(newLanguage);

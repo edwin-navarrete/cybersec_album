@@ -11,6 +11,9 @@ function getNextBusinessDay(date:Date) {
 
 export namespace Game {
 
+    // Modes the server allows, from its GAME_MODE setting
+    export type GameMode = 'solo' | 'coop' | 'both'
+
     export interface GameConfig {
         rewardStrategy: RewardStrategy,
         rewardSchema: RewardSchema,
@@ -453,7 +456,7 @@ export namespace Sticker {
                 if (!albumStiker.inAlbum) {
                     albumStiker = { ...albumStiker, inAlbum: true };
                     // to trigger the start of the album
-                    return this.userStickerDAO.upsert(albumStiker as UserSticker);
+                    return await this.userStickerDAO.upsert(albumStiker as UserSticker);
                 }
                 return albumStiker
             }

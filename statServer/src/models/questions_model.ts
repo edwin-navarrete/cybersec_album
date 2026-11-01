@@ -19,6 +19,7 @@ Para los textos de las preguntas se va a usar el resultado del issue Issue 54
 import { Questions } from '../types/questions';
 import { db } from "../db";
 import { RowDataPacket } from "mysql2";
+import { getQuestionSet } from "./question_set";
 
 
     export const getQuestionsByDates = ( since:string | undefined, to:string | undefined) => {    
@@ -39,7 +40,8 @@ import { RowDataPacket } from "mysql2";
             FROM question q
             LEFT JOIN vw_user_answer ua ON q.question_id = ua.question_id
             WHERE
-                ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
+                q.question_set = ${db.escape(getQuestionSet())}
+                AND ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
             GROUP BY q.question_id, q.question
             ORDER BY avgLatency DESC;
             `;

@@ -6,6 +6,8 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
 import { registerPlayer } from '../features/game/gameMiddleware';
+import { useAppSelector } from '../app/hooks';
+import { selectGameMode } from '../features/game/gameSlice';
 import { AppDispatch } from '../app/store'
 import ToggleLang from './ToggleLang';
 import { ToggleButtonGroup, ToggleButton } from '@mui/material';
@@ -14,7 +16,10 @@ const AlbumIntroView = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     const { t } = useTranslation();
-    const [gameMode, setGameMode] = useState('solo');
+    const allowedMode = useAppSelector(selectGameMode);
+    const [chosenMode, setGameMode] = useState('solo');
+    // The server may force a single mode, otherwise the player chooses
+    const gameMode = (allowedMode === 'solo' || allowedMode === 'coop') ? allowedMode : chosenMode;
     const [playerName, setPlayerName] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const playerId = localStorage.getItem("playerId");
@@ -82,7 +87,7 @@ const AlbumIntroView = () => {
                     />
                     {errorMessage && <p className="errorMessage">{t(errorMessage)}</p>}
                 </div>
-                {!playerId && (
+                {!playerId && allowedMode === 'both' && (
                     <div className="gameModeSelector">
                         <p>{t("gameMode.label")}</p>
                         <ToggleButtonGroup
@@ -106,7 +111,7 @@ const AlbumIntroView = () => {
                     </div>
                 )}
                 <div className="formActions">
-                    <Button type="submit" className="glowingBtn" variant="contained" color="primary" size="large">
+                    <Button type="submit" className="glowingBtn" variant="contained" color="primary" size="large" disabled={!allowedMode}>
                         <div className="languageToggle">
                             {playerId? t("button.continue") : t("button.register") }<i className="fas fa-arrow-right"></i>
                         </div>

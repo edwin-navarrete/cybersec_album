@@ -4,6 +4,8 @@ import { check, validationResult } from 'express-validator'
 import EntityDAO from '../controllers/entityDao'
 import mysqlDriver from '../controllers/mysqlDriver'
 import validateInput from './validateInput'
+import { getGameMode, isModeAllowed } from '../models/gameMode'
+import { buildOpenGroupsQuery } from '../models/groupQuery'
 
 const router = Router()
 /*
@@ -60,6 +62,10 @@ router.post('/player', [
     check('playerName', 'playerName is required and is chars numbers and spaces').isAlphanumeric('es-ES', { ignore: ' ' }),
     validateInput
     ], async (req: Request, res: Response) => {
+    const gameMode = getGameMode()
+    if (!isModeAllowed(req.body.mode ?? 'solo', gameMode)) {
+        return res.status(400).json({ errorMessage: `Game mode '${req.body.mode ?? 'solo'}' is not allowed, this server only allows '${gameMode}'` })
+    }
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
     const {playerId, playerName, isLeader = null} = req.body
     const mode = req.body.mode
@@ -120,18 +126,8 @@ router.post('/player', [
 
 async function assignGroup( lang: string){
     // Get the oldest group_id
-    const GROUP_LIMIT = 20
     const dao = new PlayerDAO(mysqlDriver.fetch, mysqlDriver.insert, 'player')
-    const grpQry = "SELECT DISTINCT p.player_id group_id, p.player_name group_name, p.modified_on, COUNT(DISTINCT t.player_id) group_size " +
-                "FROM player p " +
-                "LEFT JOIN album a ON a.player_id = p.player_id AND ended_on IS NOT NULL " +
-                "LEFT JOIN player t ON t.group_id = p.player_id AND t.is_group = 0 " +
-                "WHERE p.is_group = 1 " +
-                "AND a.player_id IS NULL " +
-                "GROUP BY p.player_name " +
-                "HAVING COUNT(DISTINCT t.player_id) < " + GROUP_LIMIT
-                " ORDER BY p.modified_on ASC " +
-                "LIMIT 2";
+    const grpQry = buildOpenGroupsQuery()
 
     while(true){
         const groups = await mysqlDriver.fetch(grpQry)

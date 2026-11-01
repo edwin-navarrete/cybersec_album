@@ -18,6 +18,7 @@ Para los textos de las preguntas se va a usar el resultado del issue Issue 54
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getQuestionsByDates = void 0;
 const db_1 = require("../db");
+const question_set_1 = require("./question_set");
 const getQuestionsByDates = (since, to) => {
     return new Promise((resolve, reject) => {
         // NOTE 2038-01-18 is the limit for DB working UNIX_TIMESTAMP with 32 bits
@@ -25,18 +26,19 @@ const getQuestionsByDates = (since, to) => {
         to = (to !== null && to !== void 0 ? to : '2038-01-18') || '2038-01-18';
         const queryString = `
             SELECT
-                q.id AS questionId,
+                q.question_id AS questionId,
                 q.question,
                 COUNT(ua.question_id) AS attempts,
                 AVG(ua.latency / 1000) AS avgLatency,
                 SUM(ua.success) / COUNT(ua.question_id) AS successProb
             FROM question q
-            LEFT JOIN vw_user_answer ua ON q.id = ua.question_id
+            LEFT JOIN vw_user_answer ua ON q.question_id = ua.question_id
             WHERE
-                ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
-            GROUP BY q.id, q.question
+                q.question_set = ${db_1.db.escape((0, question_set_1.getQuestionSet)())}
+                AND ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
+            GROUP BY q.question_id, q.question
             ORDER BY avgLatency DESC;
-        `;
+            `;
         db_1.db.query(queryString, (err, result) => {
             if (err) {
                 reject(err);

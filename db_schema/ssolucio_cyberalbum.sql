@@ -113,7 +113,9 @@ CREATE TABLE `question` (
   `solution` JSON,
   `difficulty` float NOT NULL,
   `feedback` text DEFAULT NULL,
-  PRIMARY KEY (`question_id`,`lang`)
+  `question_set` varchar(50) NOT NULL DEFAULT 'default' COMMENT 'Named set of questions, the server plays the one in QUESTION_SET',
+  PRIMARY KEY (`question_id`,`lang`),
+  KEY `question_set_idx` (`question_set`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table storing questions for the game';
 
 
