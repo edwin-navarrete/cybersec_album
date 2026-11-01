@@ -434,13 +434,15 @@ export namespace Sticker {
                 }});
                 const newPlayer = apiResponse.data
                 localStorage.setItem("playerId", newPlayer.playerId);
-                localStorage.setItem("playerName", playerName);
+                // The server may have given another name (a suffix when the one asked for was taken)
+                const registeredName: string = newPlayer.playerName ?? playerName;
+                localStorage.setItem("playerName", registeredName);
                 newPlayer.groupId && localStorage.setItem("groupId", newPlayer.groupId);
                 newPlayer.isLeader && localStorage.setItem("isLeader", newPlayer.isLeader);
                 localStorage.setItem("modifiedOn", newPlayer.modifiedOn);
                 // Register the album immediately
                 await this.getAlbumId()
-                return playerName;
+                return registeredName;
             }  
             catch (error: any) {
                 if (axios.isAxiosError(error)) {

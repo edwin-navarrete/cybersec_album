@@ -108,8 +108,8 @@ interface RegisterPlayerPayload {
 
 export const registerPlayer = createAsyncThunk<string, RegisterPlayerPayload>
     ('album/registerPlayer', async ({ playerName, gameMode }) => {
-        await theAlbum.registerPlayer(playerName, gameMode);
-        return playerName;
+        // The name the server stored, which differs from the typed one when that was taken
+        return await theAlbum.registerPlayer(playerName, gameMode);
     })
 
 export const glueSticker = createAsyncThunk<Sticker.AlbumStiker[], Sticker.AlbumStiker>
