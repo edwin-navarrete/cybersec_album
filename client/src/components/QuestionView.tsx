@@ -1,12 +1,14 @@
 // import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import '../index.css';
-import { selectQuestion, selectUnclaimed, selectAchievement, updateToken, QuestionState } from '../features/game/gameSlice';
+import { selectQuestion, selectUnclaimed, selectAchievement, selectStickers, selectStickerSpots, updateToken, QuestionState } from '../features/game/gameSlice';
+import { announcesNextPanel, nextSpot } from '../features/game/strips';
+import StripView from './StripView';
 import { putAnswer, getPlayTokenFactory } from '../features/game/gameMiddleware';
 
 import { AppDispatch, RootState } from '../app/store'
@@ -16,6 +18,11 @@ const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
     const unclaimed = useSelector(selectUnclaimed);
     const achievement = useSelector((state: RootState) => selectAchievement(state, true));
+    const stickers = useSelector(selectStickers);
+    const spots = useSelector(selectStickerSpots);
+    // Panel this question is for: fixed while answering so the reveal shows in place
+    const targetPanel = useRef<string | undefined>(undefined);
+    if (questionState?.success === undefined) targetPanel.current = nextSpot(spots, stickers);
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     const { t } = useTranslation(); // i18n
@@ -138,6 +145,8 @@ const QuestionView = () => {
         const { question, options, success, solution, wrong } = questionState
         return (<div className='questionFrame' >
             { captchaKey && <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/> }
+            {announcesNextPanel() && targetPanel.current &&
+                <StripView spots={spots} stickers={stickers} target={targetPanel.current} />}
             <h3>{question}</h3>
             {solution.length > 1 && <h4>{t("quiz.multipleWrn")}</h4>}
             {options.map((option, i) =>

@@ -94,6 +94,14 @@ Saving to the API is best effort so a failure never ends a game. `features/game/
 - Records the API did not save have no `id`: `DAO.push` never merges them by id and `UserStickerDAO.upsert` matches them by album and sticker.
 - Tests: `offlineAlbum.spec.ts`.
 
+## Strip goals (client)
+
+The 3-column album grid is read as 7 comic strips of 3 panels (`1A 1B 1C` is strip 1). `features/game/strips.ts` derives everything from the spots and the stickers owned; there is no extra data. Only with `rewardStrategy: "sequential"` (`announcesNextPanel()`), because only then the next panel is predictable.
+- **Album:** the caption shows the first strip not completely glued (`Tira 2 de 7 · 1/3 viñetas · 1 por reclamar`), the panel that needs attention is outlined (first won-but-unclaimed sticker, else the next empty panel), glued strips get a green outline and finishing one shows a banner. The banner is not shown when loading the album.
+- **Question:** `StripView` shows the strip of the panel the question is for, and the won sticker appears in place (blurred until claimed). `QuestionView` keeps the target panel fixed while answering.
+- Nothing is announced while the album could not be opened (`albumError`).
+- Tests: `strips.spec.ts`.
+
 ## Database tables (`db_schema/ssolucio_cyberalbum.sql`)
 
 - `album(album_id UUID PK, player_id, started_on, ended_on, language, os/platform/browser/version/is_mobile)`

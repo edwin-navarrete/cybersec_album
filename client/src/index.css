@@ -478,3 +478,95 @@ successSplash
   font-size: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
 }
+
+/* Strip goals: the album rows are 3-panel comic strips */
+.nextSpot {
+  outline: 3px solid #f5b301;
+  outline-offset: -3px;
+  animation: nextPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes nextPulse {
+  0%, 100% { outline-color: rgba(245, 179, 1, 0.35); }
+  50% { outline-color: rgba(245, 179, 1, 1); }
+}
+
+.stripDone {
+  outline: 3px solid #2e9e6a;
+  outline-offset: -3px;
+}
+
+.stripCaption {
+  margin: 0;
+  font-family: 'Itim', cursive;
+  font-size: 15px;
+}
+
+.stripBanner {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 10px 22px;
+  border-radius: 24px;
+  background: #2e9e6a;
+  color: white;
+  font-family: 'Itim', cursive;
+  font-size: 22px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: bannerIn 0.45s ease-out;
+}
+
+@keyframes bannerIn {
+  from { opacity: 0; top: 40px; }
+  to { opacity: 1; top: 76px; }
+}
+
+.stripView {
+  margin-bottom: 14px;
+}
+
+.stripPanels {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.stripPanel {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid bisque;
+  background-color: var(--empty-spot);
+}
+
+.stripPanel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.emptyPanel {
+  background-image: url("../public/questionMark.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 60%;
+}
+
+.stripPanel.target {
+  outline: 3px solid #f5b301;
+  outline-offset: -3px;
+  animation: nextPulse 1.6s ease-in-out infinite;
+}
+
+.stripPanel.earned {
+  outline: 3px solid #f5b301;
+  outline-offset: -3px;
+  animation: revealPanel 0.7s ease-out;
+}
+
+@keyframes revealPanel {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

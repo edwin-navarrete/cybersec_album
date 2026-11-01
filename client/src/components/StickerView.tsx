@@ -9,6 +9,8 @@ import '../index.css';
 
 interface StickerProps {
     sticker: Sticker.AlbumStiker
+    stripDone?: boolean // every panel of its strip is glued
+    highlight?: boolean // this is the panel to claim next
 }
 
 const StickerView = (props: StickerProps) => {
@@ -20,7 +22,7 @@ const StickerView = (props: StickerProps) => {
     }
 
     return (
-        <div className="stickerFrame" >
+        <div className={"stickerFrame" + (props.stripDone ? " stripDone" : "") + (props.highlight ? " nextSpot" : "")} >
             <img src={image} className={inAlbum ? 'sticker' : 'stickerHint'} onClick={handleGlue} alt={spot} />
         </div>
     );
