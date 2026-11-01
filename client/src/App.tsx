@@ -7,6 +7,7 @@ import AlbumView from './components/AlbumView';
 import QuestionView from './components/QuestionView';
 import Header from './components/Header';
 import ErrorBanner from './components/ErrorBanner';
+import RequireAlias from './components/RequireAlias';
 import PlayerView from './components/PlayerView';
 import AlbumIntroView from './components/AlbumIntroView';
 
@@ -19,11 +20,13 @@ function App() {
                 <ErrorBanner />
                 <Routes>
                     <Route path="/" element={<AlbumIntroView />} />
-                    <Route path="/album" element={<AlbumView />} />
-                    <Route path="/quest" element={<QuestionView />} />
+                    <Route path="/album" element={<RequireAlias><AlbumView /></RequireAlias>} />
+                    <Route path="/quest" element={<RequireAlias><QuestionView /></RequireAlias>} />
                     <Route path="/players" element={
-                        gameMode === undefined ? null :
-                        gameMode === 'solo' ? <Navigate to="/album" replace /> : <PlayerView />
+                        <RequireAlias>{
+                            gameMode === undefined ? null :
+                            gameMode === 'solo' ? <Navigate to="/album" replace /> : <PlayerView />
+                        }</RequireAlias>
                     } />
                 </Routes>
             </div>

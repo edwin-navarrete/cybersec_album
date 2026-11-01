@@ -445,6 +445,20 @@ successSplash
     color: darkorchid;
 }
 
+.completedHint {
+    margin: 0 0 16px;
+    font-family: 'Itim', cursive;
+    font-size: 18px;
+    text-align: center;
+}
+
+.playerBadge {
+    margin: 0;
+    font-family: 'Itim', cursive;
+    font-size: 18px;
+    font-weight: bold;
+}
+
 .glowingBtn {
     animation: glowing 1300ms infinite;
 }

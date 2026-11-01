@@ -1,12 +1,11 @@
-import { useState, useEffect, useCallback, useRef, ChangeEvent } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { selectStickers, selectStickerSpots, selectAchievement, selectGameMode, selectAlbumError, updateToken } from '../features/game/gameSlice';
-import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
+import { selectStickers, selectStickerSpots, selectAchievement, selectAlbumError, updateToken } from '../features/game/gameSlice';
+import { fetchAlbum, nextQuestion } from '../features/game/gameMiddleware';
 import { AppDispatch, RootState } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
@@ -18,7 +17,6 @@ const AlbumView = () => {
     const stickers = useSelector(selectStickers);
     const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
-    const allowedMode = useSelector(selectGameMode);
     const albumError = useSelector(selectAlbumError);
 
     // Load initial album state
@@ -37,12 +35,10 @@ const AlbumView = () => {
 
     const [splash, setSplash] = useState(true);
     const [intro, setIntro] = useState(true);
-    const [playerName, setPlayerName] = useState('');
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    // The alias is asked for before playing (see RequireAlias); it is what identifies the player
+    const playerName = localStorage.getItem('playerName') ?? '';
 
     useEffect(() => {
-        var player = localStorage.getItem('playerName')
-        player && setPlayerName(player);
         setTimeout(() => {
             setIntro(false);
         }, 5500);
@@ -100,66 +96,21 @@ const AlbumView = () => {
         return intro && (<div className='introSplash'><span className="introMsg bubble-bottom-left">{t("introMsg")}</span></div>);
     }
 
-    const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setPlayerName(event.target.value);
-        setErrorMessage(null); 
-    };
-
-
-    function handleSubmit(event: React.FormEvent) {
-        event.preventDefault();
-        if (playerName.trim() === '') {
-            setErrorMessage(t("emptyName.err"));
-            return;
-        }
-        dispatch(registerPlayer({ playerName, gameMode: allowedMode === 'coop' ? 'coop' : 'solo'}))
-        .unwrap()
-        .then(() => {
-            setErrorMessage(null); 
-            setSplash(false);
-        })
-        .catch((error) => {
-            if (error.message === "DUPLICATE_NAME") {
-                setErrorMessage(t("dupName.err"));
-            } else {
-                setErrorMessage(t("registration.err"));
-            }
-        });
-    }
-    const playerId = localStorage.getItem("playerId");
-
+    // The completed album is shown with the player's name until it is tapped, or for a while
     useEffect(() => {
-        if (playerId && isFull) {
-            setTimeout(() => {
-                setSplash(false);
-            }, 4500);
-        }
-    });
+        if (!isFull) return;
+        const id = setTimeout(() => setSplash(false), 10000);
+        return () => clearTimeout(id);
+    }, [isFull]);
+
     function success() {
         return splash && (
-            <form className='successSplash' onSubmit={handleSubmit}>
+            <div className='successSplash' role="status" onClick={() => setSplash(false)}>
                 <div className="successForm">
-                    <p className="completed" >{t("quiz.completed")}</p>
-                    {!playerId && (
-                        <>
-                            <TextField
-                                id="playerName"
-                                type="text"
-                                variant="standard"
-                                value={playerName}
-                                onChange={handleNameChange}
-                                placeholder={t("hint.register")}
-                                error={!!errorMessage}
-                                required
-                            />
-                            {errorMessage && <p className="errorMessage">{errorMessage}</p>}
-                            <Button type="submit" className="glowingBtn">
-                                {t("button.register")}
-                            </Button>
-                        </>
-                    )}
+                    <p className="completed">{t("quiz.completed", { name: playerName })}</p>
+                    <p className="completedHint">{t("quiz.tapToSee")}</p>
                 </div>
-            </form>);
+            </div>);
     }
     const captchaKey = process.env.CAPTCHAKEY;
     return (
@@ -180,6 +131,7 @@ const AlbumView = () => {
                     {t("strip.label", { strip: progress.strip, total: progress.total, owned: progress.claimed, size: progress.size })}
                     {progress.pending > 0 && " " + t("strip.pending", { pending: progress.pending })}
                 </p>}
+                {isComplete && playerName && <p className="playerBadge">{t("album.player", { name: playerName })}</p>}
                 {Gauge()}
                 <div className='buttonGrp'>
                 {!isComplete && !albumError && <Button 

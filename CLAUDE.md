@@ -100,7 +100,6 @@ The player name is the identity shown in the ranking (to find the winners), so `
 - `#` is not accepted in what a player types: `POST /player` only takes a name with the suffix from the player who owns it (same id, same stored name), so nobody can forge one.
 - The response carries the stored name; the client keeps that one (`Album.registerPlayer` returns it) and `AlbumIntroView` tells the player when it differs from the typed one ("Tu nombre en el juego es …").
 - Whoever clears their storage and registers again gets a new identity (it is not blocked): a one-entry-per-person rule would need an identifier from the organization.
-- `AlbumView`'s registration form (after finishing an unregistered album) does not show the notice.
 
 ## Strip goals (client)
 
@@ -110,6 +109,13 @@ The 3-column album grid is read as 7 comic strips of 3 panels (`1A 1B 1C` is str
 - **Next question without leaving the question view:** after answering, the bottom bar shows `Ganar láminas`. It stays disabled while there are stickers to claim ("Reclama tus láminas para seguir"), so claiming is the reward beat. When the question finished a strip (all its panels claimed) the banner shows there and the button becomes `Ver mi álbum`, so each chapter ends in the album. After a wrong answer nothing is pending, so it is available at once. The view serves several questions in a row, so `QuestionView` resets the timer and the checked options whenever `questionState.id` changes.
 - Nothing is announced while the album could not be opened (`albumError`).
 - Tests: `strips.spec.ts`.
+
+## Alias before playing, and the end of the game (client)
+
+The alias (`player.player_name`) identifies the player in the ranking and for the prizes, so nobody plays without one.
+- `RequireAlias` wraps `/album`, `/quest` and `/players`: without `playerId` in `localStorage` it redirects to `/`. The album is created by `registerPlayer`, after the alias exists, so it is born owned by the player. (Older versions asked for the name when the album was completed, which is why the end screen used to say "Regístrate"; that form is gone.)
+- When the album is complete the splash greets the player by name ("¡LO LOGRASTE, {name}!"); it closes on tap or after 10 s, and the name stays in the album's bottom bar (`Jugador: {name}`) so it can be shown to the organizers.
+- Someone with an unfinished album from before this (no alias) is sent to the start screen; that old album is not attached to the new player.
 
 ## Database tables (`db_schema/ssolucio_cyberalbum.sql`)
 
