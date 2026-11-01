@@ -1,18 +1,22 @@
+import { useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
+import { AppDispatch } from '../app/store';
+import { glueSticker } from '../features/game/gameMiddleware';
 import { Sticker } from '../features/game/sticker';
 import { stripOf, stripSpots } from '../features/game/strips';
 
 interface StripViewProps {
+    strip: number                    // the strip to show
     spots: string[]                  // all the album spots
     stickers: Sticker.AlbumStiker[]  // stickers the player already won
     target: string                   // the panel this question is for
 }
 
-// The strip the player is working on, with the panel they are about to win
-const StripView = ({ spots, stickers, target }: StripViewProps) => {
+// A strip with the panels already won; the won ones can be claimed with a click, as in the album
+const StripView = ({ strip, spots, stickers, target }: StripViewProps) => {
     const { t } = useTranslation();
-    const strip = stripOf(target);
+    const dispatch = useDispatch() as AppDispatch;
 
     return (
         <div className="stripView" data-testid="strip-view">
@@ -31,7 +35,8 @@ const StripView = ({ spots, stickers, target }: StripViewProps) => {
                     if (won) {
                         return (
                             <div key={spot} className={"stripPanel" + (isTarget ? " earned" : "")}>
-                                <img src={won.image} className={won.inAlbum ? 'sticker' : 'stickerHint'} alt={spot} />
+                                <img src={won.image} className={won.inAlbum ? 'sticker' : 'stickerHint'} alt={spot}
+                                    onClick={() => { if (!won.inAlbum) dispatch(glueSticker(won)); }} />
                             </div>
                         );
                     }

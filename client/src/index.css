@@ -570,3 +570,8 @@ successSplash
   from { transform: scale(0.6); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
+
+/* The fixed bottom bar must not cover the end of a question */
+.questionContainer {
+  padding-bottom: 110px;
+}

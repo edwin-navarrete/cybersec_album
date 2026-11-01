@@ -1,4 +1,4 @@
-import { stripOf, stripSpots, nextSpot, attentionSpot, completedStrips, stripProgress } from './strips'
+import { stripOf, stripSpots, nextSpot, attentionSpot, completedStrips, stripProgress, stripsToShow } from './strips'
 
 const spots = ['1A', '1B', '1C', '2A', '2B', '2C', '3A', '3B', '3C']
 const own = (...list: Array<[string, boolean]>) => list.map(([spot, inAlbum]) => ({ spot, inAlbum }))
@@ -43,5 +43,14 @@ describe('strips', () => {
             .toEqual({ strip: 2, total: 3, claimed: 0, pending: 1, size: 3 })
         expect(stripProgress(spots, [])).toEqual({ strip: 1, total: 3, claimed: 0, pending: 0, size: 3 })
         expect(stripProgress(spots, spots.map(s => ({ spot: s, inAlbum: true })))).toBeUndefined()
+    })
+
+    it('shows the strip being earned and the ones with stickers to claim', () => {
+        // nothing pending: only the strip of the panel being earned
+        expect(stripsToShow(spots, own(['1A', true], ['1B', true]), '1C')).toEqual([1])
+        // a sticker won earlier and still unclaimed in a previous strip stays reachable
+        expect(stripsToShow(spots, own(['1A', true], ['1B', true], ['1C', false]), '2A')).toEqual([1, 2])
+        // a big reward that spills over to the next strip
+        expect(stripsToShow(spots, own(['1A', true], ['1B', true], ['1C', true], ['2A', false], ['2B', false], ['2C', false], ['3A', false]), '3B')).toEqual([2, 3])
     })
 })

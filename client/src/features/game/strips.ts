@@ -67,3 +67,10 @@ export const stripProgress = (spots: string[], stickers: OwnedSticker[]): StripP
         size: inStrip.length
     }
 }
+
+// Strips the question shows: the one of the panel being earned and every one that
+// still has stickers to claim, so everything won can be claimed without leaving it.
+export const stripsToShow = (spots: string[], stickers: OwnedSticker[], target: string): number[] => {
+    const pending = stickers.filter(s => !s.inAlbum && spots.includes(s.spot)).map(s => stripOf(s.spot))
+    return Array.from(new Set([stripOf(target), ...pending])).sort((a, b) => a - b)
+}
