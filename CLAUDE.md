@@ -43,6 +43,7 @@ Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `
 - `models/server.ts`: `Server` class. Middlewares: cors, json, express-useragent, `recaptcha`. Mounts all routers under `${SERVER_PATH}/api`. Serves `../../../client/build` statically, with a `*` fallback to `index.html`.
 - `models/recaptcha.ts`: validates the `g-recaptcha-response` header on GET/POST against Google. Results are memoized (`memoizee`). Responds 403 on failure. Skipped when `CAPTCHA_SECRET` is unset.
 - `models/gameMode.ts`: parses `GAME_MODE` (`getGameMode`, `isModeAllowed`), tested in `gameMode.spec.ts`. `routes/config.ts` serves `GET /api/config` → `{ gameMode }`. It is mounted before the recaptcha middleware because the client reads it before it has a captcha token.
+- `models/groupQuery.ts`: `buildOpenGroupsQuery()`, the SQL that picks the team for a new coop player (oldest `modified_on` first, ties by smaller team then id, max 20 members), tested in `groupQuery.spec.ts`. A missing `+` between its string pieces once dropped the `ORDER BY`/`LIMIT`, so new players always went to the alphabetically first team.
 - `models/questionSet.ts`: parses `QUESTION_SET` (`getQuestionSet`, falls back to `default`), tested in `questionSet.spec.ts`. `routes/questionRouter.ts` filters by it.
 - `controllers/DBDriver.ts`: `Fetch` and `Insert` types.
 - `controllers/mysqlDriver.ts`: singleton mysql2 pool (limit 10, 1s connection timeout) exposing `fetch` and `insert`.
