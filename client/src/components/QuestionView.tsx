@@ -1,13 +1,15 @@
 // import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 import '../index.css';
-import { selectQuestion, selectUnclaimed, selectAchievement, updateToken, QuestionState } from '../features/game/gameSlice';
-import { putAnswer, getPlayTokenFactory } from '../features/game/gameMiddleware';
+import { selectQuestion, selectUnclaimed, selectAchievement, selectStickers, selectStickerSpots, updateToken, QuestionState } from '../features/game/gameSlice';
+import { announcesNextPanel, nextSpot, stripsToShow, completedStrips } from '../features/game/strips';
+import StripView from './StripView';
+import { putAnswer, nextQuestion, getPlayTokenFactory } from '../features/game/gameMiddleware';
 
 import { AppDispatch, RootState } from '../app/store'
 import Button from '@mui/material/Button';
@@ -16,6 +18,38 @@ const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
     const unclaimed = useSelector(selectUnclaimed);
     const achievement = useSelector((state: RootState) => selectAchievement(state, true));
+    const stickers = useSelector(selectStickers);
+    const spots = useSelector(selectStickerSpots);
+    // Panel this question is for: fixed while answering so the reveal shows in place
+    const targetPanel = useRef<string | undefined>(undefined);
+    if (questionState?.success === undefined) targetPanel.current = nextSpot(spots, stickers);
+    // Strips shown while this question lasts: one that appeared (it had something to claim)
+    // stays after its stickers are claimed, until the next question
+    const shownStrips = useRef<number[]>([]);
+    const shownFor = useRef<number | undefined>(undefined);
+    if (questionState?.id !== shownFor.current) {
+        shownFor.current = questionState?.id;
+        shownStrips.current = [];
+    }
+    if (targetPanel.current) {
+        shownStrips.current = Array.from(new Set([...shownStrips.current, ...stripsToShow(spots, stickers, targetPanel.current)]))
+            .sort((a, b) => a - b);
+    }
+    // Strips completed (every panel claimed) when the question started, to know if this
+    // question finished one: that is the moment to go and see the album
+    const completedAtStart = useRef(0);
+    const doneStrips = announcesNextPanel() ? completedStrips(spots, stickers) : [];
+    if (questionState?.success === undefined) completedAtStart.current = doneStrips.length;
+    const justCompleted = questionState?.success !== undefined && doneStrips.length > completedAtStart.current
+        ? doneStrips[doneStrips.length - 1] : undefined;
+    const [bannerStrip, setBannerStrip] = useState<number | null>(null);
+    useEffect(() => { if (justCompleted !== undefined) setBannerStrip(justCompleted) }, [justCompleted]);
+    useEffect(() => {
+        if (bannerStrip === null) return;
+        const id = setTimeout(() => setBannerStrip(null), 3000);
+        return () => clearTimeout(id);
+    }, [bannerStrip]);
+
     const navigate = useNavigate();
     const dispatch = useDispatch() as AppDispatch;
     const { t } = useTranslation(); // i18n
@@ -63,6 +97,21 @@ const QuestionView = () => {
     const [optState, setOptState] = useState(
         new Array(optCount).fill(false)
     );
+    const [loadingNext, setLoadingNext] = useState(false);
+
+    // The same view serves one question after another: each one starts from scratch
+    useEffect(() => {
+        setTimer(-1)
+        setOptState(new Array(optCount).fill(false))
+        setLoadingNext(false)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [questionState?.id]);
+
+    // Next question without going back to the album
+    function handleNext() {
+        setLoadingNext(true)
+        dispatch(nextQuestion()).then(() => setLoadingNext(false))
+    }
 
     const sendAttempt: React.ChangeEventHandler<HTMLInputElement> = (event) => {
         let position = +event.currentTarget.value;
@@ -138,6 +187,9 @@ const QuestionView = () => {
         const { question, options, success, solution, wrong } = questionState
         return (<div className='questionFrame' >
             { captchaKey && <GoogleReCaptcha action="viewQuestion" onVerify={handleCaptcha}/> }
+            {announcesNextPanel() && targetPanel.current &&
+                shownStrips.current.map(strip =>
+                    <StripView key={strip} strip={strip} spots={spots} stickers={stickers} target={targetPanel.current!} />)}
             <h3>{question}</h3>
             {solution.length > 1 && <h4>{t("quiz.multipleWrn")}</h4>}
             {options.map((option, i) =>
@@ -156,13 +208,23 @@ const QuestionView = () => {
         </div>);
     }
 
+    const answered = questionState?.success !== undefined;
+
     return (
         <section className="pageContainer">
             <section className="questionContainer" data-testid="container-a">
                 {renderQuestion(questionState)}
             </section>
+            {bannerStrip !== null && <div className="stripBanner" role="status">{t("strip.complete", { strip: bannerStrip })}</div>}
             <div className='buttonContainer'>
+                {answered && justCompleted === undefined && unclaimed > 0 &&
+                    <p className="stripCaption">{t("quiz.claimFirst")}</p>}
                 <div className='buttonGrp'>
+                {answered && (justCompleted !== undefined
+                    // a strip was finished: that is the moment to see the album
+                    ? <Button variant="contained" onClick={() => navigate("/album")}>{t("button.album")}</Button>
+                    // otherwise keep going, once what was won is claimed
+                    : <Button variant="contained" disabled={unclaimed > 0 || loadingNext} onClick={handleNext}>{t("button.earn")}</Button>)}
                 {hasGroupId && ( <Button variant="contained"  onClick={handleTeamRedirect}>
                         <i className="fas fa-users" />
                     </Button>)}

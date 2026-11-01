@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, ChangeEvent } from 'react';
+import { useState, useEffect, useCallback, useRef, ChangeEvent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameM
 import { AppDispatch, RootState } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
+import { announcesNextPanel, attentionSpot, completedStrips, stripProgress, stripOf } from '../features/game/strips';
 
 const AlbumView = () => {
     const dispatch = useDispatch() as AppDispatch;
@@ -58,13 +59,38 @@ const AlbumView = () => {
         navigate("/quest")
     }
 
+    // Strip goals: the album rows are 3-panel comic strips
+    // Nothing to announce while the album could not be opened
+    const strips = announcesNextPanel() && !albumError
+    const next = strips ? attentionSpot(spots, stickers) : undefined
+    const doneStrips = strips ? completedStrips(spots, stickers) : []
+    // The intro character covers the bottom bar of a brand new album
+    const progress = strips && !isComplete && !(intro && stickers.length === 1) ? stripProgress(spots, stickers) : undefined
+
+    // Celebrate when gluing a sticker finishes a strip (not when loading the album)
+    const lastDone = useRef<number | null>(null)
+    const [bannerStrip, setBannerStrip] = useState<number | null>(null)
+    useEffect(() => {
+        if (!strips || stickers.length === 0) return
+        const done = completedStrips(spots, stickers)
+        if (lastDone.current !== null && done.length > lastDone.current) {
+            setBannerStrip(done[done.length - 1])
+        }
+        lastDone.current = done.length
+    }, [strips, spots, stickers])
+    useEffect(() => {
+        if (bannerStrip === null) return
+        const id = setTimeout(() => setBannerStrip(null), 3000)
+        return () => clearTimeout(id)
+    }, [bannerStrip])
+
     function getStickerView(spot: string) {
         let sticker = stickers.filter(s => s.spot === spot)
         if (sticker.length) {
-            return (<StickerView key={spot} sticker={sticker[0]} />)
+            return (<StickerView key={spot} sticker={sticker[0]} stripDone={doneStrips.includes(stripOf(spot))} highlight={spot === next} />)
         }
         else {
-            return (<div className="emptySpot" key={spot}>
+            return (<div className={spot === next ? "emptySpot nextSpot" : "emptySpot"} key={spot}>
                 <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" className="sticker" alt={spot} />
             </div>)
         }
@@ -148,7 +174,12 @@ const AlbumView = () => {
                 <Button variant="contained" onClick={() => dispatch(fetchAlbum())}>{t("button.retry")}</Button>
             </div>)}
             {isFull && success()}
+            {bannerStrip !== null && <div className="stripBanner" role="status">{t("strip.complete", { strip: bannerStrip })}</div>}
             <div className='buttonContainer' key='buttonBar0'>
+                {progress && <p className="stripCaption">
+                    {t("strip.label", { strip: progress.strip, total: progress.total, owned: progress.claimed, size: progress.size })}
+                    {progress.pending > 0 && " " + t("strip.pending", { pending: progress.pending })}
+                </p>}
                 {Gauge()}
                 <div className='buttonGrp'>
                 {!isComplete && !albumError && <Button 
