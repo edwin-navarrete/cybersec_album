@@ -125,6 +125,14 @@ The alias (`player.player_name`) identifies the player in the ranking and for th
 - One request per question (`questionDefDAO.findAll({ filter })`); everything else is decided in the browser, so it keeps working offline and adds no load. `Quiz` compares the strategy with the literal `"thompson"`, not with the `Game.QuizStrategy` value: `sticker.ts` imports `question.ts`, so a value import would be circular.
 - Tests: `questionPicker.spec.ts` (the maths, with a seeded generator) and `quizThompson.spec.ts` (the `Quiz` class).
 
+## Time to answer (client)
+
+`features/game/questionTime.ts`. Reading a question is not knowing it, so the time is split:
+- **Limit** (`timeLimitFor`) = reading (`readingSeconds`: words of the question and of every option, at 3 words per second, rounded up) + thinking (`thinkingSeconds`: `floor(difficulty * 15 + 6)`, which used to be the whole limit) + 2 s for every answer after the first in a multiple-answer question. It does not depend on `difficulty` to compensate a long text: difficulty is the concept's difficulty and also decides the stickers.
+- **Latency kept** (`netLatencyMs`) = time taken minus the reading time, never below 1 s (`MIN_LATENCY_MS`: 0 would tie everybody who answers within the reading time, and a falsy 0 is ignored by `UserAnswerDAO.put`). It is what the ranking in `statServer` sums, so reading slowly, or being given a long question, does not count against the player. It is a net time: `user_answer.latency` and the average time per question in the stats are net of reading. Earlier rows are the raw time.
+- The clock starts when there is a question (`QuestionView`), not before: it used to start with a default limit (13 s) when the view opened before the question arrived.
+- Tests: `questionTime.spec.ts`.
+
 ## Database tables (`db_schema/ssolucio_cyberalbum.sql`)
 
 - `album(album_id UUID PK, player_id, started_on, ended_on, language, os/platform/browser/version/is_mobile)`
