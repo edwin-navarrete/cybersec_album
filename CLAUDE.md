@@ -117,6 +117,14 @@ The alias (`player.player_name`) identifies the player in the ranking and for th
 - When the album is complete the splash greets the player by name ("¡LO LOGRASTE, {name}!"); it closes on tap or after 10 s, and the name stays in the album's bottom bar (`Jugador: {name}`) so it can be shown to the organizers.
 - Someone with an unfinished album from before this (no alias) is sent to the start screen; that old album is not attached to the new player.
 
+## Question selection (client)
+
+`gameConfig.quizStrategy` decides how `Quiz.generate` picks the next question: `thompson` (default), `randomUnseen` or `easiestUnseen`.
+- **`thompson`** (`Quiz.generateThompson`, `features/game/questionPicker.ts`): first the questions this player has never answered, in random order. Once all were seen, Thompson sampling over the seen ones: for each, a draw from Beta(1 + w·failures, 1 + w·successes) (`EVIDENCE_WEIGHT` w = 3) is the chance that the player does not know it, and the highest wins. What was failed comes out most (a timeout counts as a failure) and rotates; what was answered right almost never does; the last 2 questions asked (`RECENT_QUESTIONS`, kept in the `Quiz` instance) are left out, so none repeats right away.
+- `user_answer` keeps only `attempts` and the last `success`, not every result: the last one counts as a success/failure and the earlier attempts as failures. **`success` comes from the API as `1`/`0` (tinyint), not as a boolean**, so it is read as truthy/falsy (`statsOf`).
+- One request per question (`questionDefDAO.findAll({ filter })`); everything else is decided in the browser, so it keeps working offline and adds no load. `Quiz` compares the strategy with the literal `"thompson"`, not with the `Game.QuizStrategy` value: `sticker.ts` imports `question.ts`, so a value import would be circular.
+- Tests: `questionPicker.spec.ts` (the maths, with a seeded generator) and `quizThompson.spec.ts` (the `Quiz` class).
+
 ## Database tables (`db_schema/ssolucio_cyberalbum.sql`)
 
 - `album(album_id UUID PK, player_id, started_on, ended_on, language, os/platform/browser/version/is_mobile)`
