@@ -1,4 +1,5 @@
 import axios from "axios"
+import * as OfflineAlbums from "./offlineAlbum"
 import { Question } from "./question";
 import {v4 as uuidv4 } from "uuid"
 
@@ -335,44 +336,47 @@ export namespace Sticker {
             this.userStickerDAO = userStickerDAO
         }
 
+        // The album id is only kept once the album exists. If it cannot be created
+        // this fails: a made-up id would make every later save fail.
         async getAlbumId(): Promise<string> {
             let albumId = localStorage.getItem("albumId");
-            if(!albumId){
-                try {
-                    const playerId = localStorage.getItem("playerId");
-                    const groupId = localStorage.getItem("groupId");
-                    const isLeader = localStorage.getItem("isLeader");
-                    const uri = process.env.REACT_APP_API+`/album`;
-                    const headers = {"g-recaptcha-response": Question.DAO.token}
-                    if( groupId && !isLeader ){
-                        const getResp = await axios.get(uri,{
-                            params: {playerId:groupId},
-                            headers
-                        });
-                        albumId = getResp.data.results?.[0]?.albumId as string ?? 'undefined';
-                    }
-                    else {
-                        albumId = uuidv4();
-                        const ownerId = groupId ?? playerId;
-                        const startedOn = Date.now().toString()
-                        await axios.post(uri,{
-                            albumId: albumId,
-                            playerId: ownerId,
-                            startedOn: startedOn,
-                            language: navigator.language
-                        }, { headers });
-                        localStorage.setItem("startedOn", startedOn);
-                    }
-                } catch (error){
-                    albumId = 'undefined';
-                    console.error("API error", error);
+            // 'undefined' was stored by an earlier version when the album could not be created
+            if (albumId && albumId !== 'undefined') return albumId
+
+            try {
+                const playerId = localStorage.getItem("playerId");
+                const groupId = localStorage.getItem("groupId");
+                const isLeader = localStorage.getItem("isLeader");
+                const uri = process.env.REACT_APP_API+`/album`;
+                const headers = {"g-recaptcha-response": Question.DAO.token}
+                if( groupId && !isLeader ){
+                    const getResp = await OfflineAlbums.withRetry(() => axios.get(uri,{
+                        params: {playerId:groupId},
+                        headers
+                    }));
+                    albumId = getResp.data.results?.[0]?.albumId as string
+                    if (!albumId) throw new Error("The team album does not exist yet")
                 }
-                localStorage.setItem("albumId", albumId);
+                else {
+                    albumId = uuidv4();
+                    const ownerId = groupId ?? playerId;
+                    const startedOn = Date.now().toString()
+                    await OfflineAlbums.withRetry(() => axios.post(uri,{
+                        albumId: albumId,
+                        playerId: ownerId,
+                        startedOn: startedOn,
+                        language: navigator.language
+                    }, { headers }));
+                    localStorage.setItem("startedOn", startedOn);
+                }
+            } catch (error){
+                console.error("API error", error);
+                throw new Error("ALBUM_UNAVAILABLE");
             }
+            localStorage.setItem("albumId", albumId);
             return albumId;
         }
 
-        // FIXME The sticker details mapped by spot is not serializable! simplify to plain array
         async getStickers(): Promise<Map<string, AlbumStiker>> {
             let self = this
             return this.userStickerDAO.findAll({ filter: { albumId: await this.getAlbumId() }, order: "+inAlbum" })
@@ -481,18 +485,22 @@ export namespace Sticker {
                     localStorage.removeItem("endedOn");
                 }
 
-                try {
-                    let uri = process.env.REACT_APP_API+`/album`;
-                    await axios.post(uri,{
-                        albumId: localStorage.getItem("albumId"),
-                        startedOn: localStorage.getItem("startedOn"),
-                        endedOn: localStorage.getItem("endedOn"),
-                        language: navigator.language
-                    },{
-                        headers:{"g-recaptcha-response": Question.DAO.token
-                    }});
-                } catch (error){
-                    console.error("API error", error);
+                const albumId = localStorage.getItem("albumId")
+                if (albumId && !OfflineAlbums.isOffline(albumId)) {
+                    try {
+                        let uri = process.env.REACT_APP_API+`/album`;
+                        await OfflineAlbums.withRetry(() => axios.post(uri,{
+                            albumId: albumId,
+                            startedOn: localStorage.getItem("startedOn"),
+                            endedOn: localStorage.getItem("endedOn"),
+                            language: navigator.language
+                        },{
+                            headers:{"g-recaptcha-response": Question.DAO.token
+                        }}));
+                    } catch (error){
+                        console.error("API error", error);
+                        OfflineAlbums.handleSaveFailure(albumId, error)
+                    }
                 }
             }
             return (filled / allSpots)
@@ -503,24 +511,27 @@ export namespace Sticker {
     export class UserStickerDAO extends Question.DAO<UserSticker> {
         constructor(initialDB:UserSticker[]) {
             super("userSticker",initialDB)
+            OfflineAlbums.registerSource(this)
         }
         async upsert(sticker: UserSticker): Promise<UserSticker> {
-            if (!sticker.id) {
+            OfflineAlbums.loadInto(this, sticker.albumId)
+            // A sticker the API did not save has no id: it is the one of the same album and sticker
+            const found = sticker.id
+                ? this.db.find(us => us.id === sticker.id)
+                : this.db.find(us => us.albumId === sticker.albumId && us.stickerId === sticker.stickerId)
+            if (!found) {
+                if (sticker.id) throw new Error("Invalid DB at UserStickerDAO")
                 // Is a new sticker
                 sticker.addedOn = Date.now();
                 sticker.inAlbum = sticker.inAlbum || false;
                 await super.push(sticker)
+                return sticker;
             }
-            else {
-                // just update some fields
-                let found = this.db.find(us => us.id === sticker.id)
-                if (!found) throw new Error("Invalid DB at UserStickerDAO")
-                found.inAlbum = sticker.inAlbum || false
-                found.addedOn = Date.now()
-                await super.push(found)
-                sticker = found
-            }
-            return sticker;
+            // just update some fields
+            found.inAlbum = sticker.inAlbum || false
+            found.addedOn = Date.now()
+            await super.push(found)
+            return found;
         }
     }
 

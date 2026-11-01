@@ -61,21 +61,16 @@ export const fetchConfig = createAsyncThunk<Game.GameMode>
 
 export const fetchAlbum = createAsyncThunk<Sticker.AlbumStiker[]>
     ('album/fetch', async () => {
-        try{
-            let stickers = await theAlbum.getStickers()
-            if(!stickers.size){
-                // if first time, give the first sticker as a sample
-                let stickerSample = await stickerDAO.findAll({ include: [1] })
-                let newStickers = await theAlbum.ownStickers(stickerSample);
-                await theAlbum.glueSticker(newStickers[0]);
-                stickers = await theAlbum.getStickers()
-            }
-            return Array.from(stickers.values())
-
-        }catch(err){
-            console.error(err);
-            return []
+        // It rejects when the album cannot be opened, the view offers to retry
+        let stickers = await theAlbum.getStickers()
+        if(!stickers.size){
+            // if first time, give the first sticker as a sample
+            let stickerSample = await stickerDAO.findAll({ include: [1] })
+            let newStickers = await theAlbum.ownStickers(stickerSample);
+            await theAlbum.glueSticker(newStickers[0]);
+            stickers = await theAlbum.getStickers()
         }
+        return Array.from(stickers.values())
     })
 
 export const changeLanguage = createAsyncThunk<QuestionsAndStickers, string>

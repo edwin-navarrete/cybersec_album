@@ -84,6 +84,16 @@ The server decides which modes are playable. `POST /player` returns 400 when the
 
 `GET /api/question?lang=` returns only the rows whose `question_set` equals `QUESTION_SET` (`default` if unset or invalid). `statServer`'s `/questions` applies the same filter through its own copy of the parser (`statServer/src/models/question_set.ts`), so both processes must share the value. An empty set makes the client fail with "Illegal question in Middleware"; the server logs a warning. `statServer/dist` is committed, so it was rebuilt for this change (`questions_model.js`, `question_set.js`).
 
+## Offline mode (client)
+
+Saving to the API is best effort so a failure never ends a game. `features/game/offlineAlbum.ts`:
+- A failed save of an album record (`userSticker`, `userAnswer`, the album itself) is retried twice (300 ms, 900 ms) when it may be transient (network error, 5xx, 408, 429). Other 4xx go offline at once.
+- If it still fails, a **solo** album goes offline: `localStorage` gets `offline:<albumId>` (when, HTTP status, message, to investigate later) and `offline:<albumId>:userSticker|userAnswer` (its records). From then on nothing is sent to the API for that album, and on refresh the DAOs read from `localStorage` (`loadInto`) instead of the API. The API keeps a consistent but older history; nothing is reconciled automatically. To reset a test album, remove those keys.
+- **Team albums never go offline** (several browsers share them): the save error is raised and `ErrorBanner` shows it.
+- `Album.getAlbumId()` throws `ALBUM_UNAVAILABLE` when the album cannot be created (it no longer stores `'undefined'`); `fetchAlbum` rejects and `AlbumView` shows "could not open your album" with a Retry button. Without the API the game cannot start.
+- Records the API did not save have no `id`: `DAO.push` never merges them by id and `UserStickerDAO.upsert` matches them by album and sticker.
+- Tests: `offlineAlbum.spec.ts`.
+
 ## Database tables (`db_schema/ssolucio_cyberalbum.sql`)
 
 - `album(album_id UUID PK, player_id, started_on, ended_on, language, os/platform/browser/version/is_mobile)`

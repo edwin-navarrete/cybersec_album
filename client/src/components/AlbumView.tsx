@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { selectStickers, selectStickerSpots, selectAchievement, selectGameMode, updateToken } from '../features/game/gameSlice';
+import { selectStickers, selectStickerSpots, selectAchievement, selectGameMode, selectAlbumError, updateToken } from '../features/game/gameSlice';
 import { fetchAlbum, nextQuestion, registerPlayer } from '../features/game/gameMiddleware';
 import { AppDispatch, RootState } from '../app/store'
 import Gauge from './Gauge';
@@ -18,6 +18,7 @@ const AlbumView = () => {
     const isComplete = useSelector((state: RootState) => selectAchievement(state, true));
     const isFull = useSelector(selectAchievement);
     const allowedMode = useSelector(selectGameMode);
+    const albumError = useSelector(selectAlbumError);
 
     // Load initial album state
     useEffect(() => {
@@ -142,11 +143,15 @@ const AlbumView = () => {
                 {spots.map((spot) => getStickerView(spot))}
             </section>
             {stickers.length === 1 && showIntro()}
+            {albumError && (<div className="albumError" role="alert">
+                <p>{t("album.err")}</p>
+                <Button variant="contained" onClick={() => dispatch(fetchAlbum())}>{t("button.retry")}</Button>
+            </div>)}
             {isFull && success()}
             <div className='buttonContainer' key='buttonBar0'>
                 {Gauge()}
                 <div className='buttonGrp'>
-                {!isComplete && <Button 
+                {!isComplete && !albumError && <Button 
                     className={stickers.length === 1? "glowingBtn" : ""}
                     key='button0' variant="contained" 
                     onClick={handleMoreStickers}>{t("button.earn")}

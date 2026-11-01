@@ -31,6 +31,10 @@ export interface AlbumState {
     token: string
     // undefined until the server config is loaded
     gameMode?: Game.GameMode
+    // the album could not be opened (or created) and the player can retry
+    albumError?: boolean
+    // progress could not be saved and the game cannot continue offline (team albums)
+    saveError?: boolean
     stickerCount: number
     stickers: Sticker.AlbumStiker[]
     team?: Sticker.Team
@@ -45,6 +49,10 @@ const initialState: AlbumState = {
 
 // Selector for the game modes the server allows (undefined while loading)
 export const selectGameMode = (state: RootState) => state.game.gameMode;
+
+// Selectors for the errors the player has to know about
+export const selectAlbumError = (state: RootState) => !!state.game.albumError;
+export const selectSaveError = (state: RootState) => !!state.game.saveError;
 
 // Selector for the question
 export const selectQuestion = (state: RootState) => state.game.question;
@@ -87,10 +95,23 @@ export const abumSlice = createSlice({
         updateToken: (state, action: PayloadAction<string>) => {
           Question.DAO.token = action.payload || "";
           state.token = Question.DAO.token;
+        },
+        dismissSaveError: (state) => {
+            state.saveError = false
         }
     },
     extraReducers: builder => {
+        builder.addCase(putAnswer.rejected, (state) => {
+            state.saveError = true
+        });
+        builder.addCase(glueSticker.rejected, (state) => {
+            state.saveError = true
+        });
+        builder.addCase(fetchAlbum.rejected, (state) => {
+            state.albumError = true
+        });
         builder.addCase(putAnswer.fulfilled, (state, action) => {
+            state.saveError = false
             state.stickers = action.payload.stickers
             if (state.question) {
                 state.question.success = action.payload.success;
@@ -101,6 +122,7 @@ export const abumSlice = createSlice({
             state.gameMode = action.payload
         });
         builder.addCase(fetchAlbum.fulfilled, (state, action) => {
+            state.albumError = false
             state.stickers = action.payload
         });
         builder.addCase(loadTeam.fulfilled, (state, action) => {
@@ -110,6 +132,7 @@ export const abumSlice = createSlice({
             state.team = action.payload
         });
         builder.addCase(glueSticker.fulfilled, (state, action) => {
+            state.saveError = false
             state.stickers = action.payload
         });
         builder.addCase(changeLanguage.fulfilled, (state, action) => {
@@ -125,5 +148,5 @@ export const abumSlice = createSlice({
     }
 })
 
-export const { updateToken } = abumSlice.actions
+export const { updateToken, dismissSaveError } = abumSlice.actions
 export default abumSlice.reducer;
