@@ -6,6 +6,7 @@ import './App.css';
 import AlbumView from './components/AlbumView';
 import QuestionView from './components/QuestionView';
 import Header from './components/Header';
+import ErrorBanner from './components/ErrorBanner';
 import PlayerView from './components/PlayerView';
 import AlbumIntroView from './components/AlbumIntroView';
 
@@ -15,6 +16,7 @@ function App() {
         <BrowserRouter>
             <div className="Initial" data-testid="app-1">
                 <Header />
+                <ErrorBanner />
                 <Routes>
                     <Route path="/" element={<AlbumIntroView />} />
                     <Route path="/album" element={<AlbumView />} />

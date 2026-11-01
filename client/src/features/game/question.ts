@@ -1,5 +1,6 @@
 import axios from "axios"
 import { Game, Sticker } from "./sticker"
+import * as OfflineAlbums from "./offlineAlbum"
 
 function shuffleCollection(collection:any[]){
     for (let i = collection.length - 1; i > 0; i--) {
@@ -210,6 +211,8 @@ export namespace Question {
         }
 
         async findAll(options: QueryOptions = {}): Promise<Type[]> {
+            // An album that went offline lives in this browser, never ask the API for it
+            if (OfflineAlbums.loadInto(this, options.filter?.albumId)) return this.inMemFindAll(options)
             // NOTE reads from remote only once, then it works offline
             let self = this
             if(this.entrypoint && !self.loaded){
@@ -233,27 +236,34 @@ export namespace Question {
 
         async push(record: Type){
             const self = this;
-            if(this.entrypoint){
+            // Records of an album (stickers, answers) know the album they belong to
+            const albumId = (record as unknown as { albumId?: string }).albumId
+            OfflineAlbums.loadInto(this, albumId)
+            if(this.entrypoint && !OfflineAlbums.isOffline(albumId)){
                 try {
                     let uri = process.env.REACT_APP_API+`/${this.entrypoint}`;
-                    const apiResponse = await axios.post(uri,record,{
+                    const apiResponse = await OfflineAlbums.withRetry(() => axios.post(uri,record,{
                         headers:{"g-recaptcha-response":DAO.token
-                    }});
+                    }}));
                     const newUserAnswer = apiResponse.data;
                     record.id = newUserAnswer[self.entrypoint+'Id']
                 } catch (error){
                     console.error("API error", error);
+                    // A solo album continues offline, a team album raises the error
+                    if (albumId) OfflineAlbums.handleSaveFailure(albumId, error)
                 }
             }
             // A record the API could not save has no id yet: it must not be merged
             // with another unsaved one, or they overwrite each other.
-            const index = record.id === undefined ? -1 : this.db.findIndex(item => item.id === record.id);
+            let index = this.db.indexOf(record)
+            if (index === -1 && record.id !== undefined) index = this.db.findIndex(item => item.id === record.id);
             if (index !== -1) {
                 Object.assign(this.db[index],record);
             }
             else {
                 this.db.push(record);
             }
+            if (OfflineAlbums.isOffline(albumId)) OfflineAlbums.persist(albumId!)
             return record
         }
     }
@@ -261,31 +271,28 @@ export namespace Question {
     export class UserAnswerDAO extends DAO<Answer> {
         constructor() {
             super("userAnswer",[])
+            OfflineAlbums.registerSource(this)
         }
 
         async put(answer: Answer): Promise<Answer> {
-            let db = this.db
-            return new Promise((resolve) => {
-                let found = db.find(a =>
-                    a.questionId === answer.questionId && a.albumId === answer.albumId)
-                if (!found) {
-                    answer.attempts = 1
-                    answer.answeredOn = Date.now()
-                    super.push(answer)
-                    resolve(answer)
-                }
-                else {
-                    found.attempts = (found.attempts || 1) + 1
-                    found.success = answer.success
-                    if (answer.latency) {
-                        found.latency = found.latency
-                            ? (found.latency * 3. + answer.latency) / 4. // Moving average for latency
-                            : answer.latency
-                    }
-                    super.push(found)
-                    resolve(found)
-                }
-            })
+            OfflineAlbums.loadInto(this, answer.albumId)
+            let found = this.db.find(a =>
+                a.questionId === answer.questionId && a.albumId === answer.albumId)
+            if (!found) {
+                answer.attempts = 1
+                answer.answeredOn = Date.now()
+                await super.push(answer)
+                return answer
+            }
+            found.attempts = (found.attempts || 1) + 1
+            found.success = answer.success
+            if (answer.latency) {
+                found.latency = found.latency
+                    ? (found.latency * 3. + answer.latency) / 4. // Moving average for latency
+                    : answer.latency
+            }
+            await super.push(found)
+            return found
         }
     }
 

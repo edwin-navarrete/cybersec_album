@@ -445,3 +445,36 @@ successSplash
 .albumDigest {
     font-size: x-large;
 }
+
+/* Save and album errors */
+.errorBanner {
+  position: fixed;
+  top: 70px;
+  left: 16px;
+  right: 16px;
+  z-index: 20;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #b3261e;
+  color: white;
+  font-family: 'Itim', cursive;
+  font-size: 18px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.albumError {
+  position: fixed;
+  top: 40%;
+  left: 24px;
+  right: 24px;
+  z-index: 15;
+  padding: 20px;
+  border-radius: 12px;
+  background: white;
+  text-align: center;
+  font-family: 'Itim', cursive;
+  font-size: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
