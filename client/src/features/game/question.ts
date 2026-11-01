@@ -245,7 +245,9 @@ export namespace Question {
                     console.error("API error", error);
                 }
             }
-            const index = this.db.findIndex(item => item.id === record.id);
+            // A record the API could not save has no id yet: it must not be merged
+            // with another unsaved one, or they overwrite each other.
+            const index = record.id === undefined ? -1 : this.db.findIndex(item => item.id === record.id);
             if (index !== -1) {
                 Object.assign(this.db[index],record);
             }
