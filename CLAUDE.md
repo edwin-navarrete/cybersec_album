@@ -94,6 +94,13 @@ Saving to the API is best effort so a failure never ends a game. `features/game/
 - Records the API did not save have no `id`: `DAO.push` never merges them by id and `UserStickerDAO.upsert` matches them by album and sticker.
 - Tests: `offlineAlbum.spec.ts`.
 
+## Unique player names
+
+The player name is the identity shown in the ranking (to find the winners), so `player.player_name` is unique. If the one a new player asks for is taken, `POST /player` does not reject it: `insertWithUniqueName` (`server/src/models/playerName.ts`) retries the insert with `"<name> #CODE"` (4 characters without 0/O/1/I, up to 5 tries). It relies on the unique key, so it holds when several players ask for the same name at once. Free names stay as typed.
+- `#` is not accepted in what a player types: `POST /player` only takes a name with the suffix from the player who owns it (same id, same stored name), so nobody can forge one.
+- The response carries the stored name; the client keeps that one (`Album.registerPlayer` returns it) and `AlbumIntroView` tells the player when it differs from the typed one ("Tu nombre en el juego es …").
+- Whoever clears their storage and registers again gets a new identity (it is not blocked): a one-entry-per-person rule would need an identifier from the organization.
+
 ## Strip goals (client)
 
 The 3-column album grid is read as 7 comic strips of 3 panels (`1A 1B 1C` is strip 1). `features/game/strips.ts` derives everything from the spots and the stickers owned; there is no extra data. Only with `rewardStrategy: "sequential"` (`announcesNextPanel()`), because only then the next panel is predictable.

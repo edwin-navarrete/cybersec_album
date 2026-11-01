@@ -6,6 +6,13 @@ import mysqlDriver from '../controllers/mysqlDriver'
 import validateInput from './validateInput'
 import { getGameMode, isModeAllowed } from '../models/gameMode'
 import { buildOpenGroupsQuery } from '../models/groupQuery'
+import { insertWithUniqueName, hasSystemSuffix, stripSuffix } from '../models/playerName'
+
+const { isAlphanumeric } = require('validator')
+
+// Letters, numbers and spaces; plus the " #CODE" suffix the game itself gives to repeated names
+const isValidPlayerName = (value: unknown) =>
+    typeof value === 'string' && isAlphanumeric(stripSuffix(value), 'es-ES', { ignore: ' ' })
 
 const router = Router()
 /*
@@ -59,7 +66,7 @@ router.post('/player', [
     check('lang', "lang must be 'es' or 'en'").default('es').optional().matches('(en|es)'),
     check('playerId', 'playerId must be numeric').optional({ nullable: true }).isNumeric(),
     check('isLeader', "isLeader must be boolean").optional().isBoolean(),
-    check('playerName', 'playerName is required and is chars numbers and spaces').isAlphanumeric('es-ES', { ignore: ' ' }),
+    check('playerName', 'playerName is required and is chars numbers and spaces').custom(isValidPlayerName),
     validateInput
     ], async (req: Request, res: Response) => {
     const gameMode = getGameMode()
@@ -71,6 +78,14 @@ router.post('/player', [
     const mode = req.body.mode
     let newPlayer: PlayerRow = { playerId, playerName, isLeader, isGroup: false };
     try {
+        // A name with the game's suffix cannot be chosen: only the player who was given it
+        // can send it back (continuing with the same name)
+        if (hasSystemSuffix(playerName)) {
+            const current = playerId ? await mysqlDriver.fetch('SELECT player_name FROM player WHERE player_id = ?', [playerId]) : []
+            if (current?.[0]?.player_name !== playerName) {
+                return res.status(400).json({ errorMessage: "Names with '#' are given by the game" })
+            }
+        }
         if(newPlayer.playerId){
             if(newPlayer.isLeader){
                 //Switch leader
@@ -88,7 +103,15 @@ router.post('/player', [
             }
             else delete newPlayer.isLeader; // Never reset the leader
         }
-        const postResult = await ( newPlayer.playerId?  dao.update(newPlayer) :  dao.post(newPlayer, false))
+        let postResult
+        if (newPlayer.playerId) {
+            postResult = await dao.update(newPlayer)
+        } else {
+            // The name asked for is kept, unless it is taken: then the game adds a suffix
+            const created = await insertWithUniqueName(name => dao.post({ ...newPlayer, playerName: name }, false), newPlayer.playerName)
+            postResult = created.result
+            newPlayer.playerName = created.name
+        }
         if( !newPlayer.playerId ){
             newPlayer.playerId = postResult.insertId
             if(req.body.mode == 'coop'){

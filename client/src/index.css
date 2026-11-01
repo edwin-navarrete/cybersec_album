@@ -385,6 +385,13 @@ code {
   margin: 20px 0;
 }
 
+.assignedName {
+  margin: 8px 20px;
+  font-family: 'Itim', cursive;
+  font-size: 18px;
+  text-align: center;
+}
+
 .formActions {
   margin-top: 20px;
   text-align: center;
