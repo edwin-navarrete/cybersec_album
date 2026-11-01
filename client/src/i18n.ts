@@ -42,6 +42,7 @@ const resources = {
             "invalidName.err": "This name is not aceptable. Please choose a different one.",
             "emptyName.err":"The name cannot be empty.",
             "registration.err": "Ocurrió un error al registrar el jugador. Inténtalo más tarde.",
+            "registration.assigned": "That name was already taken. Your name in the game is {{name}}",
             "nextLeader.hdr": "Choose a successor:",
             "dueLeader.hdr": "Choose a successor within {{dueLeader}}...",
         }
@@ -83,6 +84,7 @@ const resources = {
             "invalidName.err": "Este nombre no es aceptable. Por favor, elige otro.",
             "emptyName.err":"El nombre no puede estar vacío.",
             "registration.err": "Ocurrió un error al registrar el jugador. Inténtalo más tarde.",
+            "registration.assigned": "Ese nombre ya estaba en uso. Tu nombre en el juego es {{name}}",
             "nextLeader.hdr": "Elije a un sucesor:",
             "dueLeader.hdr": "Elije a successor dentro de {{dueLeader}}...",
         }

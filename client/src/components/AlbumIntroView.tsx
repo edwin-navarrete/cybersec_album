@@ -21,6 +21,8 @@ const AlbumIntroView = () => {
     // The server may force a single mode, otherwise the player chooses
     const gameMode = (allowedMode === 'solo' || allowedMode === 'coop') ? allowedMode : chosenMode;
     const [playerName, setPlayerName] = useState('');
+    // The name the game gave when the one typed was taken; the player must see it before going on
+    const [assignedName, setAssignedName] = useState<string | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const playerId = localStorage.getItem("playerId");
 
@@ -38,20 +40,30 @@ const AlbumIntroView = () => {
 
     const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
         setPlayerName(event.target.value);
+        setAssignedName(null);
         setErrorMessage(null); 
     };
 
     function handleSubmit(event: React.FormEvent) {
         event.preventDefault();
+        if (assignedName) {
+            navigate("/album/")
+            return;
+        }
         if (playerName.trim() === '') {
             setErrorMessage("emptyName.err");
             return;
         }
         dispatch(registerPlayer({ playerName, gameMode }))
         .unwrap()
-        .then(() => {
+        .then((registeredName) => {
             setErrorMessage(null);
-            navigate("/album/")
+            if (registeredName !== playerName) {
+                setPlayerName(registeredName);
+                setAssignedName(registeredName);
+            } else {
+                navigate("/album/")
+            }
         })
         .catch((error) => {
             if (error.message === "DUPLICATE_NAME") {
@@ -110,6 +122,7 @@ const AlbumIntroView = () => {
                         </ToggleButtonGroup>
                     </div>
                 )}
+                {assignedName && <p className="assignedName" role="status">{t("registration.assigned", { name: assignedName })}</p>}
                 <div className="formActions">
                     <Button type="submit" className="glowingBtn" variant="contained" color="primary" size="large" disabled={!allowedMode}>
                         <div className="languageToggle">
