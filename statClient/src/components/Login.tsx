@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Alert, Box, Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useAuth } from '../auth/AuthContext';
 import { errorText } from '../auth/api';
 
@@ -33,9 +32,9 @@ export default function Login() {
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', p: 2 }}>
       <Paper component="form" onSubmit={submit} elevation={3} sx={{ p: 4, width: '100%', maxWidth: 380 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
-          <LockOutlinedIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+          <img src={`${process.env.PUBLIC_URL}/logo.webp`} alt="4S Soluciones" height={64} style={{ marginBottom: 16 }} />
           <Typography variant="h5" fontWeight="bold">Panel de estadísticas</Typography>
-          <Typography variant="body2" color="text.secondary">4S Soluciones | Administrador</Typography>
+          <Typography variant="body2" color="text.secondary">Administrador</Typography>
         </Box>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         <TextField label="Usuario" value={user} onChange={(e) => setUser(e.target.value)}

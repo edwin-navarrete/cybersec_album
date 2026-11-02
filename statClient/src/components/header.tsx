@@ -32,8 +32,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <IconButton color="inherit" aria-label="Abrir menú" onClick={() => setOpen(true)} edge="start" sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
+          <Box sx={{ bgcolor: 'white', borderRadius: 1, px: 1, py: 0.25, display: 'flex', mr: 2 }}>
+            <img src={`${process.env.PUBLIC_URL}/logo.webp`} alt="4S Soluciones" height={36} />
+          </Box>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-            4S Soluciones | Administrador
+            Administrador
           </Typography>
           {session && (
             <>
