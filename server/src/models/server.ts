@@ -58,7 +58,9 @@ export class Server {
     if (this.statsAuth) {
       this.app.use(`${process.env.SERVER_PATH}/api/stats`, createStatsRouter(this.statsAuth))
     }
-    this.app.use(recaptcha)
+    // Only the API needs a captcha token: the pages (the game at / and the stats panel at /stats) are
+    // plain files that a browser asks for without any custom header, so they must not go through it.
+    this.app.use(`${process.env.SERVER_PATH}/api`, recaptcha)
   }
 
   // The stats panel (statClient build) lives under /stats, same origin as the game
