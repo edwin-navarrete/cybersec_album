@@ -32,7 +32,8 @@ Data flow: `client` → `server` (`/api/*`) → MySQL ← `statServer` (`/album_
 
 - `server/.env`: `DB_HOST`, `DB_USER`, `DB_PWD`, `DB_NAME`, `PORT` (default 5006), `SERVER_PATH` (route prefix), `CAPTCHA_SECRET` (empty disables the reCAPTCHA check), `CAPTCHA_API` (verify URL), `GAME_MODE` (`solo` | `coop` | `both`, default `both`; see Game mode below), `QUESTION_SET` (name of the question set to play, default `default`; see Question sets below). Heroku uses `JAWSDB_MARIA_URL`, which overrides the `DB_*` vars.
 - `client/` (`local.env`, `production.env`, and a `.env`): `REACT_APP_API` (API base URL), `CAPTCHAKEY` (public reCAPTCHA v3 key).
-- `statServer/`: `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin), `QUESTION_SET` (must match the game server), `STATS_USER` / `STATS_PASSWORD` (admin credentials, required), `STATS_TOKEN_SECRET` (≥32 chars, required), `STATS_TOKEN_TTL_HOURS` (default 8). The server refuses to start without the required three (see Stats auth).
+- `server/` also: `STATS_USER`, `STATS_PASSWORD`, `STATS_TOKEN_SECRET` (≥32 chars), `STATS_TOKEN_TTL_HOURS` (default 8) enable the stats panel (see Single app); `STATS_UI_DIR` (folder of the built panel, default `statClient/build`), `STATS_TZ_OFFSET_MS` (default -18000000, UTC-5; how "by day" is grouped in the ranking).
+- `statServer/` (legacy, cPanel): `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin), `QUESTION_SET` (must match the game server), `STATS_USER` / `STATS_PASSWORD` (admin credentials, required), `STATS_TOKEN_SECRET` (≥32 chars, required), `STATS_TOKEN_TTL_HOURS` (default 8). The server refuses to start without the required three (see Stats auth).
 - `statClient/`: `REACT_APP_API_URL` (defaults to the production stats URL).
 
 Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `.gitignore` lists it, so it was probably tracked before being ignored.
@@ -146,6 +147,17 @@ The alias (`player.player_name`) identifies the player in the ranking and for th
 ## `statServer/src`
 
 `app.ts` mounts `${SERVER_PATH}/album`, `/user`, `/ranking`, `/questions`. `db.ts` uses a single mysql2 connection (not a pool). `models/` holds the SQL: `ranking_model` (ranking by date, with a hard-coded UTC-5 offset `-18000000`), `questions_model` (per-question attempts, success rate, average latency, filtered by `since`/`to`; one row per question, with the Spanish text (`q.lang = 'es'`), since `question` has one row per language), `album`, `questions_answered`, `user_answer_model`. `types/` holds the interfaces. `routes/commonRoutes.ts` has `sanitizeDate` (accepts DD/MM/YYYY or YYYY-MM-DD). `ranking_model` interpolates `date` into SQL, but it is sanitized first.
+
+## Single app: the game and the stats on one URL (Heroku, one deployment per event)
+
+The game server also serves the stats, so one app, one database and one set of env vars per event. Players use `/`, the presenter uses `/stats`.
+- API: `server/src/routes/stats.ts` under `${SERVER_PATH}/api/stats` (`auth/login`, `auth/me`, `ranking`, `questions`), mounted **before** recaptcha (the presenter's browser has no captcha token) and with `Cache-Control: no-store`. Models in `server/src/stats/` use the shared pool and bound parameters (no SQL interpolation), and return numbers (not DECIMAL strings). Tests: `stats/auth.spec.ts`, `stats/sanitizeDate.spec.ts`.
+- **Fails closed**: without `STATS_USER`/`STATS_PASSWORD`/`STATS_TOKEN_SECRET` the stats are off (`Stats disabled: ...` at startup, `/api/stats` is not mounted and `/stats` serves nothing); the game works as before.
+- UI: `server/src/models/server.ts` (`statsUi`) serves the `statClient` build under `/stats` with an `index.html` fallback. The root `heroku-postbuild` builds it with `PUBLIC_URL=/stats REACT_APP_API_URL=/api/stats` (`SERVER_PATH` must be empty). The client uses `PUBLIC_URL` as the router `basename`.
+- **CSV downloads** (`export/ranking.csv`, `export/questions.csv`, same filters as the screen: date, and mode for the ranking): `stats/csv.ts` writes `;`-separated UTF-8 with BOM (opens right in Spanish-locale Excel) and prefixes text cells starting with `= + - @` with `'` so a player alias cannot inject a formula. The browser asks for them with the token (`DownloadButton` in `components/common.tsx`, blob download), not with a plain link. Export before tearing the event's app down: the data goes with it.
+- `app.set('trust proxy', 1)` so the login limiter sees the real IP behind Heroku's router.
+- The "Hasta" date filter of the questions now includes the whole day (before it cut at the start of that day).
+- `statServer/` and the committed `statClient/build` are the previous cPanel flow; they are kept for now, but `server/src/stats/` is the maintained copy (the auth code is duplicated, so fix both or retire `statServer`).
 
 ## Stats auth (`statServer` + `statClient`)
 

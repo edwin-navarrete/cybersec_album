@@ -8,6 +8,6 @@
   },
   "scripts": {
     "start": "npm start --prefix server",
-    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client && npm install --prefix server && npm run build --prefix server"
+    "heroku-postbuild": "npm install --prefix client && npm run build --prefix client && npm install --prefix statClient && PUBLIC_URL=/stats REACT_APP_API_URL=/api/stats npm run build --prefix statClient && npm install --prefix server && npm run build --prefix server"
   }
 }
