@@ -7,6 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import QuizIcon from '@mui/icons-material/Quiz';
 import SettingsIcon from '@mui/icons-material/Settings';
+import SlideshowIcon from '@mui/icons-material/Slideshow';
 import LogoutIcon from '@mui/icons-material/Logout';
 import '../css/styles.css';
 import { useAuth } from '../auth/AuthContext';
@@ -15,6 +16,7 @@ const drawerWidth = 240;
 
 const ITEMS = [
   { to: '/', label: 'Tabla de clasificación', icon: <BarChartIcon /> },
+  { to: '/presenter', label: 'Vista de presentador', icon: <SlideshowIcon /> },
   { to: '/questions_perf', label: 'Desempeño de preguntas', icon: <QuizIcon /> },
   { to: '/configuration', label: 'Configuración', icon: <SettingsIcon /> },
 ];

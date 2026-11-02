@@ -9,20 +9,29 @@ import { Dayjs } from 'dayjs';
 import { api, errorText } from '../auth/api';
 
 /** Carga `path` con `params`; se vuelve a pedir cuando cambian, y expone loading/error/reload. */
-export function useApiData<T>(path: string, params: Record<string, string | undefined>) {
+export function useApiData<T>(path: string, params: Record<string, string | undefined>, refreshMs?: number) {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
   const key = JSON.stringify(params);
 
-  const load = useCallback(() => {
+  // `silent` (sondeo): no muestra el cargando ni borra lo que ya hay; si falla, conserva los datos y marca el error.
+  const load = useCallback((silent = false) => {
     let cancelled = false;
-    setLoading(true);
-    setError('');
+    if (!silent) {
+      setLoading(true);
+      setError('');
+    }
     const clean = Object.fromEntries(Object.entries(JSON.parse(key)).filter(([, v]) => v));
     api
       .get<{ data: T[] }>(path, { params: clean })
-      .then((res) => !cancelled && setData(res.data.data))
+      .then((res) => {
+        if (cancelled) return;
+        setData(res.data.data);
+        setError('');
+        setUpdatedAt(Date.now());
+      })
       .catch((e) => !cancelled && setError(errorText(e)))
       .finally(() => !cancelled && setLoading(false));
     return () => {
@@ -31,7 +40,14 @@ export function useApiData<T>(path: string, params: Record<string, string | unde
   }, [path, key]);
 
   useEffect(() => load(), [load]);
-  return { data, loading, error, reload: load };
+
+  useEffect(() => {
+    if (!refreshMs) return;
+    const id = setInterval(() => load(true), refreshMs);
+    return () => clearInterval(id);
+  }, [load, refreshMs]);
+
+  return { data, loading, error, updatedAt, reload: () => load() };
 }
 
 export function DateFilter({ label, value, onChange }: { label: string; value: Dayjs | null; onChange: (d: Dayjs | null) => void }) {
