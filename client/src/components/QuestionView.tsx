@@ -8,6 +8,7 @@ import {  GoogleReCaptcha } from 'react-google-recaptcha-v3';
 import '../index.css';
 import { selectQuestion, selectUnclaimed, selectAchievement, selectStickers, selectStickerSpots, updateToken, QuestionState } from '../features/game/gameSlice';
 import { announcesNextPanel, nextSpot, stripsToShow, completedStrips } from '../features/game/strips';
+import { timeLimitFor, netLatencyMs } from '../features/game/questionTime';
 import StripView from './StripView';
 import { putAnswer, nextQuestion, getPlayTokenFactory } from '../features/game/gameMiddleware';
 
@@ -65,7 +66,9 @@ const QuestionView = () => {
         navigate('/players');
     };
 
-    let timeLimit = Math.floor((questionState?.difficulty || 0.5) * 15 + 6)
+    // Reading plus thinking time; the latency kept is the time taken minus the reading
+    const timeLimit = questionState ? timeLimitFor(questionState) : 0
+    const latencySince = (started: number) => questionState ? netLatencyMs(Date.now() - started, questionState) : 0
     let optCount = questionState?.options.length || 4;
 
     const [timer, setTimer] = useState(-1)
@@ -75,11 +78,12 @@ const QuestionView = () => {
     useEffect(() => { achievement && navigate("/album") })
     useEffect(() => {
         let interval: NodeJS.Timer;
-        if (questionState?.success === undefined) {
+        // The clock starts when there is a question to read, not before
+        if (questionState && questionState.success === undefined) {
             if (timer === 0) {
                 dispatch(putAnswer({
                     response: [],
-                    latency: Date.now() - timestamp
+                    latency: latencySince(timestamp)
                 }))
                 setOptState(new Array(optCount).fill(false))
                 setTimer(timeLimit)
@@ -91,6 +95,7 @@ const QuestionView = () => {
             };
         }
         return () => interval && clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [questionState?.success, timer, timeLimit, dispatch, optCount, timestamp]);
 
 
@@ -122,7 +127,7 @@ const QuestionView = () => {
             let response = newOptState.map((b, i) => b ? i : null).filter(i => i !== null) as number[];
             dispatch(putAnswer({
                 response: response,
-                latency: Date.now() - timestamp
+                latency: latencySince(timestamp)
             }))
             setOptState(new Array(optCount).fill(false))
         }

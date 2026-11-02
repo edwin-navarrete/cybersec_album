@@ -1,10 +1,11 @@
 import axios from "axios"
 import { Game, Sticker } from "./sticker"
 import * as OfflineAlbums from "./offlineAlbum"
+import { statsByQuestion, pickToReview, RECENT_QUESTIONS } from "./questionPicker"
 
-function shuffleCollection(collection:any[]){
+function shuffleCollection(collection:any[], random: () => number = Math.random){
     for (let i = collection.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(random() * (i + 1));
         [collection[i], collection[j]] = [collection[j], collection[i]];
       }
 }
@@ -95,16 +96,46 @@ export namespace Question {
         questionDefDAO: QuestionDefDAO
         answers: Answer[]
         config: Game.GameConfig
+        random: () => number
+        // Ids of the questions asked last in this session, not to repeat them right away
+        recent: number[] = []
 
-        constructor(config: Game.GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: Sticker.Album) {
+        constructor(config: Game.GameConfig, userAnswerDAO: UserAnswerDAO, questionDefDAO: QuestionDefDAO, albumId: Sticker.Album, random: () => number = Math.random) {
             this.album = albumId
             this.userAnswerDAO = userAnswerDAO
             this.questionDefDAO = questionDefDAO
             this.answers = []
             this.config = config
+            this.random = random
+        }
+
+        /*
+            The questions never seen come first, in any order. Once all were seen, the ones
+            the player most needs to review come out (Thompson sampling, see questionPicker).
+        */
+        async generateThompson(count: number): Promise<QuestionDef[]> {
+            const lang = localStorage.getItem("lang") || 'es'
+            const answers = await this.userAnswerDAO.findAll({ filter: { albumId: await this.album.getAlbumId() } })
+            const stats = statsByQuestion(answers as Array<Answer & { questionId: number }>)
+            // One request: everything else is decided here
+            const all = (await this.questionDefDAO.findAll({ filter: { lang } })).filter(q => q.id !== undefined)
+
+            const unseen = all.filter(q => !stats.has(q.id!))
+            shuffleCollection(unseen, this.random)
+            const chosen: QuestionDef[] = unseen.slice(0, count)
+            const toReview = all.filter(q => stats.has(q.id!))
+            while (chosen.length < count && toReview.length) {
+                const next = pickToReview(toReview, stats, this.recent, this.random)!
+                toReview.splice(toReview.indexOf(next), 1)
+                chosen.push(next)
+            }
+            this.recent = [...this.recent, ...chosen.map(q => q.id!)].slice(-RECENT_QUESTIONS)
+            return chosen.map(q => shuffleQuestion(q))
         }
 
         async generate(count: number): Promise<QuestionDef[]> {
+            // A literal, not Game.QuizStrategy: sticker.ts imports this file, a value import would be circular
+            if (this.config.quizStrategy === "thompson") return this.generateThompson(count)
             // Easiest unseen question first,
             // then the oldest failed questions
             // and then the oldest succeeded
