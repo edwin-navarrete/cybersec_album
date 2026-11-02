@@ -14,7 +14,7 @@ questionsRouter.get("/", async (req: Request, res: Response) => {
     res.status(200).json({ data: albumIds });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ errorMessage: error });
+    return res.status(500).json({ errorMessage: "Error interno" });
   }
 
 });

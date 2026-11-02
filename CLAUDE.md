@@ -32,7 +32,8 @@ Data flow: `client` → `server` (`/api/*`) → MySQL ← `statServer` (`/album_
 
 - `server/.env`: `DB_HOST`, `DB_USER`, `DB_PWD`, `DB_NAME`, `PORT` (default 5006), `SERVER_PATH` (route prefix), `CAPTCHA_SECRET` (empty disables the reCAPTCHA check), `CAPTCHA_API` (verify URL), `GAME_MODE` (`solo` | `coop` | `both`, default `both`; see Game mode below), `QUESTION_SET` (name of the question set to play, default `default`; see Question sets below). Heroku uses `JAWSDB_MARIA_URL`, which overrides the `DB_*` vars.
 - `client/` (`local.env`, `production.env`, and a `.env`): `REACT_APP_API` (API base URL), `REACT_APP_CAPTCHAKEY` (public reCAPTCHA v3 site key, read at build time by `captcha.ts`; without it there is no captcha).
-- `statServer/`: `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin), `QUESTION_SET` (must match the game server).
+- `server/` also: `STATS_USER`, `STATS_PASSWORD`, `STATS_TOKEN_SECRET` (≥32 chars), `STATS_TOKEN_TTL_HOURS` (default 8) enable the stats panel (see Single app); `STATS_UI_DIR` (folder of the built panel, default `statClient/build`), `STATS_TZ_OFFSET_MS` (default -18000000, UTC-5; how "by day" is grouped in the ranking).
+- `statServer/` (legacy, cPanel): `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin), `QUESTION_SET` (must match the game server), `STATS_USER` / `STATS_PASSWORD` (admin credentials, required), `STATS_TOKEN_SECRET` (≥32 chars, required), `STATS_TOKEN_TTL_HOURS` (default 8). The server refuses to start without the required three (see Stats auth).
 - `statClient/`: `REACT_APP_API_URL` (defaults to the production stats URL).
 
 Note: `client/production.env` is committed and holds `REACT_APP_CAPTCHAKEY`, the reCAPTCHA **site** key: it is public by design (it was written in the client code until 2024). CRA does not load `production.env` or `local.env` by itself: they are templates to copy to `client/.env` (or `.env.production`) before `npm run build`. **If the server has `CAPTCHA_SECRET`, build the client with the key**: since PR #130 the code read `process.env.CAPTCHAKEY`, which CRA never exposes (only `REACT_APP_*`), so a client built without `REACT_APP_CAPTCHAKEY` sends no token and every request gets a 403. The middleware in `models/recaptcha.ts` returns 403 without a token (it used to crash the server); the server logs at startup whether reCAPTCHA is required.
@@ -145,11 +146,30 @@ The alias (`player.player_name`) identifies the player in the ranking and for th
 
 ## `statServer/src`
 
-`app.ts` mounts `${SERVER_PATH}/album`, `/user`, `/ranking`, `/questions`. `db.ts` uses a single mysql2 connection (not a pool). `models/` holds the SQL: `ranking_model` (ranking by date, with a hard-coded UTC-5 offset `-18000000`), `questions_model` (per-question attempts, success rate, average latency, filtered by `since`/`to`), `album`, `questions_answered`, `user_answer_model`. `types/` holds the interfaces. `routes/commonRoutes.ts` has `sanitizeDate` (accepts DD/MM/YYYY or YYYY-MM-DD). `ranking_model` interpolates `date` into SQL, but it is sanitized first.
+`app.ts` mounts `${SERVER_PATH}/album`, `/user`, `/ranking`, `/questions`. `db.ts` uses a single mysql2 connection (not a pool). `models/` holds the SQL: `ranking_model` (ranking by date, with a hard-coded UTC-5 offset `-18000000`), `questions_model` (per-question attempts, success rate, average latency, filtered by `since`/`to`; one row per question, with the Spanish text (`q.lang = 'es'`), since `question` has one row per language), `album`, `questions_answered`, `user_answer_model`. `types/` holds the interfaces. `routes/commonRoutes.ts` has `sanitizeDate` (accepts DD/MM/YYYY or YYYY-MM-DD). `ranking_model` interpolates `date` into SQL, but it is sanitized first.
+
+## Single app: the game and the stats on one URL (Heroku, one deployment per event)
+
+The game server also serves the stats, so one app, one database and one set of env vars per event. Players use `/`, the presenter uses `/stats`.
+- API: `server/src/routes/stats.ts` under `${SERVER_PATH}/api/stats` (`auth/login`, `auth/me`, `ranking`, `questions`), mounted **before** recaptcha (the presenter's browser has no captcha token) and with `Cache-Control: no-store`. Models in `server/src/stats/` use the shared pool and bound parameters (no SQL interpolation), and return numbers (not DECIMAL strings). Tests: `stats/auth.spec.ts`, `stats/sanitizeDate.spec.ts`.
+- **Fails closed**: without `STATS_USER`/`STATS_PASSWORD`/`STATS_TOKEN_SECRET` the stats are off (`Stats disabled: ...` at startup, `/api/stats` is not mounted and `/stats` serves nothing); the game works as before.
+- UI: `server/src/models/server.ts` (`statsUi`) serves the `statClient` build under `/stats` with an `index.html` fallback. The root `heroku-postbuild` builds it with `PUBLIC_URL=/stats REACT_APP_API_URL=/api/stats` (`SERVER_PATH` must be empty). The client uses `PUBLIC_URL` as the router `basename`.
+- **CSV downloads** (`export/ranking.csv`, `export/questions.csv`, same filters as the screen: date, and mode for the ranking): `stats/csv.ts` writes `;`-separated UTF-8 with BOM (opens right in Spanish-locale Excel) and prefixes text cells starting with `= + - @` with `'` so a player alias cannot inject a formula. The browser asks for them with the token (`DownloadButton` in `components/common.tsx`, blob download), not with a plain link. Export before tearing the event's app down: the data goes with it.
+- `app.set('trust proxy', 1)` so the login limiter sees the real IP behind Heroku's router.
+- The "Hasta" date filter of the questions now includes the whole day (before it cut at the start of that day).
+- `statServer/` and the committed `statClient/build` are the previous cPanel flow; they are kept for now, but `server/src/stats/` is the maintained copy (the auth code is duplicated, so fix both or retire `statServer`).
+
+## Stats auth (`statServer` + `statClient`)
+
+The stats panel needs a login; before this, every `statServer` route was open.
+- Server: `models/auth.ts` (credentials from env, constant-time compare, HMAC-SHA256 token `payload.signature` with `exp`, in-memory `LoginLimiter`: 5 failures per IP in 15 min → 429), `middleware/requireAuth.ts` (Bearer token), `routes/authRouter.ts` (`POST /auth/login`, `GET /auth/me`). `album`, `user`, `ranking`, `questions` sit behind `requireAuth`; `/auth` does not. `app.set("trust proxy", 1)` so the limiter sees the real IP behind cPanel/Heroku. 500 responses no longer echo the internal error.
+- Client: `auth/api.ts` (axios instance adding the token, session in `sessionStorage`, 401 → logout), `auth/AuthContext.tsx` (`AuthProvider`, `RequireAuth`, auto-logout at expiry), `components/Login.tsx`.
+- Limits: a single shared admin account, and tokens cannot be revoked before they expire (changing `STATS_TOKEN_SECRET` invalidates all). The limiter is per process (it resets on restart). Serve it over HTTPS.
+- `dist/` and `statClient/build/` are committed; rebuild both before deploying.
 
 ## `statClient/src`
 
-`App.tsx` routes: `/` ranking table (`components/table.tsx`), `/questions_perf` (`QuestionPerformanceTable.tsx`), `/configuration`. UI text is Spanish.
+`App.tsx` routes: `/login`, and behind `RequireAuth` + `Layout` (`components/header.tsx`: app bar, drawer with `NavLink`s, logout): `/` ranking table (`components/table.tsx`), `/questions_perf` (`QuestionPerformanceTable.tsx`), `/configuration` (placeholder). `components/common.tsx` has `useApiData` (loading/error/retry), `DateFilter`, `SearchBox`, `QueryState`, `Page`. The ranking shows summary cards (participants, completed albums, answered questions, success rate) computed in the browser from the ranking rows for the chosen mode/date; players with no answers come with `null` counts, read as 0. Tables sort by column, search by text, and filter by date in the API (`YYYY-MM-DD`). UI text is Spanish.
 
 ## Deployment
 
@@ -163,6 +183,8 @@ The alias (`player.player_name`) identifies the player in the ranking and for th
 - Typos are part of the API surface: `bussinessDays`, `randomWeigthed`, `AlbumStiker`, `dificult`. Do not "fix" them without a repo-wide rename.
 - `mysqlDriver.fetch` calls `connection.release()` in both the try and finally blocks (a double release).
 - `entityDao.ts` ends with a stub `snakeToCamel` that throws "Function not implemented" (dead code).
-- `server/package.json` lists `react-scripts`, `jest`, and `@types/*` under dependencies, and has a self-reference `cybersec_album: file:`. The same self-reference pattern is in `client` and `statClient`/`statServer`.
+- Each package has a self-reference (`cybersec_album: file:` / `manager-ui: file:`), harmless but useless. `server/package.json` used to list `react-scripts`, `jest`, `@types/*`, `save-dev`, `ts-loader` and `source-map-loader` under dependencies; the unused ones were removed and `jest` and `@types/*` moved to devDependencies (Heroku already needs devDependencies at build, for `tsc`). `server/webpack.config.js` is now truly dead (its loaders are gone).
+- Dependencies and security: `npm audit --omit=dev` is clean in `server` and `statServer`. `client` and `statClient` still report ~70 alerts, all from `react-scripts` 5 (build tooling that is not shipped in the bundle: svgo, webpack-dev-server, workbox...); the real fix is leaving CRA (e.g. Vite). Keep `react-scripts` in `client` dependencies: the Heroku postbuild runs a nested `npm install --prefix client`. `mysql2` is on 3.x and `axios` on 1.x in all packages.
+- `POST /player` without `playerId` returns 500 (`Bind parameters must not contain undefined`): the client always sends `playerId: null`, so it is only reachable with hand-made requests. It predates the dependency update.
 - The server serves the client from `../../../client/build`, relative to `server/dist/models`.
 - Recent history: name validation (#136) and a reverted "restore album state" change (#111).

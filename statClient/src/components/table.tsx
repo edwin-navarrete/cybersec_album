@@ -1,38 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useMemo, useState } from 'react';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Toolbar,
-  Typography,
-  Paper,
-  Tooltip,
-  Divider,
-  ToggleButton,
-  ToggleButtonGroup
+  Box, Chip, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel,
+  ToggleButton, ToggleButtonGroup, Tooltip,
 } from '@mui/material';
-import {
-  LocalizationProvider,
-  DatePicker
-} from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faUser  } from '@fortawesome/free-solid-svg-icons';
-const baseURL = process.env.REACT_APP_API_URL || 'https://4ssoluciones.com/album_stats';
+import { faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { Dayjs } from 'dayjs';
+import { DateFilter, DownloadButton, Page, QueryState, SearchBox, toApiDate, useApiData } from './common';
 
 interface IData {
-  is_group:number;
-  group_id:string;
-  is_leader:number;
+  is_group: number;
   player_name: string;
-  team : string;
   started_on: number;
-  ended_on: number | string;
   number_errors: number;
   total_latency: number;
   finished: boolean;
@@ -42,276 +21,135 @@ interface IData {
   album_id: string;
 }
 
-export default function BasicTable() {
-  const [selectedDate, setSelectedDate] = useState('');
-  const [data, setData] = useState<IData[]>([]);
-  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' | null }>({ key: '', direction: null });
-  const [selectedMode, setSelectedMode] = useState('general'); 
+type SortKey = 'rank' | 'player_name' | 'number_errors' | 'answered' | 'finished' | 'total_latency' | 'errors' | 'started_on';
+type Mode = 'general' | 'alone' | 'group';
 
-  useEffect(() => {
-    getRanking();
-  }, []);
+const COLUMNS: { key: SortKey; label: string; align: 'left' | 'center'; hint?: string }[] = [
+  { key: 'rank', label: 'Posición', align: 'left' },
+  { key: 'player_name', label: 'Jugador', align: 'left' },
+  { key: 'number_errors', label: 'Errores', align: 'center' },
+  { key: 'answered', label: 'Respondidas', align: 'center', hint: 'Preguntas respondidas' },
+  { key: 'finished', label: 'Álbum', align: 'center', hint: 'Álbum finalizado' },
+  { key: 'total_latency', label: 'Tiempo (s)', align: 'center', hint: 'Tiempo total de respuesta, en segundos' },
+  { key: 'errors', label: '% error', align: 'center', hint: 'Porcentaje de error' },
+  { key: 'started_on', label: 'Inicio', align: 'left', hint: 'Fecha y hora de inicio' },
+];
 
-  useEffect(() => {
-    const handleDateChange = (date: any) => {
-      setSelectedDate(date);
-      if (date) {
-        const partes = new Date(date).toLocaleDateString('es-ES').split('/');
-        if (partes.length === 3) {
-          const dd = String(partes[0]).padStart(2, '0');
-          const mm = String(partes[1]).padStart(2, '0');
-          const yyyy = partes[2];
-          const fechaFormateada = `${dd}/${mm}/${yyyy}`;
+function StatCard({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  return (
+    <Paper variant="outlined" sx={{ flex: '1 1 150px', p: 1.5 }}>
+      <Typography variant="caption" color="text.secondary">{label}</Typography>
+      <Typography variant="h5" fontWeight="bold" lineHeight={1.2}>{value}</Typography>
+      <Typography variant="caption" color="text.secondary">{detail ?? '\u00A0'}</Typography>
+    </Paper>
+  );
+}
 
-          axios
-            .get(`${baseURL}/ranking?date=${fechaFormateada}`)
-            .then((res) => {
-              setData(res.data.data);
-            })
-            .catch((error) => {
-              console.log('Error Fecha', error);
-            });
-        } else {
-          console.log('Fecha no válida');
-        }
-      } else {
-        getRanking();
-      }
+export default function RankingTable() {
+  const [date, setDate] = useState<Dayjs | null>(null);
+  const [mode, setMode] = useState<Mode>('general');
+  const [search, setSearch] = useState('');
+  // Por defecto, el orden del servidor (la posición del ranking).
+  const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'rank', dir: 'asc' });
+
+  const { data, loading, error, reload } = useApiData<IData>('/ranking', { date: toApiDate(date) });
+
+  // Resumen del modo y la fecha elegidos (sin la búsqueda: es un resumen del evento, no de la lista).
+  const summary = useMemo(() => {
+    const scope = data.filter((r) => mode === 'general' || (mode === 'group') === (r.is_group === 1));
+    // Quien no ha respondido nada trae null en respondidas/errores.
+    const answered = scope.reduce((n, r) => n + (Number(r.answered) || 0), 0);
+    const errors = scope.reduce((n, r) => n + (Number(r.number_errors) || 0), 0);
+    const finished = scope.filter((r) => r.finished).length;
+    return {
+      total: scope.length,
+      finished,
+      answered,
+      success: answered > 0 ? Math.round((1 - errors / answered) * 100) : null,
     };
-    handleDateChange(selectedDate);
-  }, [selectedDate]);
+  }, [data, mode]);
 
-  const getRanking = () => {
-    axios
-      .get(`${baseURL}/ranking`)
-      .then((res) => {
-        setData(res.data.data);
-      })
-      .catch((error) => {
-        console.log("Error Efect: " + error);
-      });
-  };
+  const rows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const filtered = data.filter(
+      (r) => (mode === 'general' || (mode === 'group') === (r.is_group === 1)) && (!q || r.player_name.toLowerCase().includes(q))
+    );
+    const sign = sort.dir === 'asc' ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      const av = sort.key === 'finished' ? Number(a.finished) : a[sort.key];
+      const bv = sort.key === 'finished' ? Number(b.finished) : b[sort.key];
+      return av < bv ? -sign : av > bv ? sign : 0;
+    });
+  }, [data, mode, search, sort]);
 
-  const handleSort = (key: string) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const sortedData = React.useMemo(() => {
-    let sortableData = [...data];
-    if (sortConfig.key) {
-      sortableData.sort((a, b) => {
-        let aValue = a[sortConfig.key as keyof IData];
-        let bValue = b[sortConfig.key as keyof IData];
-        if (sortConfig.key === 'finished') {
-          aValue = a.finished ? 1 : 0;
-          bValue = b.finished ? 1 : 0;
-        }
-        if (aValue < bValue) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-
-    return sortableData;
-  }, [data, sortConfig]);
-
-  const handleModeChange = (event: React.MouseEvent<HTMLElement>, newMode: string | null) => {
-    if (newMode !== null) {
-      setSelectedMode(newMode);
-    }
-  };
+  const onSort = (key: SortKey) =>
+    setSort((s) => (s.key === key ? { key, dir: s.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }));
 
   return (
-
-    <TableContainer component={Paper}>
-      <Toolbar
-  sx={{
-    border: '5px solid white',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  }}
->
-
-  <Typography
-    sx={{
-      display: 'flex',
-      width: 'fit-content',
-      border: (theme) => `1px solid white`,
-      borderRadius: 1,
-    }}
-    variant="h6"
-    id="tableTitle"
-    component="div"
-  >
-    <h3>
-      Tabla de Clasificación
-    </h3>
-  </Typography>
-
-  <ToggleButtonGroup
-    value={selectedMode}
-    exclusive
-    onChange={handleModeChange}
-    aria-label="gameMode"
-    size="medium"
-    sx={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}
-    
-  >
-    <ToggleButton value="general" aria-label="solo">
-      <div className="languageToggle">
-        <i className="fas fa-user"> General</i>
-      </div>
-    </ToggleButton>
-    <ToggleButton value="alone" aria-label="solo">
-      <div className="languageToggle">
-        <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />
-        <i className="fas fa-user"> Invividual</i>
-      </div>
-    </ToggleButton>
-    <ToggleButton value="group" aria-label="cooperative">
-      <div className="languageToggle">
-        <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
-        <i className="fas fa-users"> Equipo</i>
-      </div>
-    </ToggleButton>
-  </ToggleButtonGroup>
-
-  <Tooltip
-    title="Filtrar por fecha"
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-    }}
-  >
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DemoContainer components={['DatePicker']}>
-        <DemoItem>
-          <DatePicker
-            value={selectedDate}
-            onAccept={(event) => setSelectedDate(event as string)}
-            format="DD/MM/YYYY"
-            views={['year', 'month', 'day']}
-          />
-        </DemoItem>
-      </DemoContainer>
-    </LocalizationProvider>
-  </Tooltip>
-</Toolbar>
-
-
-      <Divider></Divider>
-      <h3  style={{ textAlign: 'center' }} >
-      {selectedMode === 'general' && (
+    <Page
+      title="Tabla de clasificación"
+      actions={
         <>
-          Resultados Generales
+          <SearchBox value={search} onChange={setSearch} placeholder="Buscar jugador" />
+          <DateFilter label="Fecha" value={date} onChange={setDate} />
+          <DownloadButton path="/export/ranking.csv" params={{ date: toApiDate(date), mode }} disabled={loading || !!error} />
+          <ToggleButtonGroup value={mode} exclusive size="small" aria-label="Modo de juego"
+            onChange={(_, m: Mode | null) => m && setMode(m)}>
+            <ToggleButton value="general">General</ToggleButton>
+            <ToggleButton value="alone"><FontAwesomeIcon icon={faUser} style={{ marginRight: 6 }} />Individual</ToggleButton>
+            <ToggleButton value="group"><FontAwesomeIcon icon={faUsers} style={{ marginRight: 6 }} />Equipo</ToggleButton>
+          </ToggleButtonGroup>
         </>
+      }
+    >
+      {!loading && !error && summary.total > 0 && (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 2, flexShrink: 0 }}>
+          <StatCard label="Participantes" value={String(summary.total)} />
+          <StatCard label="Álbumes completados" value={String(summary.finished)}
+            detail={`${Math.round((summary.finished / summary.total) * 100)} % de los participantes`} />
+          <StatCard label="Preguntas respondidas" value={String(summary.answered)} />
+          <StatCard label="Tasa de éxito" value={summary.success === null ? '—' : `${summary.success} %`}
+            detail="aciertos sobre preguntas respondidas" />
+        </Box>
       )}
-
-      {selectedMode === 'group' && (
-        <>
-          <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
-            Resultados Grupales
-        </>
-      )}
-
-      {selectedMode === 'alone' && (
-        <>
-          <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />
-            Resultados Individuales
-        </>
-      )}
-      </h3>
-      <Divider></Divider>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Posición</TableCell>
-            <TableCell>
-                        Jugador
-            </TableCell>
-            <TableCell align="center">Número de errores</TableCell>
-            <TableCell align="center">Preguntas respondidas</TableCell>
-            <TableCell align="center"onClick={() => handleSort('finished')} >
-              Album finalizado
-              </TableCell>
-            {/* <TableCell align="right" onClick={() => handleSort('total_latency')}> */}
-            <TableCell align="center">
-              Tiempo total de respuesta (Segundos)
-            </TableCell>
-            <TableCell align="center" onClick={() => handleSort('errors')}>
-              Porcentaje de error (%)
-            </TableCell>
-            <TableCell align="center">Fecha y Hora de Inicio</TableCell>
-            {/* <TableCell align="right">Fecha y Hora de finalizacion</TableCell> */}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-  {sortedData
-    .filter((row) => {
-      if (selectedMode === 'general') return true; // Muestra todos los datos
-      if (selectedMode === 'group' && row.is_group === 1) return true; // Solo los grupos en modo 'group'
-      if (selectedMode === 'alone' && row.is_group === 0) return true; // Solo los individuales en modo 'individual'
-      return false; // No mostrar otros casos
-    })
-    .map((row, index) => (
-      <TableRow
-        key={row.album_id}
-        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-      >
-        <TableCell>
-          {/* Renumeración dinámica solo en vistas 'group' e 'individual' */}
-          {selectedMode !== 'general' ? index + 1 : row.rank}
-        </TableCell> {/* Aquí asignamos la posición dinámica */}
-        
-        <TableCell align="left">
-          {selectedMode === 'general' && (
-            <>
-              {row.is_group === 1 ? (
-                <>
-                  <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
-                  {row.player_name}
-                </>
-              ) : (
-                <>
-                  <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />
-                  {row.player_name}
-                </>
-              )}
-            </>
-          )}
-          {selectedMode === 'group' && row.is_group === 1 && (
-            <>
-              <FontAwesomeIcon icon={faUsers} style={{ marginRight: '8px', color: '#555' }} />
-              {row.player_name}
-            </>
-          )}
-          {selectedMode === 'alone' && row.is_group === 0 && (
-            <>
-              <FontAwesomeIcon icon={faUser} style={{ marginRight: '8px', color: '#555' }} />
-              {row.player_name}
-            </>
-          )}
-        </TableCell>
-        <TableCell align="center">{row.number_errors}</TableCell>
-        <TableCell align="center">{row.answered}</TableCell>
-        <TableCell align="center">{row.finished ? "Si" : "No"}</TableCell>
-        <TableCell align="center">{Math.round(row.total_latency)}</TableCell>
-        <TableCell align="center">{Math.round(row.errors * 100)} %</TableCell>
-        <TableCell align="center">{new Date(row.started_on).toLocaleString()}</TableCell>
-      </TableRow>
-    ))}
-</TableBody>
-      </Table>
-    </TableContainer>
+      <TableContainer component={Paper} sx={{ flex: 1, minHeight: 0 }}>
+        <Table size="small" aria-label="Tabla de clasificación" stickyHeader>
+          <TableHead>
+            <TableRow>
+              {COLUMNS.map((c) => (
+                <TableCell key={c.key} align={c.align} sortDirection={sort.key === c.key ? sort.dir : false}>
+                  <Tooltip title={c.hint ?? ''} disableHoverListener={!c.hint}>
+                    <TableSortLabel active={sort.key === c.key} direction={sort.key === c.key ? sort.dir : 'asc'} onClick={() => onSort(c.key)}>
+                      {c.label}
+                    </TableSortLabel>
+                  </Tooltip>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {!loading && !error && rows.map((r) => (
+              <TableRow key={r.album_id} hover>
+                <TableCell>{r.rank}</TableCell>
+                <TableCell>
+                  <FontAwesomeIcon icon={r.is_group === 1 ? faUsers : faUser} style={{ marginRight: 8, color: '#555' }} />
+                  {r.player_name}
+                </TableCell>
+                <TableCell align="center">{r.number_errors}</TableCell>
+                <TableCell align="center">{r.answered}</TableCell>
+                <TableCell align="center">
+                  <Chip size="small" label={r.finished ? 'Sí' : 'No'} color={r.finished ? 'success' : 'default'} variant={r.finished ? 'filled' : 'outlined'} />
+                </TableCell>
+                <TableCell align="center">{Math.round(r.total_latency)}</TableCell>
+                <TableCell align="center">{Math.round(r.errors * 100)} %</TableCell>
+                <TableCell>{new Date(r.started_on).toLocaleString()}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <QueryState loading={loading} error={error} empty={rows.length === 0} onRetry={reload}
+          emptyText={search ? 'Ningún jugador coincide con la búsqueda.' : 'No hay resultados para este filtro.'} />
+      </TableContainer>
+    </Page>
   );
 }
