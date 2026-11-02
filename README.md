@@ -115,7 +115,7 @@ REACT_APP_API=/api
 Variables de ambiente de configuración de la app cliente del juego.
 ```
 REACT_APP_API=http://localhost:8000/api 
-CAPTCHAKEY=  
+REACT_APP_CAPTCHAKEY=  
 ```
 * REACT_APP_API URL donde se encuentra el servidor
-* CAPTCHAKEY La llave pública de gcaptcha asignada por Google. Requerida para conectarse a un servidor que tenga configurada CAPTCHA_SECRET
+* REACT_APP_CAPTCHAKEY La llave pública (la del sitio) de reCAPTCHA asignada por Google. **Si el servidor tiene configurada `CAPTCHA_SECRET`, el cliente debe compilarse con esta llave**: sin ella no envía el token y el servidor rechaza todas las peticiones (403). Sin llave no hay captcha, que es como se desarrolla. El nombre debe empezar por `REACT_APP_`: Create React App solo entrega al navegador las variables con ese prefijo, y una llamada `CAPTCHAKEY` (como se llamaba antes) llega siempre vacía. Las variables se leen al **compilar**: hay que definirlas en `client/.env` (o `.env.production`) antes de `npm run build`; `production.env` y `local.env` son plantillas que CRA no carga solas.

@@ -14,6 +14,7 @@ import { putAnswer, nextQuestion, getPlayTokenFactory } from '../features/game/g
 
 import { AppDispatch, RootState } from '../app/store'
 import Button from '@mui/material/Button';
+import { getCaptchaKey } from '../captcha';
 
 const QuestionView = () => {
     const questionState = useSelector(selectQuestion);
@@ -187,7 +188,7 @@ const QuestionView = () => {
     
         if (!questionState) return (<div className='questionFrame' />);
 
-        const captchaKey = process.env.CAPTCHAKEY;
+        const captchaKey = getCaptchaKey();
 
         const { question, options, success, solution, wrong } = questionState
         return (<div className='questionFrame' >

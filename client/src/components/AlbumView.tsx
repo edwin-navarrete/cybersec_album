@@ -10,6 +10,7 @@ import { AppDispatch, RootState } from '../app/store'
 import Gauge from './Gauge';
 import StickerView from './StickerView';
 import { announcesNextPanel, attentionSpot, completedStrips, stripProgress, stripOf } from '../features/game/strips';
+import { getCaptchaKey } from '../captcha';
 
 const AlbumView = () => {
     const dispatch = useDispatch() as AppDispatch;
@@ -112,7 +113,7 @@ const AlbumView = () => {
                 </div>
             </div>);
     }
-    const captchaKey = process.env.CAPTCHAKEY;
+    const captchaKey = getCaptchaKey();
     return (
         <section className="pageContainer">
             {captchaKey && <GoogleReCaptcha action="viewAlbum" onVerify={handleCaptcha}/>}

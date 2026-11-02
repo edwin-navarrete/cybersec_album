@@ -40,18 +40,31 @@ async function testToken (token: string, ip: string) {
 
 const testTokenMem = memoize(testToken, { maxAge: 1200, promise: true })
 
-// Validate the header g-recaptcha-response for POST enrypoints
+// Only the end of a token goes to the log; a request may not have one
+const tail = (token: string | undefined) => token?.slice(-5) ?? '(no token)'
+
+/*
+    Validate the header g-recaptcha-response of GET and POST requests. It is only required when
+    CAPTCHA_SECRET is set: without it (development) every request goes through.
+    A request without a valid token gets a 403. This function is async and Express 4 does not
+    catch what an async middleware throws, so nothing may escape from it: it used to bring the
+    whole server down when the token was missing.
+*/
 export default async function recaptcha (req: Request, resp: Response, next: NextFunction) {
-  if (process.env.CAPTCHA_SECRET) {
-    if (req.method === 'POST' || req.method === 'GET') {
-      const token = req.header('g-recaptcha-response')
-      const valid = await testTokenMem(token, req.ip)
-      if (!valid) {
-        console.log('rejected ', token.slice(-5))
-        return resp.sendStatus(403)
+  try {
+    if (process.env.CAPTCHA_SECRET) {
+      if (req.method === 'POST' || req.method === 'GET') {
+        const token = req.header('g-recaptcha-response')
+        const valid = await testTokenMem(token, req.ip)
+        if (!valid) {
+          console.log('rejected ', tail(token))
+          return resp.sendStatus(403)
+        }
+        console.log('Accepted ', tail(token))
       }
-      console.log('Accepted ', token.slice(-5))
     }
+  } catch (error) {
+    return next(error)
   }
   next()
 }

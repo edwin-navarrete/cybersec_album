@@ -19,6 +19,10 @@ export class Server {
     if (isInvalidQuestionSet()) {
       console.warn(`Invalid QUESTION_SET '${process.env.QUESTION_SET}', use letters, numbers, '_', '-' or '.' (max 50). Using 'default'`)
     }
+    console.log('reCAPTCHA:', process.env.CAPTCHA_SECRET ? 'required (CAPTCHA_SECRET is set)' : 'not required (CAPTCHA_SECRET is empty)')
+    if (process.env.CAPTCHA_SECRET && !process.env.CAPTCHA_API) {
+      console.warn('CAPTCHA_SECRET is set but CAPTCHA_API is not: no token can be verified, every request will be rejected')
+    }
     console.log('Question set:', getQuestionSet())
     this.middlewares()
     
