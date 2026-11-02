@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { Dayjs } from 'dayjs';
 import { DateFilter, DownloadButton, Page, QueryState, SearchBox, toApiDate, useApiData } from './common';
+import { inMode, Mode, summarize } from './summary';
 
 interface IData {
   is_group: number;
@@ -22,7 +23,6 @@ interface IData {
 }
 
 type SortKey = 'rank' | 'player_name' | 'number_errors' | 'answered' | 'finished' | 'total_latency' | 'errors' | 'started_on';
-type Mode = 'general' | 'alone' | 'group';
 
 const COLUMNS: { key: SortKey; label: string; align: 'left' | 'center'; hint?: string }[] = [
   { key: 'rank', label: 'Posición', align: 'left' },
@@ -55,24 +55,12 @@ export default function RankingTable() {
   const { data, loading, error, reload } = useApiData<IData>('/ranking', { date: toApiDate(date) });
 
   // Resumen del modo y la fecha elegidos (sin la búsqueda: es un resumen del evento, no de la lista).
-  const summary = useMemo(() => {
-    const scope = data.filter((r) => mode === 'general' || (mode === 'group') === (r.is_group === 1));
-    // Quien no ha respondido nada trae null en respondidas/errores.
-    const answered = scope.reduce((n, r) => n + (Number(r.answered) || 0), 0);
-    const errors = scope.reduce((n, r) => n + (Number(r.number_errors) || 0), 0);
-    const finished = scope.filter((r) => r.finished).length;
-    return {
-      total: scope.length,
-      finished,
-      answered,
-      success: answered > 0 ? Math.round((1 - errors / answered) * 100) : null,
-    };
-  }, [data, mode]);
+  const summary = useMemo(() => summarize(data, mode), [data, mode]);
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
     const filtered = data.filter(
-      (r) => (mode === 'general' || (mode === 'group') === (r.is_group === 1)) && (!q || r.player_name.toLowerCase().includes(q))
+      (r) => inMode(r, mode) && (!q || r.player_name.toLowerCase().includes(q))
     );
     const sign = sort.dir === 'asc' ? 1 : -1;
     return [...filtered].sort((a, b) => {
@@ -106,7 +94,7 @@ export default function RankingTable() {
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 2, flexShrink: 0 }}>
           <StatCard label="Participantes" value={String(summary.total)} />
           <StatCard label="Álbumes completados" value={String(summary.finished)}
-            detail={`${Math.round((summary.finished / summary.total) * 100)} % de los participantes`} />
+            detail={`${summary.finishedPct} % de los participantes`} />
           <StatCard label="Preguntas respondidas" value={String(summary.answered)} />
           <StatCard label="Tasa de éxito" value={summary.success === null ? '—' : `${summary.success} %`}
             detail="aciertos sobre preguntas respondidas" />

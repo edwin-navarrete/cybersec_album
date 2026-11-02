@@ -159,6 +159,13 @@ The game server also serves the stats, so one app, one database and one set of e
 - The "Hasta" date filter of the questions now includes the whole day (before it cut at the start of that day).
 - `statServer/` and the committed `statClient/build` are the previous cPanel flow; they are kept for now, but `server/src/stats/` is the maintained copy (the auth code is duplicated, so fix both or retire `statServer`).
 
+## Presenter view (`/stats/presenter`)
+
+A full-screen page for the projector (`components/Presenter.tsx`, behind the same login): podium (top 3), the rest of the top 10, the four summary cards (`components/summary.ts`, shared with the ranking table), and a QR with the game URL. It polls `/ranking` every 5 s through `useApiData(..., refreshMs)` (silent refresh: no spinner, keeps the last data; on failure it shows "Sin conexión · datos de HH:MM:SS" instead of clearing the screen). Dark, high-contrast palette, fullscreen button, and a screen wake lock so the projector does not sleep.
+- The QR is the app's own origin (`/` is the game). `?join=https://...` overrides it (only http(s); `components/joinUrl.ts`, tested), for when the presenter opens it through an internal address.
+- Menu entry "Vista de presentador". Tests: `summary.test.ts`, `joinUrl.test.ts` (`CI=true npx react-scripts test --watchAll=false src/components`; `App.test.tsx` is the CRA boilerplate and has always failed).
+- Not checked in a real browser or projector: look at the first run (text size, contrast) before an event.
+
 ## Stats auth (`statServer` + `statClient`)
 
 The stats panel needs a login; before this, every `statServer` route was open.

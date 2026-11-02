@@ -21,6 +21,7 @@
     "axios": "^1.3.4",
     "dayjs": "^1.11.7",
     "manager-ui": "file:",
+    "qrcode.react": "^4.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.1",

@@ -6,6 +6,7 @@ import Configuracion from './components/configuracion';
 import Layout from './components/header';
 import Login from './components/Login';
 import QuestionPerformanceTable from './components/QuestionPerformanceTable';
+import Presenter from './components/Presenter';
 import { AuthProvider, RequireAuth } from './auth/AuthContext';
 
 const Protected = ({ children }: { children: React.ReactElement }) => (
@@ -23,6 +24,7 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Protected><EnhancedTable /></Protected>} />
+            <Route path="/presenter" element={<RequireAuth><Presenter /></RequireAuth>} />
             <Route path="/questions_perf" element={<Protected><QuestionPerformanceTable /></Protected>} />
             <Route path="/configuration" element={<Protected><Configuracion /></Protected>} />
             <Route path="*" element={<Protected><NotFound /></Protected>} />
