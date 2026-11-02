@@ -31,18 +31,18 @@ Data flow: `client` → `server` (`/api/*`) → MySQL ← `statServer` (`/album_
 ## Environment variables (names only; never commit values)
 
 - `server/.env`: `DB_HOST`, `DB_USER`, `DB_PWD`, `DB_NAME`, `PORT` (default 5006), `SERVER_PATH` (route prefix), `CAPTCHA_SECRET` (empty disables the reCAPTCHA check), `CAPTCHA_API` (verify URL), `GAME_MODE` (`solo` | `coop` | `both`, default `both`; see Game mode below), `QUESTION_SET` (name of the question set to play, default `default`; see Question sets below). Heroku uses `JAWSDB_MARIA_URL`, which overrides the `DB_*` vars.
-- `client/` (`local.env`, `production.env`, and a `.env`): `REACT_APP_API` (API base URL), `CAPTCHAKEY` (public reCAPTCHA v3 key).
+- `client/` (`local.env`, `production.env`, and a `.env`): `REACT_APP_API` (API base URL), `REACT_APP_CAPTCHAKEY` (public reCAPTCHA v3 site key, read at build time by `captcha.ts`; without it there is no captcha).
 - `server/` also: `STATS_USER`, `STATS_PASSWORD`, `STATS_TOKEN_SECRET` (≥32 chars), `STATS_TOKEN_TTL_HOURS` (default 8) enable the stats panel (see Single app); `STATS_UI_DIR` (folder of the built panel, default `statClient/build`), `STATS_TZ_OFFSET_MS` (default -18000000, UTC-5; how "by day" is grouped in the ranking).
 - `statServer/` (legacy, cPanel): `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin), `QUESTION_SET` (must match the game server), `STATS_USER` / `STATS_PASSWORD` (admin credentials, required), `STATS_TOKEN_SECRET` (≥32 chars, required), `STATS_TOKEN_TTL_HOURS` (default 8). The server refuses to start without the required three (see Stats auth).
 - `statClient/`: `REACT_APP_API_URL` (defaults to the production stats URL).
 
-Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `.gitignore` lists it, so it was probably tracked before being ignored.
+Note: `client/production.env` is committed and holds `REACT_APP_CAPTCHAKEY`, the reCAPTCHA **site** key: it is public by design (it was written in the client code until 2024). CRA does not load `production.env` or `local.env` by itself: they are templates to copy to `client/.env` (or `.env.production`) before `npm run build`. **If the server has `CAPTCHA_SECRET`, build the client with the key**: since PR #130 the code read `process.env.CAPTCHAKEY`, which CRA never exposes (only `REACT_APP_*`), so a client built without `REACT_APP_CAPTCHAKEY` sends no token and every request gets a 403. The middleware in `models/recaptcha.ts` returns 403 without a token (it used to crash the server); the server logs at startup whether reCAPTCHA is required.
 
 ## `server/src`
 
 - `app.ts`: loads dotenv, starts `Server`, handles SIGTERM.
 - `models/server.ts`: `Server` class. Middlewares: cors, json, express-useragent, `recaptcha`. Mounts all routers under `${SERVER_PATH}/api`. Serves `../../../client/build` statically, with a `*` fallback to `index.html`.
-- `models/recaptcha.ts`: validates the `g-recaptcha-response` header on GET/POST against Google. Results are memoized (`memoizee`). Responds 403 on failure. Skipped when `CAPTCHA_SECRET` is unset.
+- `models/recaptcha.ts`: validates the `g-recaptcha-response` header on GET/POST against Google. Results are memoized (`memoizee`). Responds 403 on failure. Skipped when `CAPTCHA_SECRET` is unset. It is mounted only on `${SERVER_PATH}/api` (after `/api/config` and `/api/stats`, which have their own rules): the pages (the game at `/`, the stats panel at `/stats`) are plain files that a browser requests without the header, and when it covered everything they got a 403 with `CAPTCHA_SECRET` set.
 - `models/gameMode.ts`: parses `GAME_MODE` (`getGameMode`, `isModeAllowed`), tested in `gameMode.spec.ts`. `routes/config.ts` serves `GET /api/config` → `{ gameMode }`. It is mounted before the recaptcha middleware because the client reads it before it has a captcha token.
 - `models/groupQuery.ts`: `buildOpenGroupsQuery()`, the SQL that picks the team for a new coop player (oldest `modified_on` first, ties by smaller team then id, max 20 members), tested in `groupQuery.spec.ts`. A missing `+` between its string pieces once dropped the `ORDER BY`/`LIMIT`, so new players always went to the alphabetically first team.
 - `models/questionSet.ts`: parses `QUESTION_SET` (`getQuestionSet`, falls back to `default`), tested in `questionSet.spec.ts`. `routes/questionRouter.ts` filters by it.
@@ -62,7 +62,7 @@ Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `
 
 ## `client/src`
 
-- `index.tsx`: Redux `Provider`, optional `GoogleReCaptchaProvider` (when `CAPTCHAKEY` is set), `./i18n`.
+- `index.tsx`: Redux `Provider`, optional `GoogleReCaptchaProvider` (when `REACT_APP_CAPTCHAKEY` is set), `./i18n`.
 - `App.tsx` routes: `/` AlbumIntroView (register/continue), `/album` AlbumView, `/quest` QuestionView, `/players` PlayerView (team and leader).
 - `app/store.ts`: a single `game` reducer. `app/hooks.ts`: typed hooks.
 - `components/`: AlbumIntroView, AlbumView, QuestionView, PlayerView, StickerView, Gauge (progress), Header, ToggleLang (es/en).

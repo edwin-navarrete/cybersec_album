@@ -24,6 +24,10 @@ export class Server {
     if (isInvalidQuestionSet()) {
       console.warn(`Invalid QUESTION_SET '${process.env.QUESTION_SET}', use letters, numbers, '_', '-' or '.' (max 50). Using 'default'`)
     }
+    console.log('reCAPTCHA:', process.env.CAPTCHA_SECRET ? 'required (CAPTCHA_SECRET is set)' : 'not required (CAPTCHA_SECRET is empty)')
+    if (process.env.CAPTCHA_SECRET && !process.env.CAPTCHA_API) {
+      console.warn('CAPTCHA_SECRET is set but CAPTCHA_API is not: no token can be verified, every request will be rejected')
+    }
     console.log('Question set:', getQuestionSet())
     const stats = tryLoadAuthConfig()
     this.statsAuth = stats.config
@@ -54,7 +58,9 @@ export class Server {
     if (this.statsAuth) {
       this.app.use(`${process.env.SERVER_PATH}/api/stats`, createStatsRouter(this.statsAuth))
     }
-    this.app.use(recaptcha)
+    // Only the API needs a captcha token: the pages (the game at / and the stats panel at /stats) are
+    // plain files that a browser asks for without any custom header, so they must not go through it.
+    this.app.use(`${process.env.SERVER_PATH}/api`, recaptcha)
   }
 
   // The stats panel (statClient build) lives under /stats, same origin as the game

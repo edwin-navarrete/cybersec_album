@@ -10,10 +10,11 @@ import './index.css';
 import './i18n';
 import { savedLanguage } from './i18n';
 import { changeLanguage, fetchConfig } from './features/game/gameMiddleware';
+import { getCaptchaKey } from './captcha';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
-const captchaKey = process.env.CAPTCHAKEY;
+const captchaKey = getCaptchaKey();
 
 store.dispatch(fetchConfig());
 
