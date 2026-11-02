@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Box, Typography } from '@mui/material';
 import { Dayjs } from 'dayjs';
-import { DateFilter, Page, QueryState, SearchBox, toApiDate, useApiData } from './common';
+import { DateFilter, DownloadButton, Page, QueryState, SearchBox, toApiDate, useApiData } from './common';
 
 interface IQuestionData {
   questionId: number;
@@ -55,6 +55,7 @@ export default function QuestionPerformanceTable() {
           <SearchBox value={search} onChange={setSearch} placeholder="Buscar pregunta" />
           <DateFilter label="Desde" value={since} onChange={setSince} />
           <DateFilter label="Hasta" value={to} onChange={setTo} />
+          <DownloadButton path="/export/questions.csv" params={{ since: toApiDate(since), to: toApiDate(to) }} disabled={loading || !!error} />
         </>
       }
     >

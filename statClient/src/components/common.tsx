@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Box, Button, CircularProgress, IconButton, InputAdornment, TextField } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
+import DownloadIcon from '@mui/icons-material/Download';
 import ClearIcon from '@mui/icons-material/Clear';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -72,6 +73,45 @@ export function QueryState({ loading, error, empty, onRetry, emptyText = 'No hay
   if (error) return <Alert severity="error" action={<Button color="inherit" size="small" onClick={onRetry}>Reintentar</Button>} sx={{ m: 2 }}>{error}</Alert>;
   if (empty) return <Alert severity="info" sx={{ m: 2 }}>{emptyText}</Alert>;
   return null;
+}
+
+/** Descarga un CSV del servidor con el token de la sesión y los filtros activos. */
+export function DownloadButton({ path, params, disabled }: { path: string; params: Record<string, string | undefined>; disabled?: boolean }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const download = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const clean = Object.fromEntries(Object.entries(params).filter(([, v]) => v));
+      const res = await api.get<Blob>(path, { params: clean, responseType: 'blob' });
+      const name = /filename="([^"]+)"/.exec(String(res.headers['content-disposition'] ?? ''))?.[1] ?? 'estadisticas.csv';
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Tooltip title={error || 'Descargar los datos filtrados en CSV (se abre en Excel)'}>
+      <span>
+        <Button variant="outlined" size="small" color={error ? 'error' : 'primary'} onClick={download} disabled={busy || disabled}
+          startIcon={busy ? <CircularProgress size={16} /> : <DownloadIcon />}>
+          {error ? 'Reintentar descarga' : 'CSV'}
+        </Button>
+      </span>
+    </Tooltip>
+  );
 }
 
 export const toApiDate = (d: Dayjs | null) => (d ? d.format('YYYY-MM-DD') : undefined);

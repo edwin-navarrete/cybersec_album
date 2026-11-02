@@ -2,7 +2,7 @@ import db from '../controllers/mysqlDriver'
 import { getQuestionSet } from '../models/questionSet'
 
 // Offset horario con el que se agrupa "por día" (antes fijo en -18000000, UTC-5).
-const TZ_OFFSET_MS = Number(process.env.STATS_TZ_OFFSET_MS ?? -18000000) || 0
+export const TZ_OFFSET_MS = Number(process.env.STATS_TZ_OFFSET_MS ?? -18000000) || 0
 
 export interface RankingRow {
   started_on: number

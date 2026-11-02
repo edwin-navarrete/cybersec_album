@@ -6,7 +6,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { Dayjs } from 'dayjs';
-import { DateFilter, Page, QueryState, SearchBox, toApiDate, useApiData } from './common';
+import { DateFilter, DownloadButton, Page, QueryState, SearchBox, toApiDate, useApiData } from './common';
 
 interface IData {
   is_group: number;
@@ -92,6 +92,7 @@ export default function RankingTable() {
         <>
           <SearchBox value={search} onChange={setSearch} placeholder="Buscar jugador" />
           <DateFilter label="Fecha" value={date} onChange={setDate} />
+          <DownloadButton path="/export/ranking.csv" params={{ date: toApiDate(date), mode }} disabled={loading || !!error} />
           <ToggleButtonGroup value={mode} exclusive size="small" aria-label="Modo de juego"
             onChange={(_, m: Mode | null) => m && setMode(m)}>
             <ToggleButton value="general">General</ToggleButton>
