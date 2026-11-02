@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
-  Chip, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel,
+  Box, Chip, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel,
   ToggleButton, ToggleButtonGroup, Tooltip,
 } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -35,6 +35,16 @@ const COLUMNS: { key: SortKey; label: string; align: 'left' | 'center'; hint?: s
   { key: 'started_on', label: 'Inicio', align: 'left', hint: 'Fecha y hora de inicio' },
 ];
 
+function StatCard({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  return (
+    <Paper variant="outlined" sx={{ flex: '1 1 150px', p: 1.5 }}>
+      <Typography variant="caption" color="text.secondary">{label}</Typography>
+      <Typography variant="h5" fontWeight="bold" lineHeight={1.2}>{value}</Typography>
+      <Typography variant="caption" color="text.secondary">{detail ?? '\u00A0'}</Typography>
+    </Paper>
+  );
+}
+
 export default function RankingTable() {
   const [date, setDate] = useState<Dayjs | null>(null);
   const [mode, setMode] = useState<Mode>('general');
@@ -43,6 +53,21 @@ export default function RankingTable() {
   const [sort, setSort] = useState<{ key: SortKey; dir: 'asc' | 'desc' }>({ key: 'rank', dir: 'asc' });
 
   const { data, loading, error, reload } = useApiData<IData>('/ranking', { date: toApiDate(date) });
+
+  // Resumen del modo y la fecha elegidos (sin la búsqueda: es un resumen del evento, no de la lista).
+  const summary = useMemo(() => {
+    const scope = data.filter((r) => mode === 'general' || (mode === 'group') === (r.is_group === 1));
+    // Quien no ha respondido nada trae null en respondidas/errores.
+    const answered = scope.reduce((n, r) => n + (Number(r.answered) || 0), 0);
+    const errors = scope.reduce((n, r) => n + (Number(r.number_errors) || 0), 0);
+    const finished = scope.filter((r) => r.finished).length;
+    return {
+      total: scope.length,
+      finished,
+      answered,
+      success: answered > 0 ? Math.round((1 - errors / answered) * 100) : null,
+    };
+  }, [data, mode]);
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -76,6 +101,16 @@ export default function RankingTable() {
         </>
       }
     >
+      {!loading && !error && summary.total > 0 && (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, mb: 2, flexShrink: 0 }}>
+          <StatCard label="Participantes" value={String(summary.total)} />
+          <StatCard label="Álbumes completados" value={String(summary.finished)}
+            detail={`${Math.round((summary.finished / summary.total) * 100)} % de los participantes`} />
+          <StatCard label="Preguntas respondidas" value={String(summary.answered)} />
+          <StatCard label="Tasa de éxito" value={summary.success === null ? '—' : `${summary.success} %`}
+            detail="aciertos sobre preguntas respondidas" />
+        </Box>
+      )}
       <TableContainer component={Paper} sx={{ flex: 1, minHeight: 0 }}>
         <Table size="small" aria-label="Tabla de clasificación" stickyHeader>
           <TableHead>

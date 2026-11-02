@@ -157,7 +157,7 @@ The stats panel needs a login; before this, every `statServer` route was open.
 
 ## `statClient/src`
 
-`App.tsx` routes: `/login`, and behind `RequireAuth` + `Layout` (`components/header.tsx`: app bar, drawer with `NavLink`s, logout): `/` ranking table (`components/table.tsx`), `/questions_perf` (`QuestionPerformanceTable.tsx`), `/configuration` (placeholder). `components/common.tsx` has `useApiData` (loading/error/retry), `DateFilter`, `SearchBox`, `QueryState`, `Page`. Tables sort by column, search by text, and filter by date in the API (`YYYY-MM-DD`). UI text is Spanish.
+`App.tsx` routes: `/login`, and behind `RequireAuth` + `Layout` (`components/header.tsx`: app bar, drawer with `NavLink`s, logout): `/` ranking table (`components/table.tsx`), `/questions_perf` (`QuestionPerformanceTable.tsx`), `/configuration` (placeholder). `components/common.tsx` has `useApiData` (loading/error/retry), `DateFilter`, `SearchBox`, `QueryState`, `Page`. The ranking shows summary cards (participants, completed albums, answered questions, success rate) computed in the browser from the ranking rows for the chosen mode/date; players with no answers come with `null` counts, read as 0. Tables sort by column, search by text, and filter by date in the API (`YYYY-MM-DD`). UI text is Spanish.
 
 ## Deployment
 
