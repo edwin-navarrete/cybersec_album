@@ -1,7 +1,7 @@
 // get the client
 import mysql from 'mysql2/promise'
 import { Fetch, Insert } from './DBDriver'
-import { URL } from 'url';
+import { connectionOptionsFromEnv, describeDbSource } from '../models/dbOptions'
 
 class MySQLDriver {
   // create the connection to database
@@ -68,28 +68,7 @@ class MySQLDriver {
   }
 }
 
-const connOpts: mysql.ConnectionOptions = {
-  connectionLimit: 10
-}
-
-const jawsdbUrl = process.env.JAWSDB_MARIA_URL;
-
-if(jawsdbUrl){
-  const parsedUrl = new URL(jawsdbUrl);
-  console.log('JAWSDB_MARIA_URL',parsedUrl.hostname);
-  connOpts.user = parsedUrl.username;  
-  connOpts.password = parsedUrl.password;  
-  connOpts.host = parsedUrl.hostname;  
-  connOpts.port = Number(parsedUrl.port) || 3306;  
-  connOpts.database = parsedUrl.pathname.split('/')[1]; 
-
-}
-else {
-  connOpts.user = process.env.DB_USER;
-  connOpts.password = process.env.DB_PWD;
-  connOpts.host = process.env.DB_HOST;
-  connOpts.port = 3306;
-  connOpts.database = process.env.DB_NAME;
-}
+const connOpts = connectionOptionsFromEnv()
+console.log('Database:', describeDbSource())
 
 export default new MySQLDriver(connOpts);

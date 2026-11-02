@@ -180,7 +180,8 @@ The stats panel needs a login; before this, every `statServer` route was open.
 
 ## Deployment
 
-- Heroku: root `Procfile` plus `heroku-postbuild`. Uses a JawsDB MariaDB add-on. The README has the exact commands.
+- Heroku (one app per event, see `tools/evento.sh`): root `Procfile` plus `heroku-postbuild` (builds `client`, `statClient` under `/stats`, and `server`). The database is the **JawsDB MySQL** add-on, which publishes `JAWSDB_URL`; the schema needs MySQL 8. `models/dbOptions.ts` reads `JAWSDB_MARIA_URL` first (so an existing MariaDB deployment does not change), then `JAWSDB_URL`, then `DB_*`. `SERVER_PATH` unset now means the root (`models/serverPath.ts`); before, it mounted the routes at `undefined/api`.
+- **Event lifecycle** (`tools/evento.sh`, needs the `heroku` CLI logged in plus `mysql`/`mysqldump`): `crear <app>` makes the app and the JawsDB add-on, sets `STATS_*`, `GAME_MODE` and `QUESTION_SET`, loads `db_schema/ssolucio_cyberalbum.sql` (it refuses if the DB already has tables, because the schema does `DROP TABLE`), pushes a ref, sets the dyno type and smoke-tests it; `exportar <app>` downloads the two CSV and a `mysqldump` into `eventos/<app>-<date>/` (git-ignored: it has player names); `destruir <app>` exports, asks to type the app name, and destroys it; `estado <app>`. `--dry-run` prints the commands without running them. A set other than `default` needs `db_schema/themes/<set>_questions.sql`. **Not yet run against a real Heroku account**: it was checked with `--dry-run`, `exportar` against a local server, and the schema load on an empty MySQL 8; verify the JawsDB plan names with `heroku addons:plans jawsdb`.
 - cPanel: `client/` and `statClient/` are built for `4ssoluciones.com` (`/album_api`, `/album_stats`), and `statClient/build` is committed.
 
 ## Known quirks and gotchas

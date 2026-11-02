@@ -8,6 +8,7 @@ import { AuthConfig, tryLoadAuthConfig } from '../stats/auth'
 import { createStatsRouter } from '../routes/stats'
 import { getGameMode, isInvalidGameMode } from './gameMode'
 import { getQuestionSet, isInvalidQuestionSet } from './questionSet'
+import { getServerPath } from './serverPath'
 
 export class Server {
   port: string | undefined
@@ -53,14 +54,14 @@ export class Server {
     this.app.use(express.json())
     this.app.use(useragent.express())
     // Before recaptcha: the client needs this before it has a captcha token
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/config'))
+    this.app.use(`${getServerPath()}/api`, require('../routes/config'))
     // Stats have their own login, so they go before recaptcha too (the presenter's browser has no captcha token)
     if (this.statsAuth) {
-      this.app.use(`${process.env.SERVER_PATH}/api/stats`, createStatsRouter(this.statsAuth))
+      this.app.use(`${getServerPath()}/api/stats`, createStatsRouter(this.statsAuth))
     }
     // Only the API needs a captcha token: the pages (the game at / and the stats panel at /stats) are
     // plain files that a browser asks for without any custom header, so they must not go through it.
-    this.app.use(`${process.env.SERVER_PATH}/api`, recaptcha)
+    this.app.use(`${getServerPath()}/api`, recaptcha)
   }
 
   // The stats panel (statClient build) lives under /stats, same origin as the game
@@ -71,18 +72,18 @@ export class Server {
       console.warn(`Stats panel not built (${build}); only the stats API is served`)
       return
     }
-    const base = `${process.env.SERVER_PATH}/stats`
+    const base = `${getServerPath()}/stats`
     this.app.use(base, express.static(build))
     this.app.get(`${base}/*`, (req, res) => res.sendFile(path.join(build, 'index.html')))
   }
 
   // Bind controllers to routes
   routes () {
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userSticker'))
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/userAnswer'))
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/album'))
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/questionRouter'))
-    this.app.use(`${process.env.SERVER_PATH}/api`, require('../routes/player'))
+    this.app.use(`${getServerPath()}/api`, require('../routes/userSticker'))
+    this.app.use(`${getServerPath()}/api`, require('../routes/userAnswer'))
+    this.app.use(`${getServerPath()}/api`, require('../routes/album'))
+    this.app.use(`${getServerPath()}/api`, require('../routes/questionRouter'))
+    this.app.use(`${getServerPath()}/api`, require('../routes/player'))
   }
 
   listen () {
