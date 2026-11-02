@@ -44,3 +44,6 @@ client/build
 
 # Playwright MCP artifacts
 .playwright-mcp/
+
+# Resultados exportados de cada evento (tienen nombres de jugadores)
+eventos/

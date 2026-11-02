@@ -119,3 +119,16 @@ REACT_APP_CAPTCHAKEY=
 ```
 * REACT_APP_API URL donde se encuentra el servidor
 * REACT_APP_CAPTCHAKEY La llave pública (la del sitio) de reCAPTCHA asignada por Google. **Si el servidor tiene configurada `CAPTCHA_SECRET`, el cliente debe compilarse con esta llave**: sin ella no envía el token y el servidor rechaza todas las peticiones (403). Sin llave no hay captcha, que es como se desarrolla. El nombre debe empezar por `REACT_APP_`: Create React App solo entrega al navegador las variables con ese prefijo, y una llamada `CAPTCHAKEY` (como se llamaba antes) llega siempre vacía. Las variables se leen al **compilar**: hay que definirlas en `client/.env` (o `.env.production`) antes de `npm run build`; `production.env` y `local.env` son plantillas que CRA no carga solas.
+
+## Despliegue de un evento (Heroku)
+
+El juego y las estadísticas salen de una sola app: los jugadores entran por `/` y el presentador por `/stats` (la pantalla para el proyector está en `/stats/presenter`). Un evento = una app y una base de datos de Heroku, que se destruyen al terminar.
+
+```
+tools/evento.sh crear <app> [--set default] [--mode both] [--dyno basic]   # crea, carga la BD, despliega y comprueba
+tools/evento.sh estado <app>                                                # URLs, dynos y add-ons
+tools/evento.sh exportar <app>                                              # CSV + respaldo SQL en eventos/<app>-<fecha>/
+tools/evento.sh destruir <app>                                              # exporta, confirma y destruye la app y su BD
+```
+
+Al crear se imprime la URL del juego (la que se comparte), la del panel y el usuario/contraseña del panel (se muestra una sola vez). Añade `--dry-run` a cualquier comando para ver lo que haría sin ejecutarlo. Requiere la CLI de `heroku` con sesión iniciada y el cliente de `mysql`. **Los datos se van con la app: `destruir` los exporta antes (puedes saltarlo con `--sin-exportar`).** Un dyno `eco` se duerme, por eso el valor por defecto es `basic`; para eventos grandes usa un plan de pago de JawsDB (`--db-plan`, mira `heroku addons:plans jawsdb`).
