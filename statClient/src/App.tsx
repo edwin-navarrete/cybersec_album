@@ -18,7 +18,7 @@ export default function App() {
   return (
     <>
       <CssBaseline />
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
