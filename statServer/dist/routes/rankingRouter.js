@@ -49,7 +49,7 @@ rankingRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ errorMessage: error });
+        return res.status(500).json({ errorMessage: "Error interno" });
     }
 }));
 //# sourceMappingURL=rankingRouter.js.map

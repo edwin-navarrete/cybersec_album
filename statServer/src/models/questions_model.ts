@@ -40,7 +40,8 @@ import { getQuestionSet } from "./question_set";
             FROM question q
             LEFT JOIN vw_user_answer ua ON q.question_id = ua.question_id
             WHERE
-                q.question_set = ${db.escape(getQuestionSet())}
+                q.lang = 'es' -- una fila por pregunta: el texto en español (las demás lenguas son traducciones)
+                AND q.question_set = ${db.escape(getQuestionSet())}
                 AND ua.answered_on BETWEEN UNIX_TIMESTAMP("${since}")*1000 AND UNIX_TIMESTAMP("${to}")*1000
             GROUP BY q.question_id, q.question
             ORDER BY avgLatency DESC;

@@ -32,7 +32,7 @@ Data flow: `client` → `server` (`/api/*`) → MySQL ← `statServer` (`/album_
 
 - `server/.env`: `DB_HOST`, `DB_USER`, `DB_PWD`, `DB_NAME`, `PORT` (default 5006), `SERVER_PATH` (route prefix), `CAPTCHA_SECRET` (empty disables the reCAPTCHA check), `CAPTCHA_API` (verify URL), `GAME_MODE` (`solo` | `coop` | `both`, default `both`; see Game mode below), `QUESTION_SET` (name of the question set to play, default `default`; see Question sets below). Heroku uses `JAWSDB_MARIA_URL`, which overrides the `DB_*` vars.
 - `client/` (`local.env`, `production.env`, and a `.env`): `REACT_APP_API` (API base URL), `CAPTCHAKEY` (public reCAPTCHA v3 key).
-- `statServer/`: `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin), `QUESTION_SET` (must match the game server).
+- `statServer/`: `DB_*`, `PORT`, `SERVER_PATH`, `UI_URL` (CORS origin), `QUESTION_SET` (must match the game server), `STATS_USER` / `STATS_PASSWORD` (admin credentials, required), `STATS_TOKEN_SECRET` (≥32 chars, required), `STATS_TOKEN_TTL_HOURS` (default 8). The server refuses to start without the required three (see Stats auth).
 - `statClient/`: `REACT_APP_API_URL` (defaults to the production stats URL).
 
 Note: `client/production.env` is committed and contains a `CAPTCHA_KEY` entry. `.gitignore` lists it, so it was probably tracked before being ignored.
@@ -145,11 +145,19 @@ The alias (`player.player_name`) identifies the player in the ranking and for th
 
 ## `statServer/src`
 
-`app.ts` mounts `${SERVER_PATH}/album`, `/user`, `/ranking`, `/questions`. `db.ts` uses a single mysql2 connection (not a pool). `models/` holds the SQL: `ranking_model` (ranking by date, with a hard-coded UTC-5 offset `-18000000`), `questions_model` (per-question attempts, success rate, average latency, filtered by `since`/`to`), `album`, `questions_answered`, `user_answer_model`. `types/` holds the interfaces. `routes/commonRoutes.ts` has `sanitizeDate` (accepts DD/MM/YYYY or YYYY-MM-DD). `ranking_model` interpolates `date` into SQL, but it is sanitized first.
+`app.ts` mounts `${SERVER_PATH}/album`, `/user`, `/ranking`, `/questions`. `db.ts` uses a single mysql2 connection (not a pool). `models/` holds the SQL: `ranking_model` (ranking by date, with a hard-coded UTC-5 offset `-18000000`), `questions_model` (per-question attempts, success rate, average latency, filtered by `since`/`to`; one row per question, with the Spanish text (`q.lang = 'es'`), since `question` has one row per language), `album`, `questions_answered`, `user_answer_model`. `types/` holds the interfaces. `routes/commonRoutes.ts` has `sanitizeDate` (accepts DD/MM/YYYY or YYYY-MM-DD). `ranking_model` interpolates `date` into SQL, but it is sanitized first.
+
+## Stats auth (`statServer` + `statClient`)
+
+The stats panel needs a login; before this, every `statServer` route was open.
+- Server: `models/auth.ts` (credentials from env, constant-time compare, HMAC-SHA256 token `payload.signature` with `exp`, in-memory `LoginLimiter`: 5 failures per IP in 15 min → 429), `middleware/requireAuth.ts` (Bearer token), `routes/authRouter.ts` (`POST /auth/login`, `GET /auth/me`). `album`, `user`, `ranking`, `questions` sit behind `requireAuth`; `/auth` does not. `app.set("trust proxy", 1)` so the limiter sees the real IP behind cPanel/Heroku. 500 responses no longer echo the internal error.
+- Client: `auth/api.ts` (axios instance adding the token, session in `sessionStorage`, 401 → logout), `auth/AuthContext.tsx` (`AuthProvider`, `RequireAuth`, auto-logout at expiry), `components/Login.tsx`.
+- Limits: a single shared admin account, and tokens cannot be revoked before they expire (changing `STATS_TOKEN_SECRET` invalidates all). The limiter is per process (it resets on restart). Serve it over HTTPS.
+- `dist/` and `statClient/build/` are committed; rebuild both before deploying.
 
 ## `statClient/src`
 
-`App.tsx` routes: `/` ranking table (`components/table.tsx`), `/questions_perf` (`QuestionPerformanceTable.tsx`), `/configuration`. UI text is Spanish.
+`App.tsx` routes: `/login`, and behind `RequireAuth` + `Layout` (`components/header.tsx`: app bar, drawer with `NavLink`s, logout): `/` ranking table (`components/table.tsx`), `/questions_perf` (`QuestionPerformanceTable.tsx`), `/configuration` (placeholder). `components/common.tsx` has `useApiData` (loading/error/retry), `DateFilter`, `SearchBox`, `QueryState`, `Page`. The ranking shows summary cards (participants, completed albums, answered questions, success rate) computed in the browser from the ranking rows for the chosen mode/date; players with no answers come with `null` counts, read as 0. Tables sort by column, search by text, and filter by date in the API (`YYYY-MM-DD`). UI text is Spanish.
 
 ## Deployment
 

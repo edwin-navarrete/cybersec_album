@@ -1,16 +1,10 @@
-import React from 'react';
+import { Alert } from '@mui/material';
+import { Page } from './common';
 
-const loadingImage = "https://media.tenor.com/to0k0Ly8tDQAAAAi/busy-cat.gif"
-
-function Loading() {
+export default function Configuracion() {
   return (
-    <>
-        
-    
-        <h1>Estamos trabajando</h1>
-      <img src={loadingImage} alt="Loading..." />
-      </>
+    <Page title="Configuración">
+      <Alert severity="info">Esta sección aún no está disponible.</Alert>
+    </Page>
   );
 }
-
-export default Loading;

@@ -1,141 +1,64 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
+import { NavLink, useLocation } from 'react-router-dom';
+import {
+  AppBar, Box, Button, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import "../css/styles.css";
-import { styled, useTheme } from '@mui/material/styles';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import SettingsIcon from '@mui/icons-material/Settings';
 import BarChartIcon from '@mui/icons-material/BarChart';
-
-
+import QuizIcon from '@mui/icons-material/Quiz';
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
+import '../css/styles.css';
+import { useAuth } from '../auth/AuthContext';
 
 const drawerWidth = 240;
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
-  open?: boolean;
-}>(({ theme, open }) => ({
-  flexGrow: 1,
-  padding: theme.spacing(3),
-  transition: theme.transitions.create('margin', {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  }),
-}));
+const ITEMS = [
+  { to: '/', label: 'Tabla de clasificación', icon: <BarChartIcon /> },
+  { to: '/questions_perf', label: 'Desempeño de preguntas', icon: <QuizIcon /> },
+  { to: '/configuration', label: 'Configuración', icon: <SettingsIcon /> },
+];
 
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
-}
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})<AppBarProps>(({ theme, open }) => ({
-  transition: theme.transitions.create(['margin', 'width'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: `${drawerWidth}px`,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
-}));
-
-export default function Header() {
-  const theme = useTheme();
+/** Marco de la app autenticada: barra superior, menú lateral y contenido. */
+export default function Layout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const { session, logout } = useAuth();
+  const { pathname } = useLocation();
 
   return (
-    <Box>
-      <CssBaseline />
-      <AppBar position="static" open={open} className="navbar" >
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <AppBar position="static" className="navbar" sx={{ flexShrink: 0 }}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
-          >
+          <IconButton color="inherit" aria-label="Abrir menú" onClick={() => setOpen(true)} edge="start" sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
+          <Box sx={{ bgcolor: 'white', borderRadius: 1, px: 1, py: 0.25, display: 'flex', mr: 2 }}>
+            <img src={`${process.env.PUBLIC_URL}/logo.webp`} alt="4S Soluciones" height={36} />
+          </Box>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-          4S Soluciones | Administrador
+            Administrador
           </Typography>
+          {session && (
+            <>
+              <Typography variant="body2" sx={{ mr: 1, display: { xs: 'none', sm: 'block' } }}>{session.user}</Typography>
+              <Button color="inherit" startIcon={<LogoutIcon />} onClick={logout}>Salir</Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </DrawerHeader>
+      <Drawer open={open} onClose={() => setOpen(false)} sx={{ '& .MuiDrawer-paper': { width: drawerWidth } }}>
+        <Toolbar><Typography variant="subtitle1" fontWeight="bold">Estadísticas</Typography></Toolbar>
         <Divider />
         <List>
-        {['Tabla de Clasificación', 'Desempeño de Preguntas','Configuración'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton href={index === 0 ? '/' : index === 1 ? '/questions_perf' : '/configuration'}>
-              <ListItemIcon>
-                {index === 0 ? <BarChartIcon /> : index === 1 ? <BarChartIcon/> : <SettingsIcon/>}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+          {ITEMS.map((i) => (
+            <ListItemButton key={i.to} component={NavLink} to={i.to} selected={pathname === i.to} onClick={() => setOpen(false)}>
+              <ListItemIcon>{i.icon}</ListItemIcon>
+              <ListItemText primary={i.label} />
             </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+          ))}
+        </List>
       </Drawer>
+      <Box component="main" sx={{ flex: 1, minHeight: 0, overflow: 'auto', p: { xs: 1.5, sm: 3 } }}>{children}</Box>
     </Box>
   );
 }

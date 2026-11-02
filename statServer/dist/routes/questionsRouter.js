@@ -50,7 +50,7 @@ questionsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
     catch (error) {
         console.log(error);
-        return res.status(500).json({ errorMessage: error });
+        return res.status(500).json({ errorMessage: "Error interno" });
     }
 }));
 //# sourceMappingURL=questionsRouter.js.map
